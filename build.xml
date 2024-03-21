@@ -1,0 +1,92 @@
+<project name="build" default="build" basedir=".">
+    
+  <taskdef resource="PCT.properties" />
+  <taskdef resource="net/sf/antcontrib/antcontrib.properties"/>
+  <typedef resource="types.properties" />
+
+  <property environment="env"/>
+
+  <target name="build" depends="initvars,init">
+    <antcall target="compile" />
+    <antcall target="unittest" />
+    <antcall target="package" />
+  </target>
+
+  <target name="initvars">
+    <property name="srcdir" location="." />
+    <property name="rootdir" location="./../.." />
+    <property name="builddir" location="${rootdir}/build" />
+    <property name="DLC" value="${env.DLC}" />
+
+    <echo message="rootdir:          ${rootdir}" />
+    <echo message="srcdir:           ${srcdir}" />
+    <echo message="builddir:         ${builddir}" />
+    <echo message="executeUnittests: ${executeUnittests}" />
+    <echo message="DLC:              ${DLC}" />
+  </target>
+
+  <target name="init" unless="initialized">
+    <delete dir="${builddir}" failonerror="false" />
+    <mkdir dir="${builddir}" />     
+    <property name="initialized" value="true" />    
+  </target>
+  
+  <target name="compile" depends="initvars">
+    
+    <property name="dbdir" location="${builddir}/dbs/framework" />
+      
+    <mkdir dir="${builddir}/xref_out" />
+      
+    <PCTCompile destdir="${builddir}/rcode" dlchome="${DLC}" stopOnError="true" 
+        graphicalMode="false" forceCompile="true" MD5="true" 
+        keepXref="true" xrefDir="${builddir}/xref_out" 
+        requireFullKeywords="true" requireFullNames="true" requireFieldQualifiers="true">
+      
+      <propath>
+        <pathelement path="${srcdir}" />
+        <pathelement path="${srcdir}/lib/lang" />
+        <pathelement path="${DLC}/tty/OpenEdge.Core.pl" />
+        <pathelement path="${DLC}/tty/netlib/OpenEdge.Net.pl" />
+      </propath>
+      
+      <fileset dir="${srcdir}">
+        <include name="**/*.p" />
+        <include name="**/*.cls" />
+        <exclude name=".builder/**/*" />
+        <exclude name="devtools/**/*" />
+        <exclude name="sandbox/**/*" />
+        <exclude name="**/test-*.p" /> 
+      </fileset>
+      
+    </PCTCompile>
+  </target>
+
+  <target name="unittest" if="executeUnittests">
+
+    <!-- <copy file="${basedir}/results.template" tofile="${basedir}/results.xml" /> -->
+
+    <ABLUnit haltOnFailure="false" writeLog="true" dlchome="${DLC}">
+      <fileset dir="${srcdir}">
+        <include name="**/*_TC.cls" />
+        <include name="**/*_UT.cls" />
+      </fileset> 
+      <propath>
+        <pathelement path="${srcdir}" />
+        <pathelement path="${srcdir}/lib/lang" />
+        <pathelement path="${DLC}/tty/netlib/OpenEdge.Net.pl" />
+      </propath>
+    </ABLUnit>
+    
+    <!-- <copy file="${basedir}/results.xml" todir="${builddir}" /> -->
+    
+  </target>
+  
+  <target name="package">
+    <PCTLibrary destFile="${builddir}/weblib.pl" dlchome="${DLC}">
+      <fileset dir="${builddir}/rcode">
+        <include name="**/*.r" />
+      </fileset>
+    </PCTLibrary>
+  </target>
+  
+</project>
