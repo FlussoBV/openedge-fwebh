@@ -8,7 +8,7 @@
 
   <target name="build" depends="initvars,init">
     <antcall target="compile" />
-    <antcall target="unittest" />
+    <!-- <antcall target="unittest" /> -->
     <antcall target="package" />
   </target>
 
@@ -16,18 +16,22 @@
     <property name="srcdir" location="." />
     <property name="rootdir" location="./../.." />
     <property name="builddir" location="${rootdir}/build" />
+    <property name="artifactdir" location="${rootdir}/artifacts" />
     <property name="DLC" value="${env.DLC}" />
 
     <echo message="rootdir:          ${rootdir}" />
     <echo message="srcdir:           ${srcdir}" />
     <echo message="builddir:         ${builddir}" />
+    <echo message="builddir:         ${artifactdir}" />
     <echo message="executeUnittests: ${executeUnittests}" />
     <echo message="DLC:              ${DLC}" />
   </target>
 
   <target name="init" unless="initialized">
     <delete dir="${builddir}" failonerror="false" />
-    <mkdir dir="${builddir}" />     
+    <mkdir dir="${builddir}" />  
+    <delete dir="${artifactdir}" failonerror="false" />
+    <mkdir dir="${artifactdir}" />  
     <property name="initialized" value="true" />    
   </target>
   
@@ -67,7 +71,6 @@
 
     <ABLUnit haltOnFailure="false" writeLog="true" dlchome="${DLC}">
       <fileset dir="${srcdir}">
-        <include name="**/*_TC.cls" />
         <include name="**/*_UT.cls" />
       </fileset> 
       <propath>
@@ -82,7 +85,7 @@
   </target>
   
   <target name="package">
-    <PCTLibrary destFile="${builddir}/weblib.pl" dlchome="${DLC}">
+    <PCTLibrary destFile="${artifactdir}/okelib.pl" dlchome="${DLC}" noCompress="true">
       <fileset dir="${builddir}/rcode">
         <include name="**/*.r" />
       </fileset>

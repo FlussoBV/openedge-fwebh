@@ -1,0 +1,146 @@
+name: CI
+
+on:
+  push
+
+permissions:
+  contents: read
+  packages: read
+
+run-name: ci - ${{ github.event.head_commit.message }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    if: ${{ !contains(github.event.head_commit.message, '#wip') }}
+    strategy:
+      matrix:
+        version: [ 12.8.1 ]
+    steps:
+
+      - name: Login to registry
+        uses: docker/login-action@e92390c5fb421da1463c202d546fed0ec5c39f20  # v3.1.0
+        with:
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+
+      - name: Build Docker image name
+        env:
+          OPENEDGE_VERSION: "${{ matrix.version }}"
+          IMAGE_REF: "devbfvio/openedge-compiler"       
+          EXECUTE_UNITTESTS: "true"      
+        run: |
+          set -x
+          echo "OPENEDGE_VERSION=${OPENEDGE_VERSION}" >> $GITHUB_ENV
+          echo "IMAGE_NAME=${IMAGE_REF}:${OPENEDGE_VERSION}" >> $GITHUB_ENV
+          echo "EXECUTE_UNITTESTS=${EXECUTE_UNITTESTS}" >> $GITHUB_ENV
+          
+      - name: Docker pull image
+        run: |
+          docker pull ${IMAGE_NAME}
+
+      - name: Checkout
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11  # v4.1.1
+        with:
+          path: src/okelib
+
+      - name: License unpack 1  # get the flattened minor version 12.2.10 --> 122
+        run: |
+          mkdir license
+          a=${{matrix.version}} 
+          echo matrix.version: $a
+          flatversion=`echo ${a%\.*} | sed "s/\.//g"`
+          echo flattened minor version: $flatversion
+          echo "FLATVERSION=${flatversion}" >> $GITHUB_ENV
+
+      - name: License unpack 2  # get progress.cfg from secret PROGRESS_CFG_12x
+        run: |
+          echo fetching progress.cfg from secret PROGRESS_CFG_${{env.FLATVERSION}}
+          echo "${{ secrets[format('PROGRESS_CFG_{0}', env.FLATVERSION)] }}" | base64 --decode > license/progress.cfg
+          ls -l license | grep -v '^total'
+
+      - name: Build
+        run: | 
+          set -x
+          mkdir artifacts
+          ls -l ${PWD}/license/
+          docker run -v ${PWD}/src:/app/src -v ${PWD}/artifacts:/app/artifacts -v ${PWD}/license/progress.cfg:/usr/dlc/progress.cfg --env ANT_HOME=/usr/dlc/ant --env EXECUTE_UNITTESTS=${EXECUTE_UNITTESTS} ${IMAGE_NAME} /app/src/okelib/scripts/build.sh
+          ls -l ${PWD}/artifacts 
+
+      # - name: Check Unit tests
+      #   run: | 
+      #     set -x
+      #     sudo apt install libxml2-utils --fix-missing
+      #     xmllint --xpath "//testcase[@status = 'Failure']/@name" ${PWD}/src/okelib/results.xml 2> /dev/null > ${PWD}/src/okelib/results.fails.txt
+      #     # ls -l ${PWD}/src/okelib
+      #     # cat ${PWD}/src/okelib/results.fails.txt
+      #     [ -s ${PWD}/src/okelib/results.fail.txt ] && cat results.fail.txt && echo -e
+      #     [ -s ${PWD}/src/okelib/results.fail.txt ] && echo -e *****************************************************************************************
+      #     [ -s ${PWD}/src/okelib/results.fail.txt ] && xmllint --xpath "//testcase[@status = 'Failure']"
+      #     [ -s ${PWD}/src/okelib/results.fail.txt ] && exit 42
+
+      # - name: Check unit tests
+      #   uses: bfv/ablunit-results@master
+      #   with:
+      #     file: ./src/okelib/results.xml
+
+      # - name: Copy extra files
+      #   run: |
+      #     set -x
+      #     cp ${PWD}/src/okelib/DockerfileArtifacts ${PWD}/artifacts
+      #     ls -l artifacts | grep -v '^total'
+
+      - name: Add Git info
+        run: |
+          echo "sha=${GITHUB_SHA}" > artifacts/version.git.info
+          echo "branch=${GITHUB_REF}" >> artifacts/version.git.info
+          echo "buildnr=${{ github.run_number }}" >> artifacts/version.git.info
+          echo "openedge=${{ env.OPENEDGE_VERSION }}" >> artifacts/version.git.info
+          cat artifacts/version.git.info
+
+      - name: Save build artifacts
+        uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3  # v4.3.1
+        with:
+          name: build-artifacts-${{ env.FLATVERSION }}.${{ github.run_number }}
+          path: artifacts/*
+          retention-days: 5
+
+      # - name: Copy sources for zipping
+      #   run: |
+      #     mkdir src-artifacts
+      #     cp -R ${PWD}/src/okelib/lib src-artifacts
+
+      # - name: Save sources
+      #   uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3  # v4.3.1
+      #   with:
+      #     name: okelib-sources
+      #     path: src-artifacts/*
+      #     retention-days: 10
+
+      # - name: Save unit test results
+      #   uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3  # v4.3.1
+      #   with:
+      #     name: results-xml-${{ env.FLATVERSION }}
+      #     path: ./src/okelib/results.xml
+      #     retention-days: 10
+
+#   push:
+#     runs-on: ubuntu-latest
+#     needs: [ build ]
+#     if: ${{ github.ref == 'refs/heads/master' && github.event_name == 'push' }} # Only run this workflow if it is master branch on push event
+#     steps:
+
+#       - uses: actions/download-artifact@9782bd6a9848b53b110e712e20e42d89988822b7  # v3.0.1
+#         with:
+#           name: build-artifacts
+#           path: .
+    
+#       - name: Build and push Docker image
+#         uses: docker/build-push-action@c56af957549030174b10d6867f20e78cfd7debc5  # v3.2.0
+#         with:
+#           context: ./
+#           file: ./DockerfileArtifacts
+#           push: true
+#           tags: docker.io/${{secrets.DOCKER_USERNAME}}/openedge-okelib:latest-dev
+#           #labels: ${{ steps.meta.outputs.labels }}
+
