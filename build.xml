@@ -51,7 +51,7 @@
       
       <propath>
         <pathelement path="${srcdir}" />
-        <pathelement path="${srcdir}/lib/lang" />
+        <pathelement path="${srcdir}/okelib/lang" />
         <pathelement path="${DLC}/tty/OpenEdge.Core.pl" />
         <pathelement path="${DLC}/tty/netlib/OpenEdge.Net.pl" />
       </propath>
