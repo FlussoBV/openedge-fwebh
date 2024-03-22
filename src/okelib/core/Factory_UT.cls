@@ -9,11 +9,12 @@
     Notes       : 
   ----------------------------------------------------------------------*/
 
+block-level on error undo, throw.
+
 using okelib.core.Factory.
 using okelib.core.IFactory.
 using OpenEdge.Core.Assert.
 
-block-level on error undo, throw.
 
 class okelib.core.Factory_UT: 
   
@@ -83,8 +84,8 @@ class okelib.core.Factory_UT:
     inst1 = {getinstance.i single as Factory from factory}.
     inst2 = {getinstance.i single as Factory from factory}.
     
-    Assert:Equals(inst1, inst2).
-    
+    //Assert:Equals(inst1, inst2).
+    Assert:Equals(true, false).
   end method.
 
   @Test(expected="Progress.Lang.SysError").  // = standard error (14284)

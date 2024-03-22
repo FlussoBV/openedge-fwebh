@@ -8,7 +8,7 @@
 
   <target name="build" depends="initvars,init">
     <antcall target="compile" />
-    <!-- <antcall target="unittest" /> -->
+    <antcall target="unittest" />
     <antcall target="package" />
   </target>
 
@@ -54,6 +54,7 @@
         <pathelement path="${srcdir}/okelib/lang" />
         <pathelement path="${DLC}/tty/OpenEdge.Core.pl" />
         <pathelement path="${DLC}/tty/netlib/OpenEdge.Net.pl" />
+        <pathelement path="${DLC}/tty/ablunit.pl" />
       </propath>
       
       <fileset dir="${srcdir}">
@@ -78,8 +79,10 @@
       </fileset> 
       <propath>
         <pathelement path="${srcdir}" />
-        <pathelement path="${srcdir}/lib/lang" />
+        <pathelement path="${srcdir}/okelib/lang" />
+        <pathelement path="${DLC}/tty/OpenEdge.Core.pl" />
         <pathelement path="${DLC}/tty/netlib/OpenEdge.Net.pl" />
+        <pathelement path="${DLC}/tty/ablunit.pl" />
       </propath>
     </ABLUnit>
     

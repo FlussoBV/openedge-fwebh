@@ -5,6 +5,7 @@ on:
     paths-ignore:
       - "doc/**"
       - "**.md"
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -68,24 +69,15 @@ jobs:
           mkdir artifacts
           ls -l ${PWD}/license/
           docker run -v ${PWD}/src:/app/src -v ${PWD}/artifacts:/app/artifacts -v ${PWD}/license/progress.cfg:/usr/dlc/progress.cfg --env ANT_HOME=/usr/dlc/ant --env EXECUTE_UNITTESTS=${EXECUTE_UNITTESTS} ${IMAGE_NAME} /app/src/okelib/scripts/build.sh
+          cp src/okelib/results.xml ${PWD}/artifacts
           ls -l ${PWD}/artifacts 
 
-      # - name: Check Unit tests
-      #   run: | 
-      #     set -x
-      #     sudo apt install libxml2-utils --fix-missing
-      #     xmllint --xpath "//testcase[@status = 'Failure']/@name" ${PWD}/src/okelib/results.xml 2> /dev/null > ${PWD}/src/okelib/results.fails.txt
-      #     # ls -l ${PWD}/src/okelib
-      #     # cat ${PWD}/src/okelib/results.fails.txt
-      #     [ -s ${PWD}/src/okelib/results.fail.txt ] && cat results.fail.txt && echo -e
-      #     [ -s ${PWD}/src/okelib/results.fail.txt ] && echo -e *****************************************************************************************
-      #     [ -s ${PWD}/src/okelib/results.fail.txt ] && xmllint --xpath "//testcase[@status = 'Failure']"
-      #     [ -s ${PWD}/src/okelib/results.fail.txt ] && exit 42
-
-      # - name: Check unit tests
-      #   uses: bfv/ablunit-results@master
-      #   with:
-      #     file: ./src/okelib/results.xml
+      - name: Check unit tests
+        uses: bfv/ablunit-results@master
+        with:
+          file: src/okelib/results.xml
+          fail-on-error: true
+          errors-only: true
 
       # - name: Copy extra files
       #   run: |
