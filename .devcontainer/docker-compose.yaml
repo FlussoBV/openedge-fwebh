@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+
+  devcontainer:
+    image: docker.io/devbfvio/openedge-devcontainer:12.8.0-rc1
+    volumes:
+      - ../..:/workspaces:cached
+      - ${LICENSE_FILE}:/usr/dlc/progress.cfg
+    ports:
+      - 3099:3099
+    command: sleep infinity
+
+    
