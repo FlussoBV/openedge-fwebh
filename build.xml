@@ -13,16 +13,18 @@
   </target>
 
   <target name="initvars">
-    <property name="srcdir" location="." />
+    <property name="srcdir" location="./src" />
     <property name="rootdir" location="./../.." />
     <property name="builddir" location="${rootdir}/build" />
     <property name="artifactdir" location="${rootdir}/artifacts" />
+    <property name="scriptsdir" location="${srcdir}/../scripts" />
     <property name="DLC" value="${env.DLC}" />
 
     <echo message="rootdir:          ${rootdir}" />
     <echo message="srcdir:           ${srcdir}" />
     <echo message="builddir:         ${builddir}" />
-    <echo message="builddir:         ${artifactdir}" />
+    <echo message="artifactdir:      ${artifactdir}" />
+    <echo message="scriptsdir:       ${scriptsdir}" />
     <echo message="executeUnittests: ${executeUnittests}" />
     <echo message="DLC:              ${DLC}" />
   </target>
@@ -44,7 +46,8 @@
     <PCTCompile destdir="${builddir}/rcode" dlchome="${DLC}" stopOnError="true" 
         graphicalMode="false" forceCompile="true" MD5="true" 
         keepXref="true" xrefDir="${builddir}/xref_out" 
-        requireFullKeywords="true" requireFullNames="true" requireFieldQualifiers="true">
+        requireFullKeywords="true" requireFullNames="true" requireFieldQualifiers="true"
+        paramfile="${scriptsdir}/build-ci.compile.pf">
       
       <propath>
         <pathelement path="${srcdir}" />
@@ -85,11 +88,20 @@
   </target>
   
   <target name="package">
-    <PCTLibrary destFile="${artifactdir}/okelib.pl" dlchome="${DLC}" noCompress="true">
+
+    <PCTLibrary destFile="${artifactdir}/okelib.pl" dlchome="${DLC}" noCompress="true"
+        cpInternal="utf-8" cpStream="utf-8">
       <fileset dir="${builddir}/rcode">
         <include name="**/*.r" />
       </fileset>
     </PCTLibrary>
+
+    <tar destfile="${artifactdir}/xref.tar.gz" compression="gzip" >
+      <fileset dir="${builddir}/xref_out">
+        <include name="**/*" />
+      </fileset>  
+    </tar>
+
   </target>
   
 </project>

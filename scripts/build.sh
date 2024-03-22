@@ -12,3 +12,5 @@ if [ "$EXECUTE_UNITTESTS" = "true" ]; then
 fi
 
 ${ANT_HOME}/bin/ant -f ${scriptpath}/../build.xml -lib /usr/dlc/pct ${unittestExpr}
+
+$DLC/bin/prolib /app/artifacts/okelib.pl -list > /app/artifacts/okelib-rcode.list

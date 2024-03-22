@@ -1,0 +1,7 @@
+
+-cpinternal  utf-8
+-cpstream    utf-8
+
+# prevent query side effects
+-noudfinwhere 
+-noroutineinwhere
