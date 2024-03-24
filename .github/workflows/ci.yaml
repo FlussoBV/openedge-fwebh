@@ -34,7 +34,6 @@ jobs:
           IMAGE_REF: "devbfvio/openedge-compiler"       
           EXECUTE_UNITTESTS: "true"      
         run: |
-          set -x
           echo "OPENEDGE_VERSION=${OPENEDGE_VERSION}" >> $GITHUB_ENV
           echo "IMAGE_NAME=${IMAGE_REF}:${OPENEDGE_VERSION}" >> $GITHUB_ENV
           echo "EXECUTE_UNITTESTS=${EXECUTE_UNITTESTS}" >> $GITHUB_ENV
@@ -65,7 +64,6 @@ jobs:
 
       - name: Build
         run: | 
-          set -x
           mkdir artifacts
           ls -l ${PWD}/license/
           docker run -v ${PWD}/src:/app/src -v ${PWD}/artifacts:/app/artifacts -v ${PWD}/license/progress.cfg:/usr/dlc/progress.cfg --env ANT_HOME=/usr/dlc/ant --env EXECUTE_UNITTESTS=${EXECUTE_UNITTESTS} ${IMAGE_NAME} /app/src/okelib/scripts/build.sh
@@ -73,15 +71,16 @@ jobs:
           ls -l ${PWD}/artifacts 
 
       - name: Check unit tests
-        uses: bfv/ablunit-results@master
+        uses: bfv/ablunit-results@f2240cbab5ae09ead8567ac91ed660943b2a2d9c  # v0.1.0
+        id: unit-tests
         with:
           file: src/okelib/results.xml
           fail-on-error: true
           errors-only: true
+          debug: false
 
       # - name: Copy extra files
       #   run: |
-      #     set -x
       #     cp ${PWD}/src/okelib/DockerfileArtifacts ${PWD}/artifacts
       #     ls -l artifacts | grep -v '^total'
 
