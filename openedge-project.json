@@ -8,7 +8,7 @@
     "buildPath": [
         { "type": "source", "path": "./src" },
         { "type": "propath", "path": "./src" },
-        { "type": "propath", "path": "./src/okelib/lang" },
+        { "type": "propath", "path": "./src/fwebh/lang" },
         { "type": "propath", "path": "${DLC}/tty/OpenEdge.Core.pl" },
         { "type": "propath", "path": "${DLC}/tty/netlib/OpenEdge.Net.pl" }
     ],

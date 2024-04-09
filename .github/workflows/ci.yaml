@@ -45,7 +45,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11  # v4.1.1
         with:
-          path: src/okelib
+          path: src/fwebh
 
       - name: License unpack 1  # get the flattened minor version 12.2.10 --> 122
         run: |
@@ -66,8 +66,8 @@ jobs:
         run: | 
           mkdir artifacts
           ls -l ${PWD}/license/
-          docker run -v ${PWD}/src:/app/src -v ${PWD}/artifacts:/app/artifacts -v ${PWD}/license/progress.cfg:/usr/dlc/progress.cfg --env ANT_HOME=/usr/dlc/ant --env EXECUTE_UNITTESTS=${EXECUTE_UNITTESTS} ${IMAGE_NAME} /app/src/okelib/scripts/build.sh
-          cp src/okelib/results.xml ${PWD}/artifacts
+          docker run -v ${PWD}/src:/app/src -v ${PWD}/artifacts:/app/artifacts -v ${PWD}/license/progress.cfg:/usr/dlc/progress.cfg --env ANT_HOME=/usr/dlc/ant --env EXECUTE_UNITTESTS=${EXECUTE_UNITTESTS} ${IMAGE_NAME} /app/src/fwebh/scripts/build.sh
+          cp src/fwebh/results.xml ${PWD}/artifacts
           ls -l ${PWD}/artifacts 
 
       - name: Check unit tests
@@ -81,7 +81,7 @@ jobs:
 
       # - name: Copy extra files
       #   run: |
-      #     cp ${PWD}/src/okelib/DockerfileArtifacts ${PWD}/artifacts
+      #     cp ${PWD}/src/fwebh/DockerfileArtifacts ${PWD}/artifacts
       #     ls -l artifacts | grep -v '^total'
 
       - name: Add Git info
@@ -102,12 +102,12 @@ jobs:
       # - name: Copy sources for zipping
       #   run: |
       #     mkdir src-artifacts
-      #     cp -R ${PWD}/src/okelib/lib src-artifacts
+      #     cp -R ${PWD}/src/fwebh/lib src-artifacts
 
       # - name: Save sources
       #   uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3  # v4.3.1
       #   with:
-      #     name: okelib-sources
+      #     name: fwebh-sources
       #     path: src-artifacts/*
       #     retention-days: 10
 
@@ -115,7 +115,7 @@ jobs:
       #   uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3  # v4.3.1
       #   with:
       #     name: results-xml-${{ env.FLATVERSION }}
-      #     path: ./src/okelib/results.xml
+      #     path: ./src/fwebh/results.xml
       #     retention-days: 10
 
 #   push:
@@ -135,6 +135,6 @@ jobs:
 #           context: ./
 #           file: ./DockerfileArtifacts
 #           push: true
-#           tags: docker.io/${{secrets.DOCKER_USERNAME}}/openedge-okelib:latest-dev
+#           tags: docker.io/${{secrets.DOCKER_USERNAME}}/openedge-fwebh:latest-dev
 #           #labels: ${{ steps.meta.outputs.labels }}
 

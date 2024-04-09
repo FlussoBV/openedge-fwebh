@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <propath version="12.8" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="schema/propath.xsd">
     <propathentry env="all" kind="src" path="@{ROOT}\src" platform="All"/>
-    <propathentry env="all" kind="dir" path="@{ROOT}\src\okelib\lang" platform="All"/>
+    <propathentry env="all" kind="dir" path="@{ROOT}\src\fwebh\lang" platform="All"/>
     <propathentry env="all" kind="dir" path="@{WORK}\src" platform="All"/>
     <propathentry env="all" kind="dir" path="@{WORK}\bin" platform="All"/>
     <propathentry env="gui" kind="con" path="com.openedge.pdt.text.GUI_LIBRARIES" platform="All"/>

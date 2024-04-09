@@ -51,7 +51,7 @@
       
       <propath>
         <pathelement path="${srcdir}" />
-        <pathelement path="${srcdir}/okelib/lang" />
+        <pathelement path="${srcdir}/fwebh/lang" />
         <pathelement path="${DLC}/tty/OpenEdge.Core.pl" />
         <pathelement path="${DLC}/tty/netlib/OpenEdge.Net.pl" />
         <pathelement path="${DLC}/tty/ablunit.pl" />
@@ -77,7 +77,7 @@
       </fileset> 
       <propath>
         <pathelement path="${srcdir}" />
-        <pathelement path="${srcdir}/okelib/lang" />
+        <pathelement path="${srcdir}/fwebh/lang" />
         <pathelement path="${DLC}/tty/OpenEdge.Core.pl" />
         <pathelement path="${DLC}/tty/netlib/OpenEdge.Net.pl" />
         <pathelement path="${DLC}/tty/ablunit.pl" />
@@ -88,7 +88,7 @@
   
   <target name="package">
 
-    <PCTLibrary destFile="${artifactdir}/okelib.pl" dlchome="${DLC}" noCompress="true"
+    <PCTLibrary destFile="${artifactdir}/fwebh.pl" dlchome="${DLC}" noCompress="true"
         cpInternal="utf-8" cpStream="utf-8">
       <fileset dir="${builddir}/rcode">
         <include name="**/*.r" />

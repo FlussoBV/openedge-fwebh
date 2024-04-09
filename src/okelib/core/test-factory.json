@@ -1,5 +1,0 @@
-{
-  "single": {"class": "okelib.core.Factory", "singleton": true},
-  "johndoe": "Progress.Lang.Object",
-  "classnotfound": "i.am.not.found"
-}
