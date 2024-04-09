@@ -23,16 +23,22 @@
 		// Configure properties specific to VS Code.
 		"vscode": {
 			"settings": {
+        "abl.buildMode": 1,
 				"abl.configuration.runtimes.default": "12.8",
 				"abl.configuration.runtimes": [
 					{ "name": "12.8", "path": "/usr/dlc" }
 				],
 				"abl.langServerJavaExecutable": "/opt/java/openjdk/bin/java",
-				"code-runner.executorMap.abl": "_progres -b -pf .devcontainer/devcontainer.pf -debugReady 3099 -p ${file}"
+				"code-runner.executorMap.abl": "_progres -b -pf .devcontainer/devcontainer.pf -debugReady 3099 -p ${file}",
+				"plantuml.diagramsRoot": "doc/uml",
+				"plantuml.exportFormat": "png",
+				"plantuml.server": "http://plantuml:8080/",
+				"plantuml.render": "PlantUMLServer"
 			},
 			"extensions": [
 				"riversidesoftware.openedge-abl-lsp@prerelease",
-				"formulahendry.code-runner"
+				"formulahendry.code-runner",
+				"jebbs.plantuml"
 			]
 		}
 	},
@@ -40,7 +46,7 @@
 		//"source=c:/docker/license/oe-12.8/progress.cfg,target=/usr/dlc/progress.cfg,type=bind,consistency=cached"
 	],
 	"containerEnv": {
-		"PROPATH": "./src,./bin"
+		"PROPATH": "./src"
 	},
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	"forwardPorts": [ 3099 ],

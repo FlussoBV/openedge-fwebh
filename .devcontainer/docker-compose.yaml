@@ -10,5 +10,10 @@ services:
     ports:
       - 3099:3099
     command: sleep infinity
+  
+  plantuml:
+    image: plantuml/plantuml-server
+    ports:
+      - 8080:8080
 
     
