@@ -1,6 +1,11 @@
 
+.builder/
 .settings/
+bin/
+
+sandbox/
 
 *.r
 
 build.config
+progress.cfg

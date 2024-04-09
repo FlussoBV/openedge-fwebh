@@ -71,8 +71,6 @@
 
   <target name="unittest" if="executeUnittests">
 
-    <!-- <copy file="${basedir}/results.template" tofile="${basedir}/results.xml" /> -->
-
     <ABLUnit haltOnFailure="false" writeLog="true" dlchome="${DLC}">
       <fileset dir="${srcdir}">
         <include name="**/*_UT.cls" />
@@ -85,8 +83,6 @@
         <pathelement path="${DLC}/tty/ablunit.pl" />
       </propath>
     </ABLUnit>
-    
-    <!-- <copy file="${basedir}/results.xml" todir="${builddir}" /> -->
     
   </target>
   

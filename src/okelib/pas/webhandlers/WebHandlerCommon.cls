@@ -54,12 +54,12 @@ class okelib.pas.webhandlers.WebHandlerCommon inherits WebHandler:
     writer = new WebResponseWriter(response).
     writer:Open().
     writer:Close().
-  end method.
+  end method.  //WriteResponse
   
-  method protected character urlDecode(urlEntry as character):
+  method protected character UrlDecode(urlEntry as character):
     urlEntry = replace(urlEntry, "%20", " ").
     return urlEntry.
-  end method.  // urlDecode
+  end method.  // UrlDecode
 
 
   method override protected integer HandleNotAllowedMethod(request as IWebRequest):
@@ -72,7 +72,7 @@ class okelib.pas.webhandlers.WebHandlerCommon inherits WebHandler:
 
     return 0.
 
-  end method.
+  end method.  // HandleNotAllowedMethod
 
 
   method override protected integer HandleNotImplemented(request as IWebRequest):
@@ -85,6 +85,6 @@ class okelib.pas.webhandlers.WebHandlerCommon inherits WebHandler:
 
     return 0.
 
-  end method.
+  end method.  // HandleNotImplemented
 
 end class.
