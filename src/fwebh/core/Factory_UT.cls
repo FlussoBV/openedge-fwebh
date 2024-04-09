@@ -37,14 +37,14 @@ class fwebh.core.Factory_UT:
   @Test.
   method public void load_correct_factory_definitions():
     
-    factory:LoadDefinitions("fwebh/core/test-factory.json").
+    factory:LoadDefinitions("test/core/test-factory.json").
     
   end method.
 
   @Test(expected="fwebh.lang.error.InvalidDataException").
   method public void load_errorneous_factory_definitions():
     
-    factory:LoadDefinitions("fwebh/core/test-factory-errorneous.json").
+    factory:LoadDefinitions("test/core/test-factory-errorneous.json").
     
   end method.
   
@@ -53,7 +53,7 @@ class fwebh.core.Factory_UT:
     
     define variable inst1 as Progress.Lang.Object no-undo.
     
-    factory:LoadDefinitions("fwebh/core/test-factory.json").
+    factory:LoadDefinitions("test/core/test-factory.json").
     inst1 = {getinstance.i janedoe as Progress.Lang.Object from factory}.
     
   end method.
@@ -64,7 +64,7 @@ class fwebh.core.Factory_UT:
     define variable inst1 as Progress.Lang.Object no-undo.
     define variable inst2 as Progress.Lang.Object no-undo.
     
-    factory:LoadDefinitions("fwebh/core/test-factory.json").
+    factory:LoadDefinitions("test/core/test-factory.json").
     
     inst1 = {getinstance.i johndoe as Progress.Lang.Object from factory}.
     inst2 = {getinstance.i johndoe as Progress.Lang.Object from factory}.
@@ -79,7 +79,7 @@ class fwebh.core.Factory_UT:
     define variable inst1 as Factory no-undo.
     define variable inst2 as Factory no-undo.
     
-    factory:LoadDefinitions("fwebh/core/test-factory.json").
+    factory:LoadDefinitions("test/core/test-factory.json").
     
     inst1 = {getinstance.i single as Factory from factory}.
     inst2 = {getinstance.i single as Factory from factory}.
@@ -93,7 +93,7 @@ class fwebh.core.Factory_UT:
     
     define variable inst1 as Progress.Lang.Object no-undo.
     
-    factory:LoadDefinitions("fwebh/core/test-factory.json").
+    factory:LoadDefinitions("test/core/test-factory.json").
     
     inst1 = {getinstance.i classnotfound as Progress.Lang.Object from factory}.
 
@@ -104,7 +104,7 @@ class fwebh.core.Factory_UT:
     
     define variable inst1 as Progress.Lang.Object no-undo.
     
-    factory:LoadDefinitions("fwebh/core/test-factory.json").
+    factory:LoadDefinitions("test/core/test-factory.json").
     
     inst1 = {getinstance.i notdefined as Progress.Lang.Object from factory}.
         
