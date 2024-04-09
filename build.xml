@@ -51,7 +51,6 @@
       
       <propath>
         <pathelement path="${srcdir}" />
-        <pathelement path="${srcdir}/fwebh/lang" />
         <pathelement path="${DLC}/tty/OpenEdge.Core.pl" />
         <pathelement path="${DLC}/tty/netlib/OpenEdge.Net.pl" />
         <pathelement path="${DLC}/tty/ablunit.pl" />
@@ -77,7 +76,6 @@
       </fileset> 
       <propath>
         <pathelement path="${srcdir}" />
-        <pathelement path="${srcdir}/fwebh/lang" />
         <pathelement path="${DLC}/tty/OpenEdge.Core.pl" />
         <pathelement path="${DLC}/tty/netlib/OpenEdge.Net.pl" />
         <pathelement path="${DLC}/tty/ablunit.pl" />

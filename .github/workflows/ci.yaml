@@ -74,7 +74,7 @@ jobs:
         uses: bfv/ablunit-results@f2240cbab5ae09ead8567ac91ed660943b2a2d9c  # v0.1.0
         id: unit-tests
         with:
-          file: src/results.xml
+          file: artifacts/results.xml
           fail-on-error: true
           errors-only: false
           debug: false
