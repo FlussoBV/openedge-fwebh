@@ -1,0 +1,21 @@
+@startuml
+class ResourceDescriptor {
+    Resource : string
+    Id: string
+    ParentResource: string
+    ParentResourceId: string
+    Verbs: HTTPVerbsEnum
+}
+
+interface IResourceResolver {
+    GetResource(request: IWebRequest) : ResourceDescriptor
+}
+
+enum HTTPVerbsEnum <<flag>>{
+    GET,
+    POST,
+    PUT,
+    DELETE,
+    PATCH
+}
+@enduml

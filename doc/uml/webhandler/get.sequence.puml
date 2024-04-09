@@ -1,0 +1,13 @@
+@startuml
+
+actor User 
+
+User -> PAS: GET /resource
+PAS -> PAS : HandleGet(IwebRequest): int
+PAS -> WebRequestParser: Parse: IRequestData
+PAS -> ResourceResolver: Resolve: IRoute 
+
+' note : GET request
+' PAS --> ResourseWebHandler: HandleGet: int
+
+@enduml

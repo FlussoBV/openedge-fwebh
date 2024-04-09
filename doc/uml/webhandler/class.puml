@@ -1,0 +1,33 @@
+@startuml
+
+class WebRequestProcessor {
+
+    +Process(request: IWebRequest): IRequestData
+
+}
+
+interface IWebRequest {
+}
+
+interface IRequestData {
+    Resource: string
+    Id: string
+    ParentResource: string
+    ParentResourceId: 
+    MimeType: string
+    Data: Progress.Lang.Object
+    QueryParameters: StringStringMap
+}
+
+class Route {
+    Name: string
+    Id: string
+    Verbs: string
+    Parent: string
+    ParentId
+}
+
+class ResourceResolver {
+    +Resolve(request: IWebRequest): ResourceDescriptor
+}
+@enduml

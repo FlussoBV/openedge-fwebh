@@ -1,0 +1,29 @@
+@startuml
+
+floating note: WebHandler GET flow
+
+start
+
+:create empty response;
+:get route;
+
+:check request;
+if (request is valid) then (no)
+    :create error response;
+else (yes)
+:extract parameter from request;
+    :get GetDataService from factory;
+    :call GET logic;
+    :process logic response;
+    if (TTL > 0) then (yes)
+        :set caching headers;
+    else (no)
+    endif
+    :set data in reponse;
+    :set content type;
+endif
+:write reponse;
+
+stop
+
+@enduml

@@ -1,0 +1,4 @@
+[
+  { "resource": "customer", "service": "customer", "verbs": [ "GET", "POST", "PUT", "DELETE" ], "TTL": 0 },
+  { "resource": "country", "service": "country", "verbs": [ "GET" ], "TTL": 86400 }
+]
