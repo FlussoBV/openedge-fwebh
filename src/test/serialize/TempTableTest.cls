@@ -43,4 +43,20 @@ class test.serialize.TempTableTest implements ISerializableDataStructure:
     
   end method.  // GetDataStructures
   
+  method public char GetLastName(firstname as char):
+    var char lastname = ?.
+    for first tt where tt.firstname = firstname:
+      lastname = tt.lastname.
+    end.
+    return lastname.
+  end method.  // GetLastName
+  
+  method public int CountRecords():
+    var int i.
+    for each tt:
+      i += 1.
+    end.
+    return i.
+  end method.  // CountRecords
+  
 end class.

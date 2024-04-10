@@ -67,11 +67,20 @@ class fwebh.serialize.SimpleJsonSerializer_UT:
 
   @Test.
   method public void serialized_arrayobj_equal_to_template():
-    var ArrayObject ao = new ArrayObject().
     var longchar str, originalString.
+    var ArrayObject ao = new ArrayObject().
+    
+    assign 
+      ao:id = -1
+      ao:ids[1] = 1 ao:ids[2] = 2 ao:ids[3] = 3 ao:ids[4] = 5
+      ao:names[1] = "Luke" ao:names[2] = "Leia" ao:names[3] = "Han"
+      .
+    //message ao:names[2] view-as alert-box.
     str = serializer:SerializeToLongchar(ao, false).
     copy-lob file "src/test/serialize/arrayobj-string1.txt" to originalString.
+    
     Assert:Equals(str, originalString).
+    
   end method.    
 
   @Test.
@@ -92,7 +101,7 @@ class fwebh.serialize.SimpleJsonSerializer_UT:
   
 
   @Test.
-  method public void serialize_openedge_list():
+  method public void serialize_openedge_string_list():
     
     var ListTest tst = new ListTest().
     var longchar str, originalString.
@@ -145,7 +154,7 @@ class fwebh.serialize.SimpleJsonSerializer_UT:
     
   end method.
   
-  
+  // NOTE: duplicate of same method in SimpleJsonDeserializer_UT
   method private Address getAddress():
     
     var Address addr = new Address().

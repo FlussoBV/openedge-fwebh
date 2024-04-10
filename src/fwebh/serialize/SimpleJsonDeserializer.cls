@@ -22,6 +22,7 @@ using Progress.Json.ObjectModel.ObjectModelParser.
 using Progress.Lang.AppError.
 using Progress.Lang.Class.
 using Progress.Reflect.Property.
+using Progress.Reflect.DataType.
 
 using fwebh.serialize.IListInfo.
 using fwebh.serialize.ISerializableDataStructure.
@@ -146,9 +147,15 @@ class fwebh.serialize.SimpleJsonDeserializer implements IDeserializable:
 
         getter = "Get" + prop:DataType:ToString().        
         if (lookup(prop:DataType:ToString(), serializeThese) > 0) then do:
-          dynamic-property(targetObj, prop:Name) = dynamic-invoke(jsonIn, getter, prop:Name) no-error.
-          if (error-status:error) then
-            dynamic-property(targetObj, prop:Name) = dynamic-invoke(jsonIn, getter, lc(prop:Name)) no-error.
+          // it may be an array
+          if (prop:Extent = 0) then do:
+            dynamic-property(targetObj, prop:Name) = dynamic-invoke(jsonIn, getter, prop:Name) no-error.
+            if (error-status:error) then
+              dynamic-property(targetObj, prop:Name) = dynamic-invoke(jsonIn, getter, lc(prop:Name)) no-error.
+          end.
+          else do:  // extent > 0
+            deserializeExtent(targetObj, prop, jsonIn:GetJsonArray(prop:Name)).
+          end.
         end.
         else do:
           
@@ -188,6 +195,27 @@ class fwebh.serialize.SimpleJsonDeserializer implements IDeserializable:
     return targetObj.
     
   end method.  // Deserialize
+  
+  method private void deserializeExtent(targetObj as Progress.Lang.Object, prop as Property, array as JsonArray):
+    
+    var int i.
+    
+    if (valid-object(array)) then do:
+      do i = 1 to array:Length:
+        case prop:DataType:
+          when DataType:Integer then dynamic-property(targetObj, prop:Name, i) = array:GetInteger(i).
+          when DataType:Character then dynamic-property(targetObj, prop:Name, i) = array:GetCharacter(i).
+          when DataType:Decimal then dynamic-property(targetObj, prop:Name, i) = array:GetDecimal(i).
+          when DataType:Date then dynamic-property(targetObj, prop:Name, i) = array:GetDate(i).
+          when DataType:DateTime then dynamic-property(targetObj, prop:Name, i) = array:GetDatetime(i).
+          when DataType:DateTimeTZ then dynamic-property(targetObj, prop:Name, i) = array:GetDatetimeTZ(i).
+          when DataType:Decimal then dynamic-property(targetObj, prop:Name, i) = array:GetDecimal(i).
+          when DataType:Logical then dynamic-property(targetObj, prop:Name, i) = array:GetLogical(i).
+        end case.
+      end. 
+    end.
+    
+  end method.  // deserializeExtent
   
   method private List deserializeList(targetObject as IListInfo, prop as Property, array as JsonArray):
     
@@ -281,7 +309,6 @@ class fwebh.serialize.SimpleJsonDeserializer implements IDeserializable:
     
     do i = 1 to array:Length:
       jsonRecord = array:GetJsonObject(i).
-      message string(JSON:Stringify(jsonRecord)).
       bufferHandle:buffer-create().
       
       do j = 1 to bufferHandle:num-fields:
