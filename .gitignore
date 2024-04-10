@@ -2,12 +2,13 @@
 .builder/
 .settings/
 bin/
-
 sandbox/
+workspace/
 
 *.r
 
 build.config
 progress.cfg
+results.xml
 
 results.xml

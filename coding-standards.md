@@ -237,3 +237,4 @@ Unit tests are written preferably for as much code as possible. Unit test concer
 see: https://learn.microsoft.com/en-us/dotnet/standard/design-guidelines/names-of-classes-structs-and-interfaces#naming-enumerations
 - names are NOT plural, unless it a flags enum
 - enums are not prefixed, nor postfixed with `Enum`. So, `OrderType` instead of `OrderTypesEnum` (assuming it's not a flags enum).
+- for each member an integer value is provided. Enums may be persisted and implicit values may lead to errors. 
