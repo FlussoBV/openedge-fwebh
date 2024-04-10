@@ -90,6 +90,7 @@
         cpInternal="utf-8" cpStream="utf-8">
       <fileset dir="${builddir}/rcode">
         <include name="**/*.r" />
+        <exclude name="**/*_UT.r" />
       </fileset>
     </PCTLibrary>
 
