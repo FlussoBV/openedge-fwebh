@@ -1,0 +1,1 @@
+{"entries":["euro: €","empty collection: Ø","αβγδ"]}

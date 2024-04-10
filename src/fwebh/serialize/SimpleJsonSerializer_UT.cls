@@ -18,6 +18,7 @@ using test.serialize.Address.
 using test.serialize.ArrayObject.
 using test.serialize.TempTableTest.
 using test.serialize.ListTest.
+using test.serialize.ListTestAddress.
 
 class fwebh.serialize.SimpleJsonSerializer_UT: 
   
@@ -106,6 +107,44 @@ class fwebh.serialize.SimpleJsonSerializer_UT:
     
   end method.
 
+  @Test.
+  method public void serialize_openedge_object_list():
+    
+    var ListTestAddress tst = new ListTestAddress().
+    var Address addr.
+    var longchar str, originalString.
+    
+    tst:Add(getAddress()).
+    addr = getAddress().
+    addr:Street = "Flusso".
+    addr:HouseNumber = 126.
+    tst:Add(addr).
+    
+    str = serializer:SerializeToLongchar(tst, false).
+    copy-lob file "src/test/serialize/list-address1.txt" to originalString.
+    
+    Assert:Equals(str, originalString).
+    
+  end method.
+  
+  
+  @Test.
+  method public void utf_char_serialization():
+    
+    var ListTest lst = new ListTest().
+    var longchar str, originalString.
+    
+    lst:AddEntry("euro: €").
+    lst:AddEntry("empty collection: Ø").
+    lst:AddEntry("αβγδ").
+    
+    str = serializer:SerializeToLongchar(lst, false).
+    copy-lob file "src/test/serialize/list-utf-chars.txt" to originalString.
+    
+    Assert:Equals(str, originalString).
+    
+  end method.
+  
   
   method private Address getAddress():
     
