@@ -17,6 +17,7 @@ using OpenEdge.Core.Collections.IMapEntry.
 using OpenEdge.Core.Collections.ISet.
 using OpenEdge.Core.Collections.KeySet.
 using OpenEdge.Core.Collections.List.
+using OpenEdge.Core.Collections.StringStringMap.
 using OpenEdge.Core.WidgetHandle.
 using Progress.Json.ObjectModel.JsonArray.
 using Progress.Json.ObjectModel.JsonConstruct.
@@ -87,6 +88,9 @@ class fwebh.serialize.SimpleJsonSerializer implements ISerializable:
           
         if (prop:DataTypeName = "OpenEdge.Core.Collections.List") then do:
           jsonSerialized:Add(prop:Name, serializeList(dynamic-property(objectToSerialize, prop:Name))).
+        end.
+        else if (prop:DataTypeName = "OpenEdge.Core.Collections.StringStringMap") then do:
+          jsonSerialized:Add(prop:Name, serializeStringStringMap(dynamic-property(objectToSerialize, prop:Name))).
         end.
         else if (prop:DataTypeName begins "Progress." or prop:DataTypeName begins "OpenEdge.") then do:
                     
@@ -209,6 +213,27 @@ class fwebh.serialize.SimpleJsonSerializer implements ISerializable:
     
   end method.  // serializeList
   
+  
+  method public JsonObject SerializeStringStringMap(dataMap as StringStringMap):
+    
+    var JsonObject obj = new JsonObject().
+    var IIterator iterator.
+    var char keyName, keyValue.
+    
+    if (not valid-object(dataMap)) then 
+      dataMap = new StringStringMap().
+      
+    iterator = dataMap:KeySet:Iterator().    
+    do while (iterator:HasNext()):
+      keyName = string(cast(iterator:Next(), "OpenEdge.Core.String"):Value).
+      keyValue = string(dataMap:Get(keyName)).
+      obj:Add(keyName, keyValue).
+    end.
+    
+    return obj.
+
+  end method.  // SerializeStringStringMap
+   
   
   method private void serializeTempTable(propertyName as character, data as handle, jsonOut as JsonObject):
     

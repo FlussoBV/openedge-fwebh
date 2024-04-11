@@ -15,6 +15,7 @@ using OpenEdge.Core.Collections.IMapEntry.
 using OpenEdge.Core.Collections.ISet.
 using OpenEdge.Core.Collections.KeySet.
 using OpenEdge.Core.Collections.List.
+using OpenEdge.Core.Collections.StringStringMap.
 using OpenEdge.Core.WidgetHandle.
 using Progress.Json.ObjectModel.JsonArray.
 using Progress.Json.ObjectModel.JsonObject.
@@ -128,6 +129,8 @@ class fwebh.serialize.SimpleJsonDeserializer implements IDeserializable:
     define variable i as integer no-undo.
     define variable getter as character no-undo.
     
+    var StringStringMap dataMap.
+    
     // if the JSON is not valid then there's nothing to deserialize
     if (not valid-object(jsonIn)) then do:
       targetObj = ?.
@@ -166,6 +169,10 @@ class fwebh.serialize.SimpleJsonDeserializer implements IDeserializable:
             //add list entries to object
             resultList = deserializeList(cast(targetObj, "fwebh.serialize.IListInfo"), prop, jsonIn:GetJsonArray(prop:Name)).
             dynamic-property(targetObj, prop:Name) = resultList.
+          end.
+          else if (prop:DataTypeName = "OpenEdge.Core.Collections.StringStringMap" /*and targetObj:GetClass():IsA("fwebh.serialize.IListInfo")*/) then do:
+            dataMap = deserializeStringStringMap(jsonIn:GetJsonObject(prop:Name)).
+            dynamic-property(targetObj, prop:Name) = dataMap.
           end.
           else if (prop:DataTypeName begins "Progress." or prop:DataTypeName begins "OpenEdge.") then do:
             // for primitive types only, others are NOT deserialized
@@ -267,6 +274,20 @@ class fwebh.serialize.SimpleJsonDeserializer implements IDeserializable:
     return newList.
     
   end method.  // deserializeList
+  
+  method public StringStringMap deserializeStringStringMap(obj as JsonObject):
+    
+    var StringStringMap dataMap = new StringStringMap().
+    var char[] names = obj:GetNames().
+    var int i.
+    
+    do i = 1 to extent(names):
+      dataMap:Put(names[i], obj:GetCharacter(names[i])).
+    end.
+    
+    return dataMap.
+    
+  end method.
   
   @todo(what="deserialize temp-table").
   method private void deserializeDataStructures(jsonIn as jsonObject, targetObj as ISerializableDataStructure):

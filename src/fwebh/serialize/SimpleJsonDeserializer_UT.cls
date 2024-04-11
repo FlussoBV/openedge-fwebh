@@ -16,10 +16,11 @@ using OpenEdge.Core.String.
 
 using fwebh.serialize.SimpleJsonDeserializer.
 using test.serialize.Address.
+using test.serialize.ArrayObject.
 using test.serialize.ListTest.
 using test.serialize.ListTestAddress.
+using test.serialize.StringStringMapTest.
 using test.serialize.TempTableTest.
-using test.serialize.ArrayObject.
 
 class fwebh.serialize.SimpleJsonDeserializer_UT: 
   
@@ -134,6 +135,20 @@ class fwebh.serialize.SimpleJsonDeserializer_UT:
     Assert:Equals(5, ao:ids[4]).
     
   end method. 
+  
+  @Test.
+  method public void deserialize_stringstringmap():
+    
+    var StringStringMapTest tst.
+    
+    tst = cast(
+      deserializer:DeserializeFile("src/test/serialize/map-string1.txt", "test.serialize.StringStringMapTest"),
+      "test.serialize.StringStringMapTest"
+    ).  
+    
+    Assert:Equals("value2", tst:pairs:Get("key2")).
+    
+  end method.
  
   // NOTE: duplicate of same method in SimpleJsonSerializer_UT   
   method private Address getAddress():
