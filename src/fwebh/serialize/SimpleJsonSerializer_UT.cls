@@ -13,13 +13,14 @@
 block-level on error undo, throw.
 
 using OpenEdge.Core.Assert.
+using OpenEdge.Core.Collections.StringStringMap.
 using fwebh.serialize.SimpleJsonSerializer.
 using test.serialize.Address.
 using test.serialize.ArrayObject.
 using test.serialize.TempTableTest.
 using test.serialize.ListTest.
 using test.serialize.ListTestAddress.
-
+using test.serialize.StringStringMapTest.
 class fwebh.serialize.SimpleJsonSerializer_UT: 
   
   var private SimpleJsonSerializer serializer.
@@ -151,6 +152,23 @@ class fwebh.serialize.SimpleJsonSerializer_UT:
     copy-lob file "src/test/serialize/list-utf-chars.txt" to originalString.
     
     Assert:Equals(str, originalString).
+    
+  end method.
+  
+  @Test.
+  method public void serialize_stringstringmap():
+    
+    var longchar str, originalString.
+    var StringStringMapTest tst = new StringStringMapTest().
+    
+    tst:pairs = new StringStringMap().
+    tst:pairs:Put("key1", "value1").
+    tst:pairs:Put("key2", "value2").
+    copy-lob file "src/test/serialize/map-string.txt" to originalString.
+    
+    str = serializer:SerializeToLongchar(tst, false).
+    
+    Assert:Equals(string(originalString), string(str)).
     
   end method.
   
