@@ -11,7 +11,7 @@
 
 block-level on error undo, throw.
 
-using fwebh.net.HTTPVerbs.
+using fwebh.net.HttpVerbs.
 
 class fwebh.pas.webhandlers.router.Route: 
   

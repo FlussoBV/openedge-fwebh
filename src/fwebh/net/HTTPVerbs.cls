@@ -1,6 +1,6 @@
 
 /*------------------------------------------------------------------------
-    File        : HTTPVerbs
+    File        : HttpVerbs
     Purpose     : 
     Syntax      : 
     Description : 
@@ -9,7 +9,7 @@
     Notes       : 
   ----------------------------------------------------------------------*/
 
-enum fwebh.net.HTTPVerbs flags :  
+enum fwebh.net.HttpVerbs flags :  
 
   define enum 
     GET = 1
@@ -19,4 +19,4 @@ enum fwebh.net.HTTPVerbs flags :
     PATCH = 16
     .    
 
-end enum.  // HTTPVerbs
+end enum.  // HttpVerbs
