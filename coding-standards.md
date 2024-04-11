@@ -230,3 +230,11 @@ At some point your code may end up on Linux and making this a habit greatly simp
 ## Avoid .NET
 Although .NET support is present for PAS on Linux it is advisable to avoid it as much as possible. If you do use it, create a 4GL wrapper in order to keep 4GL code 4GL.
 
+## Unit tests
+Unit tests are written preferably for as much code as possible. Unit test concerning classes are put in the same directory as the class and have the same name postfixed by `_UT`. Unit test themselves are class only, no procedures (`.p`).
+
+## Enums
+see: https://learn.microsoft.com/en-us/dotnet/standard/design-guidelines/names-of-classes-structs-and-interfaces#naming-enumerations
+- names are NOT plural, unless it a flags enum
+- enums are not prefixed, nor postfixed with `Enum`. So, `OrderType` instead of `OrderTypesEnum` (assuming it's not a flags enum).
+- for each member an integer value is provided. Enums may be persisted and implicit values may lead to errors. 

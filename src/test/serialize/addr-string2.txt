@@ -1,0 +1,1 @@
+{"test.serialize.Address":{"Street":"Hamersveldseweg","HouseNumber":125,"Municipale":"Leusden","Postcode":"3833 GV"}}

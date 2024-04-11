@@ -11,12 +11,12 @@
 
 block-level on error undo, throw.
 
-using fwebh.pas.webhandlers.HTTPVerbsEnum.
+using fwebh.net.HTTPVerbs.
 
 class fwebh.pas.webhandlers.router.Route: 
   
   define public property Resource as char no-undo get. set.
-  define public property Verbs as HTTPVerbsEnum no-undo get. set.
+  define public property Verbs as HTTPVerbs no-undo get. set.
   define public property TTL as int no-undo get. set.
   
 end class.

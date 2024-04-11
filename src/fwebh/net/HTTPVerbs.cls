@@ -1,6 +1,6 @@
 
 /*------------------------------------------------------------------------
-    File        : VerbsEnum
+    File        : HTTPVerbs
     Purpose     : 
     Syntax      : 
     Description : 
@@ -9,14 +9,14 @@
     Notes       : 
   ----------------------------------------------------------------------*/
 
-enum fwebh.pas.webhandlers.HTTPVerbsEnum flags :  
+enum fwebh.net.HTTPVerbs flags :  
 
   define enum 
-    POST = 1
-    GET = 2
+    GET = 1
+    POST = 2 
     PUT = 4
-    DELETE = 8
-    PATH = 16
+    DELETE = 8 
+    PATCH = 16
     .    
 
-end enum.
+end enum.  // HTTPVerbs
