@@ -4,14 +4,14 @@ class ResourceDescriptor {
     Id: string
     ParentResource: string
     ParentResourceId: string
-    Verbs: HTTPVerbsEnum
+    Verbs: HttpVerbs
 }
 
 interface IResourceResolver {
     GetResource(request: IWebRequest) : ResourceDescriptor
 }
 
-enum HTTPVerbsEnum <<flag>>{
+enum HttpVerbs <<flag>>{
     GET,
     POST,
     PUT,
