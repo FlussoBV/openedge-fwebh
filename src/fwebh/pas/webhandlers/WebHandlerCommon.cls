@@ -55,12 +55,6 @@ class fwebh.pas.webhandlers.WebHandlerCommon inherits WebHandler:
     writer:Open().
     writer:Close().
   end method.  //WriteResponse
-  
-  method protected character UrlDecode(urlEntry as character):
-    urlEntry = replace(urlEntry, "%20", " ").
-    return urlEntry.
-  end method.  // UrlDecode
-
 
   method override protected integer HandleNotAllowedMethod(request as IWebRequest):
 
