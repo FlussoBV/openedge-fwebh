@@ -1,5 +1,8 @@
 # 4GL coding standards
 
+## language
+The language for coding is English (American). Domain specific terms can be in local language (eindloonregeling anyone?).
+
 ## casing
 - 4GL statements: *lowercase* (every self respecting language uses lowercase)
 - directory names: lowercase (so also for package of `using`)
@@ -7,9 +10,16 @@
 - Class names: PascalCase
 - public, protected members: PascalCase
 - private members: camelCase
+- acronyms in PascalCase, with the exception of 2 letters ones. So for example: HttpVerbs and IOStream.
+
+## abbreviations
+Do not use abbreviations. Use for example GetWindow instead of GetWin.
+
+## acronyms
+Do not use acronyms unless they are common, like IO, HTTP, BTW (Dutch for VAT).
 
 ## indentation
-Indentation is 2 spaces. Not 4, not tabs.
+Indentation is 2 spaces. Not 3, not 4, no tabs.
 Correct indentation is essential for readability. There's no excuse to mess this up.
 
 ## prefixes
