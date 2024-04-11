@@ -1,13 +1,13 @@
 {
-    "name": "DevContPoc",
+    "name": "fwebh",
     "version": "1.0",
     "oeversion": "12.8",
     "graphicalMode": false,
     "charset": "utf-8",
     "extraParameters": "",
     "buildPath": [
-        { "type": "source", "path": "./src" },
-        { "type": "propath", "path": "./src" },
+        { "type": "source", "path": "src" },
+        { "type": "propath", "path": "src" },
         { "type": "propath", "path": "${DLC}/tty/OpenEdge.Core.pl" },
         { "type": "propath", "path": "${DLC}/tty/netlib/OpenEdge.Net.pl" }
     ],
