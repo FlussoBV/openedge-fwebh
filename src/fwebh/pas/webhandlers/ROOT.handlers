@@ -1,0 +1,11 @@
+{
+  "version": "2.0",
+  "serviceName": "",
+  "handlers": [
+    { "uri": "/v{version}/{parent-resource}/{parent-id}/{resource}", "class": "fwebh.pas.webhandlers.ResourceWebHandler", "enabled": true },
+    { "uri": "/v{version}/{resource}/{id}", "class": "fwebh.pas.webhandlers.ResourceWebHandler", "enabled": true },
+    { "uri": "/v{version}/{resource}", "class": "fwebh.pas.webhandlers.ResourceWebHandler", "enabled": true },
+    { "uri": "/v{version}", "class": "fwebh.pas.webhandlers.ResourceWebHandler", "enabled": true },
+    { "uri": "/test", "class": "fwebh.pas.webhandlers.ResourceWebHandler", "enabled": true }
+  ]
+}
