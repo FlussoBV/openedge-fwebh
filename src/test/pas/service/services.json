@@ -1,0 +1,6 @@
+{
+  "sysinfo": {"classname": "fwebh.pas.service.system.SystemInfoService"},
+  "single": {"classname": "fwebh.pas.service.system.SystemInfoService", "singleton": true},
+  "non-single": {"classname": "fwebh.pas.service.system.SystemInfoService", "singleton": false},
+  "empty": {"classname": "test.pas.service.EmptyService"}
+}

@@ -10,8 +10,10 @@
 
 block-level on error undo, throw.
 
+using Progress.Json.ObjectModel.JsonObject.
 using fwebh.pas.data.IRequestData.
 using fwebh.pas.data.IResponseData.
+using fwebh.pas.data.ResponseData.
 using fwebh.pas.service.IGetDataService.
 
 class fwebh.pas.service.system.SystemInfoService implements IGetDataService:
@@ -21,7 +23,16 @@ class fwebh.pas.service.system.SystemInfoService implements IGetDataService:
   end constructor.
 
   method public IResponseData GetData(request as IRequestData):
-
+    var JsonObject json = new JsonObject().
+    var ResponseData response = new ResponseData().
+    
+    json:Add("status", "ok").
+    json:Add("time", iso-date(datetime-tz(now))).
+    
+    response:Json = json.
+    
+    return response.
+    
   end method.  // GetData
 
 end class.  // SystemInfoService
