@@ -16,7 +16,7 @@ block-level on error undo, throw.
 class fwebh.lang.error.BadRequestException inherits AppError: 
 
   constructor public BadRequestException (errorMessage as character):
-    super (substitute("Bad request: &1", errorMessage), -1).
+    super (substitute("BadRequestException: &1", errorMessage), -1).
   end constructor.
 
 end class.

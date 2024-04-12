@@ -16,7 +16,7 @@ block-level on error undo, throw.
 class fwebh.lang.error.InvalidFormatException inherits AppError: 
 
   constructor public InvalidFormatException (formattedValue as character):
-    super (substitute("Invalid format: &1", formattedValue), -1).
+    super (substitute("InvalidFormatException: &1", formattedValue), -1).
   end constructor.
 
 end class.

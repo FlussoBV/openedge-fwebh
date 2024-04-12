@@ -17,7 +17,7 @@ block-level on error undo, throw.
 class fwebh.lang.error.InvalidDataException inherits AppError: 
 
   constructor public InvalidDataException (errorMessage as character):
-    super (substitute("Invalid Data: &1", errorMessage), -1).
+    super (substitute("InvalidDataException: &1", errorMessage), -1).
   end constructor.
 
 end class.

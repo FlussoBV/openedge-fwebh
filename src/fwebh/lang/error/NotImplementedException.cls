@@ -1,11 +1,11 @@
  
  /*------------------------------------------------------------------------
-    File        : NotFoundException
+    File        : NotImplementedException
     Purpose     : 
     Syntax      : 
     Description : 
     Author(s)   : bronco
-    Created     : Tue Aug 23 11:42:22 CEST 2022
+    Created     : Fri Apr 12 13:31:19 CEST 2024
     Notes       : 
   ----------------------------------------------------------------------*/
 
@@ -14,10 +14,10 @@ block-level on error undo, throw.
 using Progress.Lang.AppError.
 
 
-class fwebh.lang.error.NotFoundException inherits AppError: 
+class fwebh.lang.error.NotImplementedException inherits AppError: 
   
-  constructor public NotFoundException(errorMessage as character):
-    super (substitute("NotFoundException: &1", errorMessage), -1).
+  constructor public NotImplementedException(errorMessage as character):
+    super (substitute("NotImplementedException: &1", errorMessage), -1).
   end.
   
 end class.
