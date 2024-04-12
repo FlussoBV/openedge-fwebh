@@ -44,8 +44,7 @@ class fwebh.core.Factory implements IFactory:
     field obj as Progress.Lang.Object
     .
     
-  define public static property Instance as Factory get. 
-    private set.
+  define public static property Instance as Factory get. private set.
     
   /* you can create your own Factory and load definitions */ 
   constructor public Factory():
@@ -81,35 +80,49 @@ class fwebh.core.Factory implements IFactory:
     end.  // do on error...
                    
   end method.  // LoadDefinitions
+  
+  
+  method public void AddDefinition(identifier as char, classname as char, singleton as logical):
+    
+    find ttdefintion where ttdefintion.indentifier = identifier no-error.
+    if (not available(ttdefintion)) then do:
+      create ttdefintion.
+      ttdefintion.indentifier = identifier.
+    end.
+    
+    ttdefintion.classname = classname.
+    ttdefintion.singleton = singleton.  
+    
+  end method.  // AddDefinitions
     
     
   method private void processDefinitions(jsonDefintions as JsonObject):
       
     define variable i as integer no-undo.
     define variable names as character extent no-undo.
-    define variable propertyName as character no-undo.
     define variable propertyType as integer no-undo.
     define variable defintionObject as JsonObject no-undo.
+    
+    var char identifier, classname.
+    var logical singleton.
         
     names = jsonDefintions:GetNames().
     do i = 1 to extent(names):
             
-      create ttdefintion.
-            
-      propertyName = names[i].
-      propertyType = jsonDefintions:GetType(propertyName).
-      ttdefintion.indentifier = propertyName.
+      identifier = names[i].
+      propertyType = jsonDefintions:GetType(identifier).
             
       case (propertyType):
                 
         when JsonDataTypeEnum:String:GetValue() then do:
-          ttdefintion.classname = jsonDefintions:GetCharacter(propertyName).   
+          classname = jsonDefintions:GetCharacter(identifier).
+          singleton = false.   
         end.
                 
         when JsonDataTypeEnum:Object:GetValue() then do:
-          defintionObject = jsonDefintions:GetJsonObject(propertyName).
-          ttdefintion.classname = defintionObject:GetCharacter("class").
-          ttdefintion.singleton = (defintionObject:Has("singleton") and defintionObject:GetLogical("singleton")).  
+          defintionObject = jsonDefintions:GetJsonObject(identifier).
+          classname = defintionObject:GetCharacter("class").
+          singleton = (defintionObject:Has("singleton") and defintionObject:GetLogical("singleton")).  
         end.
                 
         otherwise do:
@@ -117,6 +130,8 @@ class fwebh.core.Factory implements IFactory:
         end.
              
       end case.
+      
+      AddDefinition(identifier, classname, singleton).
         
     end.  // do i = 1 to extent(names)...
       
