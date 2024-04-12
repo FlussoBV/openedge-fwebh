@@ -22,7 +22,7 @@ using fwebh.pas.data.RequestDataProcessor.
 using fwebh.pas.webhandlers.WebHandlerCommon.
 
 class fwebh.pas.webhandlers.ResourceWebHandler inherits WebHandlerCommon: 
-
+  
   method override protected integer HandleGet(request as IWebRequest):
     
     var IHttpResponse response.
@@ -35,14 +35,17 @@ class fwebh.pas.webhandlers.ResourceWebHandler inherits WebHandlerCommon:
       the idea is: 
         - first get the request info (resource name etc)
         - get the service
-        - see if service has preferences on how the data should be put in the RequestData object
+        - see if service has preferences on how the data should be put in the RequestData object (POST, PUT, etc)
         - execute logic
         - create response data
         - ...
     */
-
+    
     data = new RequestDataProcessor():ProcessRequestInfo(request).
-    json = new SimpleJsonSerializer():Serialize(data).
+    
+    // for testing purposes serialize the RequestData and return it
+    json = new JsonObject().
+    json:Add("requestData", new SimpleJsonSerializer():Serialize(data)).
 
     response:Entity = json.
     response:ContentType = "application/json".
@@ -53,4 +56,4 @@ class fwebh.pas.webhandlers.ResourceWebHandler inherits WebHandlerCommon:
 
   end method.  // HandleGet
 
-end class.
+end class.  // ResourceWebHandler

@@ -17,6 +17,7 @@ class fwebh.pas.resource.ResourceDescriptor:
   define public property Id as char init ? no-undo get. set.
   define public property ParentName as char init ? no-undo get. set.
   define public property ParentId as char no-undo init ? get. set.
+  define public property TimeToLive as int no-undo get. set.  // for caching purposes
   
   constructor public ResourceDescriptor(resource as char):
     Name = resource.  
