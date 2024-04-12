@@ -18,17 +18,28 @@ using Progress.Json.ObjectModel.JsonObject.
 
 using fwebh.serialize.SimpleJsonSerializer.
 using fwebh.pas.data.IRequestData.
+using fwebh.pas.data.IResponseData.
 using fwebh.pas.data.RequestDataProcessor.
+using fwebh.pas.service.IGetDataService.
+using fwebh.pas.service.ServiceFactory.
 using fwebh.pas.webhandlers.WebHandlerCommon.
 
 class fwebh.pas.webhandlers.ResourceWebHandler inherits WebHandlerCommon: 
+  
+  var private ServiceFactory factory.
+  
+  constructor public ResourceWebHandler():
+    factory = new ServiceFactory().
+  end.
   
   method override protected integer HandleGet(request as IWebRequest):
     
     var IHttpResponse response.
     var IRequestData data.
+    var IResponseData responseData.
     var JsonObject json.
-
+    var IGetDataService service.
+    
     response = new WebResponse().
 
     /*
@@ -43,10 +54,15 @@ class fwebh.pas.webhandlers.ResourceWebHandler inherits WebHandlerCommon:
     
     data = new RequestDataProcessor():ProcessRequestInfo(request).
     
+    // get the service instance and execute the logic
+    service = factory:GetGetDataService(data:Resource:Name).
+    responseData = service:GetData(data).
+    
     // for testing purposes serialize the RequestData and return it
     json = new JsonObject().
     json:Add("requestData", new SimpleJsonSerializer():Serialize(data)).
-
+    json:Add("response", cast(responseData:Json, JsonObject)).
+    
     response:Entity = json.
     response:ContentType = "application/json".
 
