@@ -1,6 +1,6 @@
  
  /*------------------------------------------------------------------------
-    File        : RequestDataBuilder
+    File        : RequestDataProcessor
     Purpose     : 
     Syntax      : 
     Description : 
@@ -15,26 +15,11 @@ using OpenEdge.Web.IWebRequest.
 using OpenEdge.Core.Collections.StringStringMap.
 using fwebh.pas.data.IRequestData.
 using fwebh.pas.data.RequestData.
-using fwebh.pas.data.RequestDataBuilder.
+using fwebh.pas.data.RequestDataProcessor.
 using fwebh.net.UrlHelper.
 using fwebh.pas.resource.ResourceDescriptor.
 
-class fwebh.pas.data.RequestDataBuilder: 
-  
-  var private IRequestData rd.
-  
-  define public property RequestData as IRequestData 
-    get():
-      return rd.
-    end.
-    
-  constructor private RequestDataBuilder():
-    rd = new RequestData().
-  end.
-  
-  method public static RequestDataBuilder Get():
-    return new RequestDataBuilder().
-  end method.  // Get
+class fwebh.pas.data.RequestDataProcessor: 
   
   method public IRequestData ProcessRequestInfo(request as IWebRequest):
     

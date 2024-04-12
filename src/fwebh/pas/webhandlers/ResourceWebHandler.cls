@@ -18,7 +18,7 @@ using Progress.Json.ObjectModel.JsonObject.
 
 using fwebh.serialize.SimpleJsonSerializer.
 using fwebh.pas.data.IRequestData.
-using fwebh.pas.data.RequestDataBuilder.
+using fwebh.pas.data.RequestDataProcessor.
 using fwebh.pas.webhandlers.WebHandlerCommon.
 
 class fwebh.pas.webhandlers.ResourceWebHandler inherits WebHandlerCommon: 
@@ -41,8 +41,8 @@ class fwebh.pas.webhandlers.ResourceWebHandler inherits WebHandlerCommon:
         - ...
     */
 
-    data = RequestDataBuilder:Get():ProcessRequestInfo(request).
-    json = (new SimpleJsonSerializer()):Serialize(data).
+    data = new RequestDataProcessor():ProcessRequestInfo(request).
+    json = new SimpleJsonSerializer():Serialize(data).
 
     response:Entity = json.
     response:ContentType = "application/json".
@@ -51,6 +51,6 @@ class fwebh.pas.webhandlers.ResourceWebHandler inherits WebHandlerCommon:
 
     return 0.
 
-  end method.
+  end method.  // HandleGet
 
 end class.
