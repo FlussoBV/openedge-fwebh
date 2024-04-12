@@ -12,6 +12,7 @@
 using Progress.Json.ObjectModel.JsonConstruct.
 using Progress.Json.ObjectModel.ObjectModelParser.
 using Progress.Json.ObjectModel.JsonArray.
+using Progress.Json.ObjectModel.JsonObject.
 
 block-level on error undo, throw.
 
@@ -28,8 +29,18 @@ class fwebh.core.JSON:
     return json.
     
   end method.  // ParseFile
-
-
+  
+  
+  method public static JsonObject ParseFileToObject(filename as character):
+    return cast(ParseFile(filename), JsonObject).
+  end method.
+  
+  
+  method public static JsonArray ParseFileToArray(filename as character):
+    return cast(ParseFile(filename), JsonArray).
+  end method.
+  
+  
   method public static JsonConstruct ParseString(jsonString as longchar):
     
     define variable parser as ObjectModelParser no-undo.
