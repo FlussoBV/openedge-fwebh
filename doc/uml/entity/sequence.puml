@@ -1,0 +1,9 @@
+@startuml
+WebHandler -> WebHandler: getEntityWriter
+
+WebHandler -> EntityWriterFactory: GetWriter
+EntityWriterFactory --> WebHandler : IEntityWriter
+
+WebHandler -> IEntityWriter: Write(response: IResponseData)
+IEntityWriter --> WebHandler: Progress.Lang.Object
+@enduml

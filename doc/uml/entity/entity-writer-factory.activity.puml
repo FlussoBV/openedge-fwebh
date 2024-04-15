@@ -1,0 +1,12 @@
+@startuml
+
+floating note: EntityWriterFactory initialization
+
+start
+:read entitywriters.json;
+:read entitywriters-custom.json;
+stop
+
+floating note: json files are read from propath
+
+@enduml

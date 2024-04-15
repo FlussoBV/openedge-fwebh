@@ -1,0 +1,6 @@
+@startjson
+{
+  "application/json": "fwebh.pas.data.JsonEntityWriter",
+  "text/xml": "fwebh.pas.data.XmlEntityWriter"
+}
+@endjson
