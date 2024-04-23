@@ -26,6 +26,9 @@ class fwebh.pas.service.system.SystemInfoService implements IGetDataService:
     var JsonObject json = new JsonObject().
     var ResponseData response = new ResponseData().
     
+    if (request:Accept = "..." ) then 
+      response:ContentType = "application/json".
+
     json:Add("status", "ok").
     json:Add("time", iso-date(datetime-tz(now))).
     
