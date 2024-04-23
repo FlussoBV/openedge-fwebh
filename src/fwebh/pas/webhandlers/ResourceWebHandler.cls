@@ -86,8 +86,7 @@ class fwebh.pas.webhandlers.ResourceWebHandler inherits WebHandlerCommon:
     return 0.
 
   end method.  // HandleGet
-  
-  
+
   method private IHttpResponse handleErrors(err as Progress.Lang.Error):
     
     var WebResponse response.
@@ -97,24 +96,29 @@ class fwebh.pas.webhandlers.ResourceWebHandler inherits WebHandlerCommon:
     
     contentType = "text/plain".  
     case errorType:
-      when "fwebh.lang.error.NotImplementedException" then do:
+      when "fwebh.lang.error.NotAllowedException" then do:
         errorMessage = err:GetMessage(1).
         errorNumber = 405.
       end.
-      otherwise do:
+      when "fwebh.lang.error.NotFoundException" then do:
         errorMessage = err:GetMessage(1).
+        errorNumber = 404.
+      end.      
+      otherwise do:
+        errorMessage = err:GetClass():TypeName + ": " + err:GetMessage(1).
+        errorNumber = 500.
       end.
     end case.  
     
     response = new WebResponse().
     response:Entity = new String(errorMessage).
     response:StatusCode = errorNumber.
-    response:StatusReason = StatusCodeHelper:GetMessage(errorNumber).
     response:ContentType = contentType.
     
     return response.
     
   end method.  // handleErrors
+
  
  
   method private IEntityWriter getEntityWriter(responseData as IResponseData):

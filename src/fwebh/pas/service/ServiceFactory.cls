@@ -13,8 +13,8 @@ block-level on error undo, throw.
 using Progress.Json.ObjectModel.JsonObject.
 using fwebh.core.Factory.
 using fwebh.core.JSON.
+using fwebh.lang.error.NotAllowedException.
 using fwebh.lang.error.NotFoundException.
-using fwebh.lang.error.NotImplementedException.
 using fwebh.pas.service.IDeleteDataService.
 using fwebh.pas.service.IGetDataService.
 using fwebh.pas.service.IPatchDataService.
@@ -63,7 +63,7 @@ class fwebh.pas.service.ServiceFactory:
      
     if (not obj:GetClass():IsA(expectedInterface)) then do:
       methodName = caps(replace(replace(expectedInterface, "fwebh.pas.service.I", ""), "DataService", "")). 
-      undo, throw new NotImplementedException(substitute("&1 for '&2'", methodName, identifier)).
+      undo, throw new NotAllowedException(substitute("&1 for '&2'", methodName, identifier)).
     end.
     
     return obj.
