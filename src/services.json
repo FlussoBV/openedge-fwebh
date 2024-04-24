@@ -1,3 +1,4 @@
 {
+  "echo": {"classname": "fwebh.pas.service.system.EchoService"},
   "sysinfo": {"classname": "fwebh.pas.service.system.SystemInfoService"}
 }
