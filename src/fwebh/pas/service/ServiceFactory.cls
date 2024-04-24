@@ -78,7 +78,7 @@ class fwebh.pas.service.ServiceFactory:
     var JsonObject defs.
     var ServiceDescription svcDef.
     var int i.
-    var char []names.
+    var char[] names.
     
     deserializer = new SimpleJsonDeserializer().
     defs = JSON:ParseFileToObject("services.json").
