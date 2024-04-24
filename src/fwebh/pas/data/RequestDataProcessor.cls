@@ -18,6 +18,7 @@ using fwebh.pas.data.RequestData.
 using fwebh.pas.data.RequestDataProcessor.
 using fwebh.net.UrlHelper.
 using fwebh.pas.resource.ResourceDescriptor.
+using OpenEdge.Net.HTTP.HttpHeader.
 
 class fwebh.pas.data.RequestDataProcessor: 
   
@@ -33,7 +34,8 @@ class fwebh.pas.data.RequestDataProcessor:
     data:Verb = getContextValue(request, "REQUEST_METHOD").
     data:MimeType = getContextValue(request, "CONTENT_TYPE").
     data:Version = request:GetPathParameter("version").
-    data:Parameters = ExtractQueryParameters(request).  // StringStringMap is not yet supported by serializer
+    data:Parameters = extractQueryParameters(request).  // StringStringMap is not yet supported by serializer
+    data:Headers = extractHeaders(request).
     
     return data.
     
@@ -62,7 +64,7 @@ class fwebh.pas.data.RequestDataProcessor:
     return contentType.
   end method.
 
-  method public StringStringMap ExtractQueryParameters(request as IWebRequest):
+  method private StringStringMap extractQueryParameters(request as IWebRequest):
     
     var char parameters, currentEntry, parameterName, parameterValue.
     var int i, parameterCount.
@@ -81,6 +83,58 @@ class fwebh.pas.data.RequestDataProcessor:
     
     return queryParameters.
     
-  end method.  // ExtractQueryParameters
+  end method.  // extractQueryParameters
+  
+  method private StringStringMap extractHeaders(request as IWebRequest):
+    
+    var StringStringMap headers.
+    var HttpHeader[] httpHeaders.  //, currentHeader.
+    var HttpHeader currentHeader.
+    var int i, headerCount.
+    
+    headers = new StringStringMap().
+    
+    headerCount = request:GetHeaders(httpHeaders).
+    do i = 1 to headerCount:
+      currentHeader = httpHeaders[i].
+      headers:Put(normalizeHeaderName(currentHeader:Name), currentHeader:Value).
+    end.
+    
+    return headers.
+    
+  end method.  // addHeaders 
 
+
+  method private character normalizeHeaderName(headerName as character):
+    
+    var logical nextCharUpper.
+    var char resultString, currentChar.
+    var int i, headerNameLength.
+    
+    headerNameLength = length(headerName).
+    nextCharUpper = true.
+    do i = 1 to headerNameLength:
+      
+      currentChar = substring(headerName, i, 1).
+
+      if (nextCharUpper) then do:
+        resultString += caps(currentChar).
+        nextCharUpper = false.
+        next.
+      end.  
+      
+      if (currentChar = '_') then
+        currentChar = '-'.
+      
+      if (currentChar = '-') then
+        nextCharUpper = true.        
+      
+      resultString += lc(currentChar).
+      
+    end.
+    
+    return resultString.
+    
+  end method.  // normalizeHeaderName
+    
 end class.

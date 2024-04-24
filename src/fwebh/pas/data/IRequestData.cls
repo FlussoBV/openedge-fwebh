@@ -21,5 +21,6 @@ interface fwebh.pas.data.IRequestData:
   define public property Verb as char no-undo get. set.
   define public property Version as char no-undo get. set.
   define public property Parameters as StringStringMap no-undo get. set.
+  define public property Headers as StringStringMap no-undo get. set.
   
 end interface.
