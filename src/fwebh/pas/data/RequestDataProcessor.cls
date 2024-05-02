@@ -102,9 +102,15 @@ class fwebh.pas.data.RequestDataProcessor:
     
     return headers.
     
-  end method.  // addHeaders 
+  end method.  // extractHeaders 
 
-
+  /*------------------------------------------------------------------------------
+  Purpose: Normalizes context names from the (web) context to header names. For example
+           f("CONTENT_TYPE") = "ContentType"
+  Notes:
+  @param the header name
+  @return char normalized header name
+  ------------------------------------------------------------------------------*/
   method private character normalizeHeaderName(headerName as character):
     
     var logical nextCharUpper.
