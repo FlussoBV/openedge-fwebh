@@ -87,30 +87,6 @@ message "valid responseObj" valid-object(responseObj).
       
     end.  // do on error undo, throw
 
-    /*
-      the idea is: 
-        - first get the request info (resource name etc)
-        - get the service
-        - see if service has preferences on how the data should be put in the RequestData object (POST, PUT, etc)
-        - execute logic
-        - create response data
-        - ...
-    */
-    
-    data = new RequestDataProcessor():ProcessRequestInfo(request).
-    
-    // get the service instance and execute the logic
-    service = factory:GetGetDataService(data:Resource:Name).
-    responseData = service:GetData(data).
-    
-    // for testing purposes serialize the RequestData and return it
-    json = new JsonObject().
-    json:Add("requestData", new SimpleJsonSerializer():Serialize(data)).
-    json:Add("response", cast(responseData:Json, JsonObject)).
-    
-    response:Entity = json.
-    response:ContentType = "application/json".
-
     WriteResponse(response).
 
     return 0.
@@ -148,7 +124,12 @@ message "valid responseObj" valid-object(responseObj).
  
  
   method private IEntityWriter getEntityWriter(responseData as IResponseData):
+    
+    if responseData:ContentType = "" then 
+      responseData:ContentType = "application/json".
+      
     return writerFactory:GetEntityWriter(responseData:ContentType).
+    
   end method.
   
 end class.  // ResourceWebHandler
