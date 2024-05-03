@@ -19,42 +19,43 @@ using fwebh.pas.data.IResponseData.
 
 class fwebh.pas.data.XmlEntityWriter implements IEntityWriter: 
 
-  method public Progress.Lang.Object Write( responseData as IResponseData ):
+  method public Progress.Lang.Object Write(responseData as IResponseData):
+    
+    var Progress.Lang.Object entityData.
     
     case responseData:DataType:
-      when ResponseDataType:DATASET then return writeDataset(responseData:DatasetHandle).
-      when ResponseDataType:TEMP-TABLE then return writeTemptable(responseData:DatasetHandle).
-      when ResponseDataType:BUFFER then return writeBuffer(responseData:DatasetHandle).
-      otherwise undo, throw new AppError(substitute("XmlEntityWriter cannot process EntityDataType '&1'",responseData:DataType),-1).
+      when ResponseDataType:DATASET then entityData = writeDataset(responseData:DatasetHandle).
+      when ResponseDataType:TEMP-TABLE then entityData = writeTemptable(responseData:DatasetHandle).
+      when ResponseDataType:BUFFER then entityData = writeBuffer(responseData:DatasetHandle).
+      otherwise undo, throw new AppError(substitute("XmlEntityWriter cannot process EntityDataType '&1'", responseData:DataType), -1).
     end case.
 
   end method.
 
-  method private String writeBuffer( bufferHandle as handle ):
+  method private String writeBuffer(bufferHandle as handle):
     
     var longchar bufferData .
-    var String xml.
     
     bufferHandle:serialize-row("XML",
                                "longchar",
                                bufferData,
-                               true, // formatted
+                               false, // formatted
                                ?, // encoding
                                false, // omit-initial-values
                                true // omit-outer-object
                                ).
-
+  
     return new String(bufferData).
     
   end method.
 
-  method private String writeDataset( datasetHandle as handle ):
+  method private String writeDataset( datasetHandle as handle):
     
     var longchar datasetData.
     
     datasetHandle:write-json("longchar",
                              datasetData,
-                             true, // formatted
+                             false, // formatted
                              ?, // encoding
                              false, // omit-initial-values
                              true, // omit-outer-object
@@ -65,13 +66,13 @@ class fwebh.pas.data.XmlEntityWriter implements IEntityWriter:
     
   end method.
 
-  method private String writeTemptable( temptableHandle as handle ):
+  method private String writeTemptable(temptableHandle as handle):
     
     var longchar temptableData.
     
     temptableHandle:write-json("longchar",
                                temptableData,
-                               true, // formatted
+                               false, // formatted
                                ?, // encoding
                                false, // omit-initial-values
                                true, // omit-outer-object

@@ -11,42 +11,36 @@
 block-level on error undo, throw.
 
 using Progress.Json.ObjectModel.JsonObject.
-using fwebh.core.Factory.
+using fwebh.core.IFactory.
 using fwebh.core.JSON.
-using fwebh.pas.data.IEntityWriter.
 using fwebh.lang.error.NotFoundException.
+using fwebh.pas.data.IEntityWriter.
 
 class fwebh.pas.data.EntityWriterFactory: 
 
-  var private Factory factory.
+  var private IFactory factory.
   
   constructor public EntityWriterFactory():
-
-    factory = new Factory().
-
+    factory = dynamic-new("fwebh.core.Factory")().  // no hard refs
     loadDefinitions("entitywriter.json").
-
   end constructor.
   
-  method public IEntityWriter GetEntityWriter( mimeType as character ):
+  method public IEntityWriter GetEntityWriter(mimeType as character):
 
     var IEntityWriter entityWriter.
 
-    do on error undo, throw:
-
-      return cast(factory:GetInstance(mimeType), IEntityWriter).
-
-      catch e as NotFoundException :
-
-        mimeType = entry( 1, mimeType, "/") + "/*".
-        return  cast(factory:GetInstance(mimeType), IEntityWriter).
-
-      end catch.
+    if (factory:Has(mimeType)) then
+      entityWriter = cast(factory:GetInstance(mimeType), IEntityWriter).
+    else do:
+      mimeType = entry(1, mimeType, "/") + "/*".
+      entityWriter = cast(factory:GetInstance(mimeType), IEntityWriter).
     end.
+        
+    return entityWriter.
+   
+  end method.  // GetEntityWriter
 
-  end method.
-
-  method private void loadDefinitions( filename as character ):
+  method private void loadDefinitions(filename as character):
     
     var JsonObject defs.
     var int i.

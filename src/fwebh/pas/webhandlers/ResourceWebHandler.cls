@@ -13,9 +13,11 @@ block-level on error undo, throw.
 
 using OpenEdge.Core.String.
 using OpenEdge.Net.HTTP.IHttpResponse.
+using OpenEdge.Net.HTTP.StatusCodeHelper.
 using OpenEdge.Web.IWebRequest.
 using OpenEdge.Web.WebResponse.
 using Progress.Json.ObjectModel.JsonObject.
+using fwebh.pas.data.EntityWriterFactory.
 using fwebh.pas.data.IEntityWriter.
 using fwebh.pas.data.IRequestData.
 using fwebh.pas.data.IResponseData.
@@ -24,16 +26,16 @@ using fwebh.pas.service.IGetDataService.
 using fwebh.pas.service.ServiceFactory.
 using fwebh.pas.webhandlers.WebHandlerCommon.
 using fwebh.serialize.SimpleJsonSerializer.
-using fwebh.pas.data.EntityWriterFactory.
-using OpenEdge.Net.HTTP.StatusCodeHelper.
 
 
 class fwebh.pas.webhandlers.ResourceWebHandler inherits WebHandlerCommon: 
   
-  var private ServiceFactory factory.
+  var private ServiceFactory serviceFactory.
+  var private EntityWriterFactory writerFactory.
   
   constructor public ResourceWebHandler():
-    factory = new ServiceFactory().
+    serviceFactory = new ServiceFactory().
+    writerFactory = new EntityWriterFactory().
   end.
   
   method override protected integer HandleGet(request as IWebRequest):
@@ -62,7 +64,7 @@ class fwebh.pas.webhandlers.ResourceWebHandler inherits WebHandlerCommon:
       requestData = new RequestDataProcessor():ProcessRequestInfo(request).
       
       // get the service instance and execute the logic
-      service = factory:GetGetDataService(requestData:Resource:Name).
+      service = serviceFactory:GetGetDataService(requestData:Resource:Name).
       
       // checking
       
@@ -84,7 +86,8 @@ class fwebh.pas.webhandlers.ResourceWebHandler inherits WebHandlerCommon:
       catch err1 as Progress.Lang.Error:
         response = handleErrors(err1).  
       end catch.
-    end.
+      
+    end.  // do on error undo, throw
 
     /*
       the idea is: 
@@ -142,12 +145,7 @@ class fwebh.pas.webhandlers.ResourceWebHandler inherits WebHandlerCommon:
  
  
   method private IEntityWriter getEntityWriter(responseData as IResponseData):
-    
-    var EntityWriterFactory factory = new EntityWriterFactory().
-    
-    return factory:GetEntityWriter(responseData:ContentType).
-    
+    return writerFactory:GetEntityWriter(responseData:ContentType).
   end method.
-  
   
 end class.  // ResourceWebHandler
