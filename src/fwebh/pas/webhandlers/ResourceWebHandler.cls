@@ -59,8 +59,9 @@ class fwebh.pas.webhandlers.ResourceWebHandler inherits WebHandlerCommon:
     responseData = service:GetData(data).
     
     // for testing purposes serialize the RequestData and return it
+    // assume JSON for now 
     json = new JsonObject().
-    json:Add("requestData", new SimpleJsonSerializer():Serialize(data)).
+    json:Add("request", new SimpleJsonSerializer():Serialize(data)).
     json:Add("response", cast(responseData:Json, JsonObject)).
     
     response:Entity = json.
