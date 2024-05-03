@@ -46,6 +46,7 @@ class fwebh.pas.webhandlers.ResourceWebHandler inherits WebHandlerCommon:
     var JsonObject json.
     var IGetDataService service.
     var IEntityWriter entityWriter.
+    var Progress.Lang.Object responseObj.
     
     do on error undo, throw:
       
@@ -62,28 +63,25 @@ class fwebh.pas.webhandlers.ResourceWebHandler inherits WebHandlerCommon:
       */
       
       requestData = new RequestDataProcessor():ProcessRequestInfo(request).
-      
+message "get:" requestData:Resource:Name.      
       // get the service instance and execute the logic
       service = serviceFactory:GetGetDataService(requestData:Resource:Name).
-      
-      // checking
-      
+message "valid service" valid-object(service).      
       responseData = service:GetData(requestData).
-      
-      // zoek de goede entity writer
+message "valid responseData" valid-object(responseData) responseData:ContentType.   
+      // write the data to the response       
+
       entityWriter = getEntityWriter(responseData).
-      response:Entity = entityWriter:Write(responseData).
+message "valid entityWriter" valid-object(entityWriter).       
+      responseObj = entityWriter:Write(responseData).
       
       
-      // for testing purposes serialize the RequestData and return it
-      json = new JsonObject().
-      json:Add("requestData", new SimpleJsonSerializer():Serialize(requestData)).
-      json:Add("response", cast(responseData:Json, JsonObject)).
-      
-      response:Entity = json.
-      response:ContentType = "application/json".
-      
+      response:Entity = responseObj.
+message "valid responseObj" valid-object(responseObj).      
+      response:ContentType = responseData:ContentType.
+               
       catch err1 as Progress.Lang.Error:
+        MESSAGE "error?" VIEW-AS ALERT-BOX.
         response = handleErrors(err1).  
       end catch.
       
@@ -133,6 +131,9 @@ class fwebh.pas.webhandlers.ResourceWebHandler inherits WebHandlerCommon:
         errorMessage = err:GetMessage(1).
         errorNumber = 405.
       end.
+      otherwise do:
+        errorMessage = err:GetMessage(1).
+      end.
     end case.  
     
     response = new WebResponse().
@@ -140,6 +141,8 @@ class fwebh.pas.webhandlers.ResourceWebHandler inherits WebHandlerCommon:
     response:StatusCode = errorNumber.
     response:StatusReason = StatusCodeHelper:GetMessage(errorNumber).
     response:ContentType = contentType.
+    
+    return response.
     
   end method.  // handleErrors
  
