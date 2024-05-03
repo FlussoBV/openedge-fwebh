@@ -32,7 +32,8 @@ class fwebh.pas.data.RequestDataProcessor:
     
     data:Resource = getResourceInfo(request).
     data:Verb = getContextValue(request, "REQUEST_METHOD").
-    data:MimeType = getContextValue(request, "CONTENT_TYPE").
+    data:ContentType = getContextValue(request, "CONTENT_TYPE").
+    data:Accept = getContextValue(request, "HTTP_ACCEPT").
     data:Version = request:GetPathParameter("version").
     data:Parameters = extractQueryParameters(request).  // StringStringMap is not yet supported by serializer
     data:Headers = extractHeaders(request).

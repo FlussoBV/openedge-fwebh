@@ -1,0 +1,7 @@
+{
+  "application/json": "fwebh.pas.data.JsonEntityWriter",
+  "text/xml": "fwebh.pas.data.XmlEntityWriter",
+  "image/*": "fwebh.pas.data.BinaryEntityWriter",
+  "application/*": "fwebh.pas.data.BinaryEntityWriter",
+  "default": "fwebh.pas.data.JsonEntityWriter"   
+}
