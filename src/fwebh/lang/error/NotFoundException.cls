@@ -17,7 +17,7 @@ using Progress.Lang.AppError.
 class fwebh.lang.error.NotFoundException inherits AppError: 
   
   constructor public NotFoundException(errorMessage as character):
-    super (substitute("NotFoundException: &1", errorMessage), -1).
+    super("Not found", -1).
   end.
   
 end class.
