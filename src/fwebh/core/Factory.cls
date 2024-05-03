@@ -184,5 +184,10 @@ class fwebh.core.Factory implements IFactory:
       delete ttinstance.
     end.
   end method.  // DeleteInstance
-    
+  
+  
+  method public logical Has(instanceName as char):
+    return can-find(first ttdefintion where ttdefintion.indentifier = instanceName).
+  end method.  
+  
 end class.
