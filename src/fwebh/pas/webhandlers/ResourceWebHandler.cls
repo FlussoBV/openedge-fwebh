@@ -52,16 +52,6 @@ class fwebh.pas.webhandlers.ResourceWebHandler inherits WebHandlerCommon:
       
       response = new WebResponse().
   
-      /*
-        the idea is: 
-          - first get the request info (resource name etc)
-          - get the service
-          - see if service has preferences on how the data should be put in the RequestData object (POST, PUT, etc)
-          - execute logic
-          - create response data
-          - ...
-      */
-      
       requestData = new RequestDataProcessor():ProcessRequestInfo(request).
       
       // get the service instance and execute the logic
