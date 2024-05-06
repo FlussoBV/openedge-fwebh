@@ -14,6 +14,7 @@ using Progress.Json.ObjectModel.JsonObject.
 using fwebh.core.IFactory.
 using fwebh.core.JSON.
 using fwebh.lang.error.NotFoundException.
+using fwebh.lang.error.UnacceptableException.
 using fwebh.pas.data.IEntityWriter.
 
 class fwebh.pas.data.EntityWriterFactory: 
@@ -28,14 +29,23 @@ class fwebh.pas.data.EntityWriterFactory:
   method public IEntityWriter GetEntityWriter(mimeType as character):
 
     var IEntityWriter entityWriter.
-
-    if (factory:Has(mimeType)) then
-      entityWriter = cast(factory:GetInstance(mimeType), IEntityWriter).
-    else do:
-      mimeType = entry(1, mimeType, "/") + "/*".
-      entityWriter = cast(factory:GetInstance(mimeType), IEntityWriter).
-    end.
-        
+    var char tmp.
+    
+    do on error undo, throw:
+      
+      if (factory:Has(mimeType)) then
+        entityWriter = cast(factory:GetInstance(mimeType), IEntityWriter).
+      else do:
+        tmp = entry(1, mimeType, "/") + "/*".
+        entityWriter = cast(factory:GetInstance(tmp), IEntityWriter).
+      end.
+      
+      catch err1 as Progress.Lang.Error :
+        undo, throw new UnacceptableException(mimeType).
+      end catch.
+      
+    end.  // do on error...
+            
     return entityWriter.
    
   end method.  // GetEntityWriter

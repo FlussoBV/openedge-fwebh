@@ -65,9 +65,11 @@ class fwebh.pas.webhandlers.ResourceWebHandler inherits WebHandlerCommon:
       requestData = new RequestDataProcessor():ProcessRequestInfo(request).
       
       // get the service instance and execute the logic
-      service = serviceFactory:GetGetDataService(requestData:Resource:Name).
+      service = serviceFactory:GetGetDataService(requestData:Resource:Name).      
       responseData = service:GetData(requestData).
-
+      
+      responseData:ContentType = handleContentType(service, requestData, responseData).
+      
       // write the data to the response       
       entityWriter = getEntityWriter(responseData).
       responseObj = entityWriter:Write(responseData).
@@ -82,7 +84,9 @@ class fwebh.pas.webhandlers.ResourceWebHandler inherits WebHandlerCommon:
     end.  // do on error undo, throw
 
     WriteResponse(response).
-
+    
+    @todo(what="garbage collect, certainly in case of memptr's").
+    
     return 0.
 
   end method.  // HandleGet
@@ -93,17 +97,21 @@ class fwebh.pas.webhandlers.ResourceWebHandler inherits WebHandlerCommon:
     var char errorType = err:GetClass():TypeName.
     var char errorMessage, contentType.
     var int errorNumber.
-    
+  
     contentType = "text/plain".  
     case errorType:
-      when "fwebh.lang.error.NotAllowedException" then do:
-        errorMessage = err:GetMessage(1).
-        errorNumber = 405.
-      end.
       when "fwebh.lang.error.NotFoundException" then do:
         errorMessage = err:GetMessage(1).
         errorNumber = 404.
       end.      
+      when "fwebh.lang.error.NotAllowedException" then do:
+        errorMessage = err:GetMessage(1).
+        errorNumber = 405.
+      end.
+      when "fwebh.lang.error.UnacceptableException" then do:
+        errorMessage = err:GetMessage(1).
+        errorNumber = 406.
+      end.
       otherwise do:
         errorMessage = err:GetClass():TypeName + ": " + err:GetMessage(1).
         errorNumber = 500.
@@ -120,12 +128,27 @@ class fwebh.pas.webhandlers.ResourceWebHandler inherits WebHandlerCommon:
   end method.  // handleErrors
 
  
- 
+  method private char handleContentType(service as Progress.Lang.Object, requestData as IRequestData, responseData as IResponseData):
+    
+    var char contentType.
+
+    if (responseData:ContentType > "") then 
+      contentType = responseData:ContentType.
+    else if requestData:Accept > "" and requestData:Accept <> "*/*" then 
+      contentType = requestData:Accept.
+    else if service:GetClass():IsA("fwebh.pas.data.IDefaultContentType") then 
+      contentType = cast(service, "fwebh.pas.data.IDefaultContentType"):GetDefaultContentType().
+    
+    if contentType = "" then
+      contentType = "application/json".  // last resort
+   
+    return contentType.
+    
+  end method.  // handleContentType
+  
+  
   method private IEntityWriter getEntityWriter(responseData as IResponseData):
     
-    if responseData:ContentType = "" then 
-      responseData:ContentType = "application/json".
-      
     return writerFactory:GetEntityWriter(responseData:ContentType).
     
   end method.
