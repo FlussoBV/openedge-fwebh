@@ -46,9 +46,14 @@ class fwebh.pas.data.RequestDataProcessor:
     
     var ResourceDescriptor resource = new ResourceDescriptor(request:GetPathParameter("resource")).
 
-    if hasPathParameter(request, "id") then resource:Id = request:GetPathParameter("id").    
-    if hasPathParameter(request, "parent-resource") then resource:ParentName = request:GetPathParameter("parent-resource").
-    if hasPathParameter(request, "parent-id") then resource:ParentId = request:GetPathParameter("parent-id").
+    if hasPathParameter(request, "id") then 
+      resource:Id = request:GetPathParameter("id").    
+    if hasPathParameter(request, "parent_resource") then 
+      resource:ParentName = request:GetPathParameter("parent_resource").
+    if hasPathParameter(request, "parent_id") then 
+      resource:ParentId = request:GetPathParameter("parent_id").
+    if hasPathParameter(request, "version") then 
+      resource:Version = request:GetPathParameter("version").
 
     return resource.
     
