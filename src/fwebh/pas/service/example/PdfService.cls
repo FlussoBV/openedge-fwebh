@@ -25,7 +25,7 @@ class fwebh.pas.service.example.PdfService implements IGetDataService:
     
     copy-lob file search("fwebh/pas/service/example/example.pdf") to pdfData.
     
-    response:Memptr = pdfData.
+    response:Data:Memptr = pdfData.
     response:ContentType = "application/pdf".
     
     return response.

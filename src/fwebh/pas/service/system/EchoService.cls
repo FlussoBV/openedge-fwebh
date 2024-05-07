@@ -26,7 +26,7 @@ class fwebh.pas.service.system.EchoService implements IGetDataService:
     
     var IResponseData response = new ResponseData().
         
-    response:Json = new SimpleJsonSerializer():Serialize(request).
+    response:Data:Json = new SimpleJsonSerializer():Serialize(request).
     
     return response.
     

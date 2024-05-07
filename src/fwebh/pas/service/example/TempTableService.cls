@@ -32,7 +32,7 @@ class fwebh.pas.service.example.TempTableService implements fwebh.pas.service.IG
     
     var IResponseData response = new ResponseData().
         
-    response:TempTableHandle = temp-table tt:handle.
+    response:Data:TempTableHandle = temp-table tt:handle.
     
     return response.
     

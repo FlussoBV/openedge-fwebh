@@ -10,16 +10,12 @@
 
 
 using Progress.Json.ObjectModel.JsonConstruct.
-using fwebh.pas.data.*.
+using fwebh.pas.data.IDataHolder.
+using fwebh.pas.data.ResponseDataType.
 
 interface fwebh.pas.data.IResponseData:  
   
-  define public property DatasetHandle as handle no-undo get. set.
-  define public property TempTableHandle as handle no-undo get. set.
-  define public property BufferHandle as handle no-undo get. set.
-  define public property Json as JsonConstruct no-undo get. set.
-  define public property Memptr as memptr no-undo get. set.
-  define public property DataType as ResponseDataType no-undo get. set. 
+  define public property Data as IDataHolder no-undo get.
   define public property ContentType as char no-undo get. set.
   
 end interface.
