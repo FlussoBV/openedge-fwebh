@@ -23,11 +23,11 @@ class fwebh.pas.data.XmlEntityWriter implements IEntityWriter:
     
     var Progress.Lang.Object entityData.
     
-    case responseData:DataType:
-      when ResponseDataType:DATASET then entityData = writeDataset(responseData:DatasetHandle).
-      when ResponseDataType:TEMP-TABLE then entityData = writeTemptable(responseData:TempTableHandle).
-      when ResponseDataType:BUFFER then entityData = writeBuffer(responseData:BufferHandle).
-      otherwise undo, throw new AppError(substitute("XmlEntityWriter cannot process EntityDataType '&1'", responseData:DataType), -1).
+    case responseData:Data:DataType:
+      when ResponseDataType:DATASET then entityData = writeDataset(responseData:Data:DatasetHandle).
+      when ResponseDataType:TEMP-TABLE then entityData = writeTemptable(responseData:Data:TempTableHandle).
+      when ResponseDataType:BUFFER then entityData = writeBuffer(responseData:Data:BufferHandle).
+      otherwise undo, throw new AppError(substitute("XmlEntityWriter cannot process EntityDataType '&1'", responseData:Data:DataType), -1).
     end case.
     
     return entityData.

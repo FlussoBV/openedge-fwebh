@@ -22,9 +22,9 @@ class fwebh.pas.data.BinaryEntityWriter implements IEntityWriter:
     
     var Progress.Lang.Object entityData.
     
-    case responseData:DataType:
-      when ResponseDataType:MEMPTR then entityData = new Memptr(responseData:Memptr).
-      otherwise undo, throw new AppError(substitute("BinaryEntityWriter cannot process EntityDataType '&1'", responseData:DataType), -1).
+    case responseData:Data:DataType:
+      when ResponseDataType:MEMPTR then entityData = new Memptr(responseData:Data:Memptr).
+      otherwise undo, throw new AppError(substitute("BinaryEntityWriter cannot process EntityDataType '&1'", responseData:Data:DataType), -1).
     end case.
     
     return entityData.

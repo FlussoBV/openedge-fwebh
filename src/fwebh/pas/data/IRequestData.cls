@@ -11,6 +11,7 @@
 
 
 using OpenEdge.Core.Collections.StringStringMap.
+using fwebh.pas.data.IDataHolder.
 using fwebh.pas.resource.ResourceDescriptor.
 
 @DefaultImplementation(class="fwebh.pas.data.RequestData").
@@ -23,5 +24,6 @@ interface fwebh.pas.data.IRequestData:
   define public property Version as char no-undo get. set.
   define public property Parameters as StringStringMap no-undo get. set.
   define public property Headers as StringStringMap no-undo get. set.
+  define public property Data as IDataHolder no-undo get. 
   
 end interface.

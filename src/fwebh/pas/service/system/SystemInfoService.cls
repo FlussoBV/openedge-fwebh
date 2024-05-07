@@ -32,7 +32,7 @@ class fwebh.pas.service.system.SystemInfoService implements IGetDataService:
     json:Add("status", "ok").
     json:Add("time", iso-date(datetime-tz(now))).
     
-    response:Json = json.
+    response:Data:Json = json.
     
     return response.
     

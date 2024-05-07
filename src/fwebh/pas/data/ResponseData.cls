@@ -11,47 +11,21 @@
 block-level on error undo, throw.
 
 using Progress.Json.ObjectModel.JsonConstruct.
+using fwebh.pas.data.DataHolder.
 using fwebh.pas.data.IResponseData.
-using fwebh.pas.data.ResponseDataType.
+using fwebh.pas.data.IDataHolder.
 
 class fwebh.pas.data.ResponseData implements IResponseData: 
+  
+  // lazy instantiate, requests may not have data (204 No Content f.e.)
+  define public property Data as IDataHolder no-undo 
+    get():
+      if not valid-object(Data) then 
+        Data = new DataHolder().
+      return Data.
+    end. 
+    private set.
 
-  define public property DatasetHandle as handle no-undo 
-    get. 
-    set(h as handle):
-      DatasetHandle = h.
-      this-object:DataType = ResponseDataType:DATASET.
-    end.
-    
-  define public property TempTableHandle as handle no-undo 
-    get. 
-    set(h as handle):
-      TempTableHandle = h.
-      this-object:DataType = ResponseDataType:TEMP-TABLE.
-    end.
-    
-  define public property BufferHandle as handle no-undo 
-    get. 
-    set(h as handle):
-      BufferHandle = h.
-      this-object:DataType = ResponseDataType:BUFFER.
-    end.
-  
-  define public property Json as JsonConstruct no-undo 
-    get. 
-    set(jsonIn as JsonConstruct):
-      Json = jsonIn.
-      this-object:DataType = ResponseDataType:JSON.
-    end.
-    
-  define public property Memptr as memptr no-undo 
-    get. 
-    set(p as memptr):
-      this-object:Memptr = p.
-      this-object:DataType = ResponseDataType:MEMPTR.
-    end.
-  
-  define public property DataType as ResponseDataType no-undo get. set. 
   define public property ContentType as char no-undo get. set.
   
 end class.
