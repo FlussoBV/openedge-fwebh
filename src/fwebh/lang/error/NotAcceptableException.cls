@@ -1,6 +1,6 @@
  
  /*------------------------------------------------------------------------
-    File        : UnacceptableException
+    File        : NotAcceptableException
     Purpose     : 
     Syntax      : 
     Description : 
@@ -13,10 +13,10 @@ block-level on error undo, throw.
 
 using Progress.Lang.AppError. 
 
-class fwebh.lang.error.UnacceptableException inherits AppError: 
+class fwebh.lang.error.NotAcceptableException inherits AppError: 
   
-  constructor public UnacceptableException (errorMessage as character):
-    super (substitute("Unacceptable: &1", errorMessage), -1).
+  constructor public NotAcceptableException (errorMessage as character):
+    super (substitute("Not Acceptable: &1", errorMessage), -1).
   end constructor.
   
 end class.

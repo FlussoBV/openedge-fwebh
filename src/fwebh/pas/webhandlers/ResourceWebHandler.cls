@@ -98,7 +98,7 @@ class fwebh.pas.webhandlers.ResourceWebHandler inherits WebHandlerCommon:
         errorMessage = err:GetMessage(1).
         errorNumber = 405.
       end.
-      when "fwebh.lang.error.UnacceptableException" then do:
+      when "fwebh.lang.error.NotAcceptableException" then do:
         errorMessage = err:GetMessage(1).
         errorNumber = 406.
       end.
