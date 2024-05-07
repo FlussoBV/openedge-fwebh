@@ -20,77 +20,79 @@ class fwebh.pas.data.EntityWriterFactory_UT:
   
   var EntityWriterFactory factory.  
 
-  @Before.
-  method public void beforeStartAllTests():
+  @Setup.
+  method public void _setup_each_test():
     factory = new EntityWriterFactory().
   end method.
   
-  @Setup.
-  method public void beforeTest():   
-  end method.
-  
-  @TearDown.
-  method public void afterTest():   
-  end method.
-  
-  @After.
-  method public void afterStartAllTests():
-  end method.
-  
   @Test.
-  method public void TestJsonEntityWriter():
+  method public void application_json_returns_correct_writer():
     define variable entityWriter as IEntityWriter no-undo.
     entityWriter = factory:GetEntityWriter("application/json").
     Assert:Equals(entityWriter:GetClass():TypeName, "fwebh.pas.data.JsonEntityWriter").
   end method.
 
   @Test.
-  method public void TestXmlEntityWriter():
+  method public void text_xml_returns_correct_writer():
     define variable entityWriter as IEntityWriter no-undo.
     entityWriter = factory:GetEntityWriter("text/xml").
     Assert:Equals(entityWriter:GetClass():TypeName, "fwebh.pas.data.XmlEntityWriter").
   end method.
 
   @Test.
-  method public void TestBinaryEntityWriterForImage():
+  method public void image_asterisk_returns_correct_writer():
     define variable entityWriter as IEntityWriter no-undo.
     entityWriter = factory:GetEntityWriter("image/*").
     Assert:Equals(entityWriter:GetClass():TypeName, "fwebh.pas.data.BinaryEntityWriter").
   end method.
 
   @Test.
-  method public void TestBinaryEntityWriterForApplication():
+  method public void application_asterisk_returns_correct_writer():
     define variable entityWriter as IEntityWriter no-undo.
     entityWriter = factory:GetEntityWriter("application/*").
     Assert:Equals(entityWriter:GetClass():TypeName, "fwebh.pas.data.BinaryEntityWriter").
   end method.
 
   @Test.
-  method public void TestBinaryEntityWriterForPdf():
+  method public void application_pdf_returns_correct_writer():
     define variable entityWriter as IEntityWriter no-undo.
     entityWriter = factory:GetEntityWriter("application/pdf").
     Assert:Equals(entityWriter:GetClass():TypeName, "fwebh.pas.data.BinaryEntityWriter").
   end method.
 
-  @Test(expected="fwebh.lang.error.NotFoundException").
-  method public void TestFailureForDummy():
+  @Test(expected="fwebh.lang.error.NotAcceptableException").
+  method public void dummy_fails():
     define variable entityWriter as IEntityWriter no-undo.
     entityWriter = factory:GetEntityWriter("dummy").
   end method.
 
-  @todo(what="extend loadDefinitions to validate input write fail loadDefinitions").
-  // @Test(expected="fwebh.lang.error.NotFoundException").
-  method public void TestFailureForLoadDefinitions():
-    var EntityWriterFactory factory = new EntityWriterFactory().  
+  @Test(expected="Progress.Json.JsonParserError ").
+  method public void corrupt_json_fails_load_definitions():
+    var EntityWriterFactory factory.  
     var IEntityWriter entityWriter.
-    
-    ProPathHelper:addFirstEntry("src/test/pas/data").
-    message search("entitywriter.json")
-    view-as alert-box.
-    entityWriter = factory:GetEntityWriter("dummy").
+
+    ProPathHelper:addFirstEntry("src/test/pas/data/corrupt").
+    factory = new EntityWriterFactory().
+
     finally:
       ProPathHelper:removeFirstEntry().
-      delete object factory.
+      if valid-object(factory) then
+        delete object factory.
+    end finally.
+  end method.
+
+  @Test(expected="Progress.Json.JsonError ").
+  method public void invalid_json_fails_load_definitions():
+    var EntityWriterFactory factory.  
+    var IEntityWriter entityWriter.
+
+    ProPathHelper:addFirstEntry("src/test/pas/data/invalid").
+    factory = new EntityWriterFactory().
+
+    finally:
+      ProPathHelper:removeFirstEntry().
+      if valid-object(factory) then
+        delete object factory.
     end finally.
   end method.
 

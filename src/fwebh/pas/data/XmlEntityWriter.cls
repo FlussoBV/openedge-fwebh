@@ -43,8 +43,7 @@ class fwebh.pas.data.XmlEntityWriter implements IEntityWriter:
                                bufferData,
                                false, // formatted
                                ?, // encoding
-                               false, // omit-initial-values
-                               true // omit-outer-object
+                               false // omit-initial-values
                                ).
   
     return new String(bufferData).
