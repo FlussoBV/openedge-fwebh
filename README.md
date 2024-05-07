@@ -1,4 +1,4 @@
-# flusso webhandler library
+# flusso webhandler library for openedge
 
 [![CI](https://github.com/FlussoBV/openedge-fwebh/actions/workflows/ci.yaml/badge.svg)](https://github.com/FlussoBV/openedge-fwebh/actions/workflows/ci.yaml)
 
