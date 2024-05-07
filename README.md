@@ -4,10 +4,11 @@
 
 A databaseless project primarily aimed at providing a standard implementation 
 
-unittests are placed next to the classes that are tested and get suffix _UT
+### unittest
+unittests are placed next to the classes that are tested and get suffix `_UT`
 
 naming of annotated methods
-
+```
   @Before.
   method public void _before_all_tests():
 
@@ -21,3 +22,4 @@ naming of annotated methods
   method public void _after_all_tests():
 
   @Test methods follow snka_casing
+```
