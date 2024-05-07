@@ -14,7 +14,7 @@ using Progress.Json.ObjectModel.JsonObject.
 using fwebh.core.IFactory.
 using fwebh.core.JSON.
 using fwebh.lang.error.NotFoundException.
-using fwebh.lang.error.UnacceptableException.
+using fwebh.lang.error.NotAcceptableException.
 using fwebh.pas.data.IEntityWriter.
 
 class fwebh.pas.data.EntityWriterFactory: 
@@ -41,7 +41,7 @@ class fwebh.pas.data.EntityWriterFactory:
       end.
       
       catch err1 as Progress.Lang.Error :
-        undo, throw new UnacceptableException(mimeType).
+        undo, throw new NotAcceptableException(mimeType).
       end catch.
       
     end.  // do on error...
