@@ -11,8 +11,10 @@
 
 block-level on error undo, throw.
 
-using OpenEdge.Web.IWebRequest.
 using OpenEdge.Core.Collections.StringStringMap.
+using OpenEdge.Net.HTTP.HttpHeader.
+using OpenEdge.Web.IWebRequest.
+using Progress.Json.ObjectModel.JsonConstruct.
 using fwebh.pas.data.IRequestData.
 using fwebh.pas.data.RequestData.
 using fwebh.pas.data.RequestDataProcessor.
@@ -39,10 +41,21 @@ class fwebh.pas.data.RequestDataProcessor:
     data:Parameters = extractQueryParameters(request).  // StringStringMap is not yet supported by serializer
     data:Headers = extractHeaders(request).
     
+    if valid-object(request:Entity) then 
+      processBody(request, data).
+      
     return data.
     
   end method.  // ProcessRequest
   
+  method private void processBody(request as IWebRequest, data as RequestData):
+    
+    // assume JSON for now
+    data:Data:Json = cast(request:Entity, Progress.Json.ObjectModel.JsonConstruct).    
+    
+  end method.
+  
+
   method private ResourceDescriptor getResourceInfo(request as IWebRequest):
     
     var ResourceDescriptor resource = new ResourceDescriptor(request:GetPathParameter("resource")).
