@@ -46,14 +46,10 @@ class fwebh.pas.data.RequestDataProcessor:
     
     var ResourceDescriptor resource = new ResourceDescriptor(request:GetPathParameter("resource")).
 
-    if hasPathParameter(request, "id") then 
-      resource:Id = request:GetPathParameter("id").    
-    if hasPathParameter(request, "parent_resource") then 
-      resource:ParentName = request:GetPathParameter("parent_resource").
-    if hasPathParameter(request, "parent_id") then 
-      resource:ParentId = request:GetPathParameter("parent_id").
-    if hasPathParameter(request, "version") then 
-      resource:Version = request:GetPathParameter("version").
+    resource:Id = getPathParameter(request, "id").    
+    resource:ParentName = getPathParameter(request, "parentResource").
+    resource:ParentId = getPathParameter(request, "parentId").
+    resource:Version = getPathParameter(request, "version").
 
     return resource.
     
@@ -63,13 +59,24 @@ class fwebh.pas.data.RequestDataProcessor:
     return lookup(name, request:PathParameterNames) > 0.
   end method.  
 
+  method private char getPathParameter(request as IWebRequest, pathParameter as char):
+    
+    var char parameterValue = ?.
+    
+    if hasPathParameter(request, pathParameter) then 
+      parameterValue = request:GetPathParameter(pathParameter).
+    
+    return parameterValue.
+    
+  end method.  // getPathParameter
+  
   method private char getContextValue(request as IWebRequest, name as character):
     var char contentType = request:GetContextValue(name).
     if (contentType = "") then
       contentType = ?.
     return contentType.
   end method.
-
+  
   method private StringStringMap extractQueryParameters(request as IWebRequest):
     
     var char parameters, currentEntry, parameterName, parameterValue.
