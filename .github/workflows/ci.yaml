@@ -138,17 +138,58 @@ jobs:
         run: |
           docker logs $(cat container.id)
 
-      - name: Curl echo
+      - name: Test echo service (200 response)
         continue-on-error: false
         run: |
           curl http://localhost:8810/web/v1/echo --max-time 30
 
-      - name: Test error response
+      - name: Test 400 error response
         continue-on-error: false
         run: |
-          STATUSCODE=$(curl --silent --output /dev/stderr --write-out "%{http_code}" http://localhost:8810/web/v1/test?error=400)
-          if test $STATUSCODE -ne 400; then
-            echo "expected http error 400, got: $STATUSCODE"
+          httperror=400
+          STATUSCODE=$(curl --silent --output /dev/stderr --write-out "%{http_code}" http://localhost:8810/web/v1/test?error=${httperror})
+          if test $STATUSCODE -ne ${httperror}; then
+            echo "expected http error ${httperror}, got: $STATUSCODE"
+            exit 1
+          fi
+
+      - name: Test 404 error response
+        continue-on-error: false
+        run: |
+          httperror=404
+          STATUSCODE=$(curl --silent --output /dev/stderr --write-out "%{http_code}" http://localhost:8810/web/v1/test?error=${httperror})
+          if test $STATUSCODE -ne ${httperror}; then
+            echo "expected http error ${httperror}, got: $STATUSCODE"
+            exit 1
+          fi
+
+      - name: Test 405 error response
+        continue-on-error: false
+        run: |
+          httperror=405
+          STATUSCODE=$(curl --silent --output /dev/stderr --write-out "%{http_code}" http://localhost:8810/web/v1/test?error=${httperror})
+          if test $STATUSCODE -ne ${httperror}; then
+            echo "expected http error ${httperror}, got: $STATUSCODE"
+            exit 1
+          fi
+
+      - name: Test 500 error response
+        continue-on-error: false
+        run: |
+          httperror=500
+          STATUSCODE=$(curl --silent --output /dev/stderr --write-out "%{http_code}" http://localhost:8810/web/v1/test?error=${httperror})
+          if test $STATUSCODE -ne ${httperror}; then
+            echo "expected http error ${httperror}, got: $STATUSCODE"
+            exit 1
+          fi
+
+      - name: Test other error return 500
+        continue-on-error: false
+        run: |
+          httperror=500
+          STATUSCODE=$(curl --silent --output /dev/stderr --write-out "%{http_code}" http://localhost:8810/web/v1/test?error=555)
+          if test $STATUSCODE -ne ${httperror}; then
+            echo "expected http error ${httperror}, got: $STATUSCODE"
             exit 1
           fi
 
