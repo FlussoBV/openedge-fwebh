@@ -90,6 +90,10 @@ class fwebh.pas.webhandlers.ResourceWebHandler inherits WebHandlerCommon:
   
     contentType = "text/plain".  
     case errorType:
+      when "fwebh.lang.error.BadRequestException" then do:
+        errorMessage = err:GetMessage(1).
+        errorNumber = 400.
+      end.      
       when "fwebh.lang.error.NotFoundException" then do:
         errorMessage = err:GetMessage(1).
         errorNumber = 404.
