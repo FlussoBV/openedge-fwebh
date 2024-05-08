@@ -32,6 +32,7 @@ class fwebh.pas.service.system.CiTestService implements IGetDataService:
       case errorCode:
         when "400" then undo, throw new BadRequestException("bad request").
         when "404" then undo, throw new NotFoundException("not found").
+        when "405" then undo, throw new NotAllowedException("not found").
         when "500" then undo, throw new Progress.Lang.AppError("requested 500 error").
         otherwise undo, throw new AppError("unforseen error", -1).
       end case.

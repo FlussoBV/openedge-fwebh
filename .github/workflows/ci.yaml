@@ -114,11 +114,12 @@ jobs:
           name: build-artifacts-${{ matrix.version }}.${{ github.run_number }}
           path: .
 
-      - name: inspect artifacts
+      - name: Inspect artifacts
         run: |
           ls -l ${PWD}
           
-      - run: |
+      - name: Get flattened version  # get the flattened minor version 12.2.10 --> 122
+        run: |
           a=${{matrix.version}}
           flatversion=`echo ${a%\.*} | sed "s/\.//g"`
           echo "FLATVERSION=${flatversion}" >> $GITHUB_ENV
@@ -183,7 +184,7 @@ jobs:
             exit 1
           fi
 
-      - name: Test other error return 500
+      - name: Test other errors return 500
         continue-on-error: false
         run: |
           httperror=500
