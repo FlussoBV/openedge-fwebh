@@ -131,7 +131,7 @@ jobs:
       - name: Start PAS container
         run: |
           docker run -d -p 8810:8810 -v ${PWD}/progress.cfg:/usr/dlc/progress.cfg -v ${PWD}:/app/src -v ${PWD}/fwebh.pl:/app/lib/logic.pl --env PASWEBHANDLERS=/app/src/ROOT.handlers docker.io/devbfvio/openedge-pas:${{ matrix.version }}-dev /app/pas/start.sh > container.id
-          sleep 5
+          sleep 30   # unfortunately necessary to wait for the container to start
           docker ps -a
 
       - name: Display container logs before call
@@ -139,9 +139,18 @@ jobs:
           docker logs $(cat container.id)
 
       - name: Curl echo
-        #continue-on-error: true
+        continue-on-error: false
         run: |
-          curl -v http://localhost:8810/web/v1/echo --max-time 30
+          curl http://localhost:8810/web/v1/echo --max-time 30
+
+      - name: Test error response
+        continue-on-error: false
+        run: |
+          STATUSCODE=$(curl --silent --output /dev/stderr --write-out "%{http_code}" http://localhost:8810/web/v1/test?error=400)
+          if test $STATUSCODE -ne 400; then
+            echo "expected http error 400, got: $STATUSCODE"
+            exit 1
+          fi
 
       - name: Display container logs after call
         run: |

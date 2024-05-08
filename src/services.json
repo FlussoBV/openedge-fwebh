@@ -2,5 +2,6 @@
   "echo": {"classname": "fwebh.pas.service.system.EchoService"},
   "pdf": { "classname": "fwebh.pas.service.example.PdfService"},
   "sysinfo": {"classname": "fwebh.pas.service.system.SystemInfoService"},
-  "temptable": {"classname": "fwebh.pas.service.example.TempTableService"}
+  "temptable": {"classname": "fwebh.pas.service.example.TempTableService"},
+  "test": {"classname": "fwebh.pas.service.system.CiTestService"}
 }
