@@ -16,5 +16,6 @@ enum fwebh.pas.data.ResponseDataType :
     BUFFER
     JSON
     MEMPTR
+    WIDGET-HANDLE
     .
 end enum.
