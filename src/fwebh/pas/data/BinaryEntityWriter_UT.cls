@@ -12,10 +12,10 @@ block-level on error undo, throw.
 
 using fwebh.pas.data.BinaryEntityWriter.
 using fwebh.pas.data.ResponseData.
-using OpenEdge.Core.Assertion.AssertObject.
 using OpenEdge.Core.Assert.
-using Progress.Lang.Object.
+using OpenEdge.Core.Assertion.AssertObject.
 using OpenEdge.Core.Memptr.
+using Progress.Lang.Object.
 
 class fwebh.pas.data.BinaryEntityWriter_UT: 
   
@@ -53,7 +53,7 @@ class fwebh.pas.data.BinaryEntityWriter_UT:
     response:Data:Memptr = mem.
     obj = writer:Write(response).
     
-    Assert:Equals(cast(obj,memptr):Size, 12).
+    Assert:Equals(cast(obj, Memptr):Size, 12).
 
     finally:
       set-size(mem) = 0.

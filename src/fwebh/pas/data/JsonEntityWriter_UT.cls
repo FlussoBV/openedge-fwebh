@@ -8,14 +8,14 @@
     Notes       : 
   ----------------------------------------------------------------------*/
 
-using Progress.Lang.*.
 using fwebh.pas.data.JsonEntityWriter.
 using fwebh.pas.data.ResponseData.
+using OpenEdge.Core.Assert.
 using OpenEdge.Core.Assertion.AssertJson.
 using OpenEdge.Core.Assertion.AssertObject.
-using Progress.Json.ObjectModel.JsonObject.
-using OpenEdge.Core.Assert.
 using Progress.Json.ObjectModel.JsonArray.
+using Progress.Json.ObjectModel.JsonObject.
+using Progress.Lang.Object.
 
 block-level on error undo, throw.
 
@@ -81,7 +81,7 @@ class fwebh.pas.data.JsonEntityWriter_UT:
                             false, // omit-initial-values
                             true // omit-outer-object
                           ).
-    Assert:Equals(cast(obj,JsonObject):GetJsonText(), data:GetJsonText()).
+    Assert:Equals(cast(obj, JsonObject):GetJsonText(), data:GetJsonText()).
 
   end method.  
 
@@ -98,7 +98,7 @@ class fwebh.pas.data.JsonEntityWriter_UT:
   
   @Test.
   method public void set_dataset_correct_compare(  ):
-    var Progress.Lang.Object obj.
+    var Object obj.
     var JsonObject data = new JsonObject().
     
     response:Data:DatasetHandle = dataset ds:handle.
@@ -111,7 +111,7 @@ class fwebh.pas.data.JsonEntityWriter_UT:
                             true, // omit-outer-object
                             false // write-before-image
                           ).
-    Assert:Equals(cast(obj,JsonObject):GetJsonText(), data:GetJsonText()).
+    Assert:Equals(cast(obj, JsonObject):GetJsonText(), data:GetJsonText()).
 
   end method.  
 
@@ -135,13 +135,13 @@ class fwebh.pas.data.JsonEntityWriter_UT:
     response:Data:Json = data.
     obj = writer:Write(response).
     
-    Assert:Equals(cast(obj,JsonObject):GetJsonText(), data:GetJsonText()).
+    Assert:Equals(cast(obj, JsonObject):GetJsonText(), data:GetJsonText()).
 
   end method.  
 
   @Test.
   method public void set_temp_table_correct_write(  ):
-    var Progress.Lang.Object obj.
+    var Object obj.
     
     response:Data:TempTableHandle = temp-table tt:handle.
     obj = writer:Write(response).
@@ -152,7 +152,7 @@ class fwebh.pas.data.JsonEntityWriter_UT:
   
   @Test.
   method public void set_temp_table_correct_compare(  ):
-    var Progress.Lang.Object obj.
+    var Object obj.
     var JsonArray data = new JsonArray().
     
     response:Data:TempTableHandle = temp-table tt:handle.

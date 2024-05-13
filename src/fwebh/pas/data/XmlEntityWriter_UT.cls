@@ -8,12 +8,12 @@
     Notes       : 
   ----------------------------------------------------------------------*/
 
-using Progress.Lang.*.
 using fwebh.pas.data.XmlEntityWriter.
 using fwebh.pas.data.ResponseData.
 using OpenEdge.Core.Assertion.AssertObject.
 using OpenEdge.Core.Assert.
 using OpenEdge.Core.String.
+using Progress.Lang.Object.
 
 block-level on error undo, throw.
 
@@ -53,7 +53,7 @@ class fwebh.pas.data.XmlEntityWriter_UT:
 
   @Test.
   method public void set_buffer_correct_write(  ):
-    var Progress.Lang.Object obj.
+    var Object obj.
     
     find tt.
     response:Data:BufferHandle = buffer tt:handle.
@@ -65,7 +65,7 @@ class fwebh.pas.data.XmlEntityWriter_UT:
   
   @Test.
   method public void set_buffer_correct_compare(  ):
-    var Progress.Lang.Object obj.
+    var Object obj.
     var longchar data.
     
     find tt.
@@ -78,13 +78,13 @@ class fwebh.pas.data.XmlEntityWriter_UT:
                             ?, // encoding
                             false // omit-initial-values
                             ).
-    Assert:Equals(cast(obj,String):Value, data).
+    Assert:Equals(cast(obj, String):Value, data).
 
   end method.  
 
   @Test.
   method public void set_dataset_correct_write(  ):
-    var Progress.Lang.Object obj.
+    var Object obj.
     
     response:Data:DatasetHandle = dataset ds:handle.
     obj = writer:Write(response).
@@ -95,7 +95,7 @@ class fwebh.pas.data.XmlEntityWriter_UT:
   
   @Test.
   method public void set_dataset_correct_compare(  ):
-    var Progress.Lang.Object obj.
+    var Object obj.
     var longchar data.
     
     response:Data:DatasetHandle = dataset ds:handle.
@@ -105,13 +105,13 @@ class fwebh.pas.data.XmlEntityWriter_UT:
                             false, // formatted
                             ? // encoding
                           ).
-    Assert:Equals(cast(obj,String):Value, data).
+    Assert:Equals(cast(obj, String):Value, data).
 
   end method.  
 
   @Test.
   method public void set_temp_table_correct_write(  ):
-    var Progress.Lang.Object obj.
+    var Object obj.
     
     response:Data:TempTableHandle = temp-table tt:handle.
     obj = writer:Write(response).
@@ -122,7 +122,7 @@ class fwebh.pas.data.XmlEntityWriter_UT:
   
   @Test.
   method public void set_temp_table_correct_compare(  ):
-    var Progress.Lang.Object obj.
+    var Object obj.
     var longchar data.
     
     response:Data:TempTableHandle = temp-table tt:handle.
@@ -132,9 +132,8 @@ class fwebh.pas.data.XmlEntityWriter_UT:
                             false, // formatted
                             ? // encoding
                             ).
-    Assert:Equals(cast(obj,String):Value, data).
+    Assert:Equals(cast(obj, String):Value, data).
 
   end method.  
-
 
 end class.
