@@ -34,11 +34,12 @@ using fwebh.serialize.ISerializableDataStructure.
 
 class fwebh.serialize.SimpleJsonSerializer implements ISerializable: 
   
-  define private variable serializeThese as character no-undo.
-  
+  var private char serializeThese.
+  var private char skipThese. 
   
   constructor public SimpleJsonSerializer():
-    serializeThese = "character,date,datetime,datetimetz,decimal,integer,int64,logical,longchar,memptr".    
+    serializeThese = "character,date,datetime,datetimetz,decimal,integer,int64,logical,longchar,memptr".
+    skipThese = "handle".    
   end.
   
   
@@ -49,17 +50,15 @@ class fwebh.serialize.SimpleJsonSerializer implements ISerializable:
    
   method public JsonObject Serialize(objectToSerialize as Progress.Lang.Object, includeClassName as logical): 
     
-    define variable cls as class Class no-undo.
-    define variable props as Property extent no-undo.
-    define variable prop as Property no-undo.
-    define variable jsonOut as JsonObject no-undo.
-    define variable jsonSerialized as JsonObject no-undo.
-    define variable jc as JsonConstruct no-undo.
-    
-    define variable valueObject as Progress.Lang.Object no-undo.
-    define variable i as integer no-undo.
+    var Progress.Lang.Class cls.
+    var Property[] props.
+    var Property prop.
+    var JsonObject jsonOut, jsonSerialized.
+    var JsonConstruct jc.
+    var Progress.Lang.Object valueObject.
+    var int i.
    
-    
+
     cls = objectToSerialize:GetClass().
     props = cls:GetProperties().  
     jsonOut = new JsonObject().
@@ -75,7 +74,10 @@ class fwebh.serialize.SimpleJsonSerializer implements ISerializable:
       prop = props[i].
       if (not prop:CanRead or prop:Name = "next-sibling" or prop:Name = "prev-sibling") then
         next.
-      
+
+      if (lookup(prop:DataType:ToString(), skipThese) > 0) then
+        next.
+        
       if (lookup(prop:DataType:ToString(), serializeThese) > 0) then do:
         
         if (prop:Extent = 0) then
@@ -93,7 +95,7 @@ class fwebh.serialize.SimpleJsonSerializer implements ISerializable:
           jsonSerialized:Add(prop:Name, serializeStringStringMap(dynamic-property(objectToSerialize, prop:Name))).
         end.
         else if (prop:DataTypeName begins "Progress." or prop:DataTypeName begins "OpenEdge.") then do:
-                    
+                   
           case true:
                          
             when (prop:DataTypeName begins "Progress.Json.ObjectModel.Json") then do:
@@ -110,8 +112,8 @@ class fwebh.serialize.SimpleJsonSerializer implements ISerializable:
           
         end.
         else do:
-          valueObject = dynamic-property(objectToSerialize, prop:Name). 
-          if (valid-object(valueObject)) then 
+          valueObject = dynamic-property(objectToSerialize, prop:Name).           
+          if (valid-object(valueObject)) then
             jsonSerialized:Add(prop:Name, Serialize(valueObject)).
         end.
         
@@ -138,8 +140,8 @@ class fwebh.serialize.SimpleJsonSerializer implements ISerializable:
   
   method public longchar SerializeToLongchar(objectToSerialize as Progress.Lang.Object, formatted as logical):
     
-    define variable json as JsonObject no-undo.
-    define variable resultString as longchar no-undo.
+    var JsonObject json.
+    var longchar resultString.
     
     json = this-object:Serialize(objectToSerialize, formatted).
     json:Write(resultString).
@@ -151,16 +153,15 @@ class fwebh.serialize.SimpleJsonSerializer implements ISerializable:
 
   method private void addDatastructures(objectToSerialize as ISerializableDataStructure, jsonOut as JsonObject):
     
-    define variable dataStructs as IMap no-undo.
-    define variable dataStruct as IMapEntry no-undo.
-    define variable keyset as ISet no-undo.
-    define variable iterator as IIterator no-undo.
-    define variable keyname as character no-undo.
-    define variable dataHandle as handle no-undo.
-    define variable keyObject as Progress.Lang.Object no-undo.
-    define variable dataObject as WidgetHandle no-undo.
-    
-    define variable i as integer no-undo.
+    var IMap dataStructs.
+    var IMapEntry dataStruct.
+    var ISet keyset.
+    var IIterator iterator.
+    var char keyname.
+    var handle dataHandle.
+    var Progress.Lang.Object keyObject.
+    var WidgetHandle dataObject.
+    var int i.
     
     dataStructs = objectToSerialize:GetDataStructures().
     keyset = dataStructs:KeySet.
@@ -191,12 +192,11 @@ class fwebh.serialize.SimpleJsonSerializer implements ISerializable:
   
   method public JsonArray SerializeList(dataArray as List):
     
-    define variable iterator as IIterator no-undo.
-    define variable arrayItem as Progress.Lang.Object no-undo.
-    define variable array as JsonArray no-undo.
-    define variable obj as Progress.Lang.Object no-undo.
+    var IIterator iterator.
+    var Progress.Lang.Object arrayItem.
+    var JsonArray array = new JsonArray().
+    var Progress.Lang.Object obj.
     
-    array = new JsonArray().
     if (not valid-object(dataArray)) then
       dataArray = new List().
       
@@ -237,14 +237,11 @@ class fwebh.serialize.SimpleJsonSerializer implements ISerializable:
   
   method private void serializeTempTable(propertyName as character, data as handle, jsonOut as JsonObject):
     
-    define variable queryHandle as handle no-undo.
-    define variable bufferHandle as handle no-undo.
-    define variable fieldHandle as handle no-undo.
-    define variable i as integer no-undo.
-    define variable array as JsonArray no-undo.
-    define variable record as JsonObject no-undo.
+    var handle queryHandle, bufferHandle, fieldHandle.
+    var int i.
+    var JsonArray array = new JsonArray().
+    var JsonObject record.
     
-    array = new JsonArray().
     create query queryHandle.
     bufferHandle = data:default-buffer-handle.
     
@@ -274,10 +271,9 @@ class fwebh.serialize.SimpleJsonSerializer implements ISerializable:
   
   method private JsonArray serializeExtent(objectToSerialize as Progress.Lang.Object, prop as Property):
     
-    define variable serializedExtent as JsonArray no-undo.
-    define variable i as integer no-undo.
+    var JsonArray serializedExtent = new JsonArray().
+    var int i.
     
-    serializedExtent = new JsonArray().
     
     do i = 1 to prop:Extent:
       serializedExtent:Add(dynamic-property(objectToSerialize, prop:Name, i)).
