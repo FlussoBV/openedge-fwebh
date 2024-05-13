@@ -11,9 +11,9 @@
 block-level on error undo, throw.
 
 using Progress.Json.ObjectModel.JsonObject.
+using Progress.Lang.AppError.
 using fwebh.core.IFactory.
 using fwebh.core.JSON.
-using fwebh.lang.error.NotFoundException.
 using fwebh.lang.error.NotAcceptableException.
 using fwebh.pas.data.IEntityWriter.
 
@@ -30,24 +30,20 @@ class fwebh.pas.data.EntityWriterFactory:
 
     var IEntityWriter entityWriter.
     var char tmp.
-    
-    do on error undo, throw:
+
+    if (factory:Has(mimeType)) then
+      entityWriter = cast(factory:GetInstance(mimeType), IEntityWriter).
+    else do:
+      tmp = entry(1, mimeType, "/") + "/*".
+      entityWriter = cast(factory:GetInstance(tmp), IEntityWriter).
+    end.
       
-      if (factory:Has(mimeType)) then
-        entityWriter = cast(factory:GetInstance(mimeType), IEntityWriter).
-      else do:
-        tmp = entry(1, mimeType, "/") + "/*".
-        entityWriter = cast(factory:GetInstance(tmp), IEntityWriter).
-      end.
-      
-      catch err1 as Progress.Lang.Error :
-        undo, throw new NotAcceptableException(mimeType).
-      end catch.
-      
-    end.  // do on error...
-            
     return entityWriter.
    
+    catch err as Progress.Lang.Error :
+      undo, throw new NotAcceptableException(mimeType).
+    end catch.
+
   end method.  // GetEntityWriter
 
   method private void loadDefinitions(filename as character):
@@ -55,14 +51,20 @@ class fwebh.pas.data.EntityWriterFactory:
     var JsonObject defs.
     var int i.
     var char[] names.
+    
+    file-info:file-name = filename.
+    // give informative error of the filename passed instead of:
+    // Invalid source parameter to Progress.Json.ObjectModel.ObjectModelParser:ParseFile( ). Can not be UNKNOWN (?) or empty string. (16055)
+    if file-info:full-pathname = ? then
+      undo, throw new AppError(substitute("Could not find file (&1) for EntityWriterFactory",filename),-1).
 
     defs = JSON:ParseFileToObject(filename).
-
+    
     names = defs:GetNames().
     do i = 1 to extent(names):
       factory:AddDefinition(names[i], defs:GetCharacter(names[i]), true).
     end.
-    
+
   end method.  // loadDefinitions
 
 end class.
