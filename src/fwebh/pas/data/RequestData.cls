@@ -11,7 +11,7 @@
 
 block-level on error undo, throw.
 
-using OpenEdge.Core.Collections.StringStringMap.
+using OpenEdge.Core.Collections.IStringStringMap.
 using fwebh.pas.data.DataHolder.
 using fwebh.pas.data.IDataHolder.
 using fwebh.pas.data.IRequestData.
@@ -24,8 +24,8 @@ class fwebh.pas.data.RequestData implements IRequestData:
   define public property Accept as char no-undo get. set.
   define public property Verb as char no-undo get. set.
   define public property Version as char no-undo get. set.
-  define public property Parameters as StringStringMap no-undo get. set.
-  define public property Headers as StringStringMap no-undo get. set.
+  define public property Parameters as IStringStringMap no-undo get. set.
+  define public property Headers as IStringStringMap no-undo get. set.
   
   // lazy instantiate, GET requests do not have data (=body)
   define public property Data as IDataHolder no-undo 

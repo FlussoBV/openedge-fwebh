@@ -10,7 +10,7 @@
   ----------------------------------------------------------------------*/
 
 
-using OpenEdge.Core.Collections.StringStringMap.
+using OpenEdge.Core.Collections.IStringStringMap.
 using fwebh.pas.data.IDataHolder.
 using fwebh.pas.resource.ResourceDescriptor.
 
@@ -22,8 +22,8 @@ interface fwebh.pas.data.IRequestData:
   define public property Accept as char no-undo get. set.
   define public property Verb as char no-undo get. set.
   define public property Version as char no-undo get. set.
-  define public property Parameters as StringStringMap no-undo get. set.
-  define public property Headers as StringStringMap no-undo get. set.
+  define public property Parameters as IStringStringMap no-undo get. set.
+  define public property Headers as IStringStringMap no-undo get. set.
   define public property Data as IDataHolder no-undo get. 
   
 end interface.
