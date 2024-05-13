@@ -19,6 +19,7 @@ using fwebh.pas.data.RequestDataProcessor.
 using fwebh.net.UrlHelper.
 using fwebh.pas.resource.ResourceDescriptor.
 using OpenEdge.Net.HTTP.HttpHeader.
+using OpenEdge.Core.Collections.IStringStringMap.
 
 class fwebh.pas.data.RequestDataProcessor: 
   
@@ -77,24 +78,24 @@ class fwebh.pas.data.RequestDataProcessor:
     return contentType.
   end method.
   
-  method private StringStringMap extractQueryParameters(request as IWebRequest):
+  method private IStringStringMap extractQueryParameters(request as IWebRequest):
     
-    var char parameters, currentEntry, parameterName, parameterValue.
-    var int i, parameterCount.
-    var StringStringMap queryParameters. 
-    
-    queryParameters = new StringStringMap().
-    parameters = request:GetContextValue("QUERY_STRING").
-    
-    parameterCount = num-entries(parameters, "&").
-    do i = 1 to parameterCount:
-      currentEntry = entry(i, parameters, "&").
-      parameterName = entry(1, currentEntry, "=").
-      parameterValue = UrlHelper:Decode(entry(2, currentEntry, "=")).
-      queryParameters:Put(parameterName, parameterValue).
-    end.
-    
-    return queryParameters.
+/*    var char parameters, currentEntry, parameterName, parameterValue.*/
+/*    var int i, parameterCount.                                       */
+/*    var StringStringMap queryParameters.                             */
+/*                                                                     */
+/*    queryParameters = new StringStringMap().                         */
+/*    parameters = request:GetContextValue("QUERY_STRING").            */
+/*                                                                     */
+/*    parameterCount = num-entries(parameters, "&").                   */
+/*    do i = 1 to parameterCount:                                      */
+/*      currentEntry = entry(i, parameters, "&").                      */
+/*      parameterName = entry(1, currentEntry, "=").                   */
+/*      parameterValue = UrlHelper:Decode(entry(2, currentEntry, "=")).*/
+/*      queryParameters:Put(parameterName, parameterValue).            */
+/*    end.                                                             */
+
+    return request:URI:GetQueryMap().
     
   end method.  // extractQueryParameters
   
