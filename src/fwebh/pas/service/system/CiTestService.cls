@@ -27,6 +27,7 @@ class fwebh.pas.service.system.CiTestService implements IGetDataService:
     
     var IResponseData response = new ResponseData().
     var char errorCode = request:Parameters:Get("error").
+    var JsonObject json.
     
     if errorCode > "" then do:
       case errorCode:
@@ -37,8 +38,11 @@ class fwebh.pas.service.system.CiTestService implements IGetDataService:
         otherwise undo, throw new AppError("unforseen error", -1).
       end case.
     end.
-    else 
-      response:Data:Json = new JsonObject().
+    else do:
+      json = new JsonObject().
+      json:Add("test", "ok").
+      response:Data:Json = json.
+    end. 
     
     return response.
     
