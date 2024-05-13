@@ -124,7 +124,7 @@ class fwebh.pas.webhandlers.ResourceWebHandler inherits WebHandlerCommon:
     
     return 0.
 
-  end method.  // HandleGet
+  end method.  // HandlePost
 
 
   method private IHttpResponse handleErrors(err as Progress.Lang.Error):

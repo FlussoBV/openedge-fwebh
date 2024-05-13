@@ -48,8 +48,26 @@ class fwebh.pas.data.RequestDataProcessor:
   
   method private void processBody(request as IWebRequest, data as RequestData):
     
-    // assume JSON for now
-    data:Data:Json = cast(request:Entity, Progress.Json.ObjectModel.JsonConstruct).    
+    var char type.
+    var handle h.
+    
+    type = request:Entity:GetClass():TypeName.
+    
+    case type:
+      
+      when "Progress.Json.ObjectModel.JsonObject" then
+        data:Data:Json = cast(request:Entity, Progress.Json.ObjectModel.JsonConstruct).
+        
+      when "OpenEdge.Core.Memptr" then 
+        data:Data:Memptr = cast(request:Entity, OpenEdge.Core.Memptr):Value.    
+      
+      when "OpenEdge.Core.WidgetHandle" then do:
+        h = cast(request:Entity, OpenEdge.Core.WidgetHandle):Value.
+        data:Data:GenericHandle = h.  // with the tmp var h it might crash
+
+      end.
+        
+    end case.
     
   end method.
   
