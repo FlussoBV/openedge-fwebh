@@ -79,24 +79,9 @@ class fwebh.pas.data.RequestDataProcessor:
   end method.
   
   method private IStringStringMap extractQueryParameters(request as IWebRequest):
-    
-/*    var char parameters, currentEntry, parameterName, parameterValue.*/
-/*    var int i, parameterCount.                                       */
-/*    var StringStringMap queryParameters.                             */
-/*                                                                     */
-/*    queryParameters = new StringStringMap().                         */
-/*    parameters = request:GetContextValue("QUERY_STRING").            */
-/*                                                                     */
-/*    parameterCount = num-entries(parameters, "&").                   */
-/*    do i = 1 to parameterCount:                                      */
-/*      currentEntry = entry(i, parameters, "&").                      */
-/*      parameterName = entry(1, currentEntry, "=").                   */
-/*      parameterValue = UrlHelper:Decode(entry(2, currentEntry, "=")).*/
-/*      queryParameters:Put(parameterName, parameterValue).            */
-/*    end.                                                             */
 
     return request:URI:GetQueryMap().
-    
+
   end method.  // extractQueryParameters
   
   method private StringStringMap extractHeaders(request as IWebRequest):
