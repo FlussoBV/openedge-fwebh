@@ -1,7 +1,8 @@
- 
  /*------------------------------------------------------------------------
     File        : DefaultUnitTest_UT
-    Purpose     : 
+    Purpose     : If there are no unittests at all the unittest step in 
+                  the pipeline fails. Although this class is not needed
+                  anymore we leave it.
     Syntax      : 
     Description : 
     Author(s)   : bronco
@@ -16,7 +17,7 @@ using OpenEdge.Core.Assert.
 class fwebh.misc.DefaultUnitTest_UT: 
 
   @Test.
-  method public void this_is_the_first_unittest():
+  method public void needed_as_only_unittest():
     Assert:Equals(true, true).
   end method.
 

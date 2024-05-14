@@ -26,14 +26,14 @@ class fwebh.pas.data.XmlEntityWriter_UT:
   var XmlEntityWriter writer.
   var ResponseData response.
 
-  @Before.
-  method public void _before_all_tests():
+  @BeforeAll.
+  method public void _BeforeAll():
     create tt.
     tt.f = "test".
   end method.
   
-  @Setup.
-  method public void _setup_each_test():
+  @BeforeEach.
+  method public void _BeforeEach():
     writer = new XmlEntityWriter().
     response = new ResponseData().
   end method.

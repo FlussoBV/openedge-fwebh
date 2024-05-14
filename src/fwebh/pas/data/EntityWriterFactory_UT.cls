@@ -19,8 +19,8 @@ class fwebh.pas.data.EntityWriterFactory_UT:
   
   var EntityWriterFactory factory.  
 
-  @Setup.
-  method public void _setup_each_test():
+  @BeforeEach.
+  method public void _BeforeEach():
     factory = new EntityWriterFactory().
   end method.
   
