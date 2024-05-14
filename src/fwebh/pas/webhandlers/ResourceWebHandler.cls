@@ -23,6 +23,7 @@ using fwebh.pas.data.IRequestData.
 using fwebh.pas.data.IResponseData.
 using fwebh.pas.data.RequestDataProcessor.
 using fwebh.pas.service.IGetDataService.
+using fwebh.pas.service.IPostDataService.
 using fwebh.pas.service.ServiceFactory.
 using fwebh.pas.webhandlers.WebHandlerCommon.
 using fwebh.serialize.SimpleJsonSerializer.
@@ -80,6 +81,51 @@ class fwebh.pas.webhandlers.ResourceWebHandler inherits WebHandlerCommon:
     return 0.
 
   end method.  // HandleGet
+
+
+  method override protected integer HandlePost(request as IWebRequest):
+    
+    var IHttpResponse response.
+    var IRequestData requestData.
+    var IResponseData responseData.
+    var JsonObject json.
+    var IPostDataService service.
+    var IEntityWriter entityWriter.
+    var Progress.Lang.Object responseObj.
+    
+    do on error undo, throw:
+      
+      response = new WebResponse().
+  
+      requestData = new RequestDataProcessor():ProcessRequestInfo(request).
+      
+      // get the service instance and execute the logic
+      service = serviceFactory:GetPostDataService(requestData:Resource:Name).      
+      responseData = service:PostData(requestData).
+      
+      responseData:ContentType = handleContentType(service, requestData, responseData).
+      
+      // write the data to the response       
+      entityWriter = getEntityWriter(responseData).
+      responseObj = entityWriter:Write(responseData).
+      
+      response:Entity = responseObj.
+      response:ContentType = responseData:ContentType.
+               
+      catch err1 as Progress.Lang.Error:
+        response = handleErrors(err1).  
+      end catch.
+      
+    end.  // do on error undo, throw
+
+    WriteResponse(response).
+    
+    @todo(what="garbage collect, certainly in case of memptr's").
+    
+    return 0.
+
+  end method.  // HandlePost
+
 
   method private IHttpResponse handleErrors(err as Progress.Lang.Error):
     

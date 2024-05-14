@@ -38,6 +38,13 @@ class fwebh.pas.data.DataHolder implements IdataHolder:
       this-object:DataType = ResponseDataType:BUFFER.
     end.
   
+  define public property GenericHandle as handle no-undo 
+    get. 
+    set(h as handle):
+      GenericHandle = h.
+      this-object:DataType = ResponseDataType:WIDGET-HANDLE.
+    end.
+  
   define public property Json as JsonConstruct no-undo 
     get. 
     set(jsonIn as JsonConstruct):

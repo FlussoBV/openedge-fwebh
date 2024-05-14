@@ -193,6 +193,24 @@ jobs:
             echo "expected http error ${httperror}, got: $STATUSCODE"
             exit 1
           fi
+      
+      - name: Test POST JSON
+        continue-on-error: false
+        run: |
+          CHECKNUMBER=$(curl --silent http://localhost:8810/web/v1/echo --header 'Content-Type: application/json' --data '{ "id": 5, "client": "postman", "version": "0.1" }' -X POST | jq ".posted.id")
+          if test $CHECKNUMBER -ne 5; then
+            echo "expected .posted.id is 5, got: $CHECKNUMBER"
+            exit 1
+          fi
+
+      - name: Test POST XML
+        continue-on-error: false
+        run: |
+          XMLTEXT=$(curl --silent http://localhost:8810/web/v1/echo --header 'Content-Type: application/xml' --data '<xml><id>5</id><client>postman</client><version>0.1</version></xml>' -X POST | jq ".posted.xml")
+          if test $XMLTEXT -ne "<xml><id>5</id><client>postman</client><version>0.1</version></xml>"; then
+           echo "expected .posted.xml is \"<xml><id>5</id><client>postman</client><version>0.1</version></xml>\", got: $XMLTEXT"
+           exit 1
+          fi
 
       - name: Display container logs after call
         run: |

@@ -11,8 +11,10 @@
 
 block-level on error undo, throw.
 
-using OpenEdge.Web.IWebRequest.
 using OpenEdge.Core.Collections.StringStringMap.
+using OpenEdge.Net.HTTP.HttpHeader.
+using OpenEdge.Web.IWebRequest.
+using Progress.Json.ObjectModel.JsonConstruct.
 using fwebh.pas.data.IRequestData.
 using fwebh.pas.data.RequestData.
 using fwebh.pas.data.RequestDataProcessor.
@@ -39,10 +41,38 @@ class fwebh.pas.data.RequestDataProcessor:
     data:Parameters = extractQueryParameters(request).  // StringStringMap is not yet supported by serializer
     data:Headers = extractHeaders(request).
     
+    if valid-object(request:Entity) then 
+      processBody(request, data).
+      
     return data.
     
   end method.  // ProcessRequest
   
+  method private void processBody(request as IWebRequest, data as RequestData):
+    
+    var char type.
+    var handle h.
+    
+    type = request:Entity:GetClass():TypeName.
+    
+    case type:
+      
+      when "Progress.Json.ObjectModel.JsonObject" or when "Progress.Json.ObjectModel.JsonArray" then
+        data:Data:Json = cast(request:Entity, Progress.Json.ObjectModel.JsonConstruct).
+        
+      when "OpenEdge.Core.Memptr" then 
+        data:Data:Memptr = cast(request:Entity, OpenEdge.Core.Memptr):Value.    
+      
+      when "OpenEdge.Core.WidgetHandle" then do:
+        h = cast(request:Entity, OpenEdge.Core.WidgetHandle):Value.
+        data:Data:GenericHandle = h.  // with the tmp var h it might crash
+      end.
+        
+    end case.
+    
+  end method.  // processBody
+  
+
   method private ResourceDescriptor getResourceInfo(request as IWebRequest):
     
     var ResourceDescriptor resource = new ResourceDescriptor(request:GetPathParameter("resource")).
