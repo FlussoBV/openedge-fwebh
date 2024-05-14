@@ -19,25 +19,25 @@ class fwebh.pas.service.ServiceFactory_UT:
   
   var private ServiceFactory factory.
    
-  @Setup.
-  method public void beforeTest():   
+  @BeforeEach.
+  method public void _BeforeEach():   
     factory = new ServiceFactory().
   end method.
   
-  @TearDown.
-  method public void afterTest():   
+  @AfterEach.
+  method public void _AfterEach():   
     if (propath matches "*faulty*") then  // reset from faulty services.json in propath
       removeFirstPropathEntry().
     delete object factory no-error.
   end method.
   
-  @Before.
-  method public void beforeStartAllTests():
+  @BeforeAll.
+  method public void _BeforeAll():
     addPropathEntry("./src/test/pas/service").  // make sure the unittest services.json is found 
   end method.
   
-  @After.
-  method public void afterStartAllTests():
+  @AfterAll.
+  method public void _AfterAll():
     removeFirstPropathEntry().
   end method.
   

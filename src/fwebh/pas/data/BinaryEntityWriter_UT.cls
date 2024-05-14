@@ -22,8 +22,8 @@ class fwebh.pas.data.BinaryEntityWriter_UT:
   var BinaryEntityWriter writer.
   var ResponseData response.
 
-  @Setup.
-  method public void _setup_each_test():
+  @BeforeEach.
+  method public void _BeforeEach():
     writer = new BinaryEntityWriter().
     response = new ResponseData().
   end method.

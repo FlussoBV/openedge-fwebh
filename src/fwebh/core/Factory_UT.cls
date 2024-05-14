@@ -1,4 +1,3 @@
- 
  /*------------------------------------------------------------------------
     File        : Factory_UT
     Purpose     : 
@@ -14,6 +13,7 @@ block-level on error undo, throw.
 using fwebh.core.Factory.
 using fwebh.core.IFactory.
 using OpenEdge.Core.Assert.
+using Progress.Lang.Object.
 
 
 class fwebh.core.Factory_UT: 
@@ -22,13 +22,13 @@ class fwebh.core.Factory_UT:
   
   {fwebh/core/ttfactorydef.i}
   
-  @Setup.
-  method public void SetupUnittest():
+  @BeforeEach.
+  method public void _BeforeEach():
     factory = new Factory().
   end method.
   
-  @TearDown.
-  method public void TeardownUnittest():
+  @AfterEach.
+  method public void _AfterEach():
     if (valid-object(factory)) then
       delete object factory.
   end method.
@@ -61,8 +61,8 @@ class fwebh.core.Factory_UT:
   @Test.
   method public void non_singleton_returns_new_instance():
     
-    define variable inst1 as Progress.Lang.Object no-undo.
-    define variable inst2 as Progress.Lang.Object no-undo.
+    var Object inst1.
+    var Object inst2.
     
     factory:LoadDefinitions("test/core/test-factory.json").
     
@@ -76,8 +76,8 @@ class fwebh.core.Factory_UT:
   @Test.
   method public void singleton_returns_same_instance():
     
-    define variable inst1 as Factory no-undo.
-    define variable inst2 as Factory no-undo.
+    var Factory inst1.
+    var Factory inst2.
     
     factory:LoadDefinitions("test/core/test-factory.json").
     
@@ -91,7 +91,7 @@ class fwebh.core.Factory_UT:
   @Test(expected="Progress.Lang.SysError").  // = standard error (14284)
   method public void class_not_found_returns_error():
     
-    define variable inst1 as Progress.Lang.Object no-undo.
+    var Object inst1.
     
     factory:LoadDefinitions("test/core/test-factory.json").
     
@@ -102,7 +102,7 @@ class fwebh.core.Factory_UT:
   @Test(expected="fwebh.lang.error.NotFoundException").
   method public void defintions_not_found_returns_error():
     
-    define variable inst1 as Progress.Lang.Object no-undo.
+    var Object inst1.
     
     factory:LoadDefinitions("test/core/test-factory.json").
     
