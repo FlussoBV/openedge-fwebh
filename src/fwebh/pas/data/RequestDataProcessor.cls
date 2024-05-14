@@ -57,7 +57,7 @@ class fwebh.pas.data.RequestDataProcessor:
     
     case type:
       
-      when "Progress.Json.ObjectModel.JsonObject" then
+      when "Progress.Json.ObjectModel.JsonObject" or when "Progress.Json.ObjectModel.JsonArray" then
         data:Data:Json = cast(request:Entity, Progress.Json.ObjectModel.JsonConstruct).
         
       when "OpenEdge.Core.Memptr" then 
@@ -66,12 +66,11 @@ class fwebh.pas.data.RequestDataProcessor:
       when "OpenEdge.Core.WidgetHandle" then do:
         h = cast(request:Entity, OpenEdge.Core.WidgetHandle):Value.
         data:Data:GenericHandle = h.  // with the tmp var h it might crash
-
       end.
         
     end case.
     
-  end method.
+  end method.  // processBody
   
 
   method private ResourceDescriptor getResourceInfo(request as IWebRequest):

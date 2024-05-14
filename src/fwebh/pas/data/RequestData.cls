@@ -36,8 +36,4 @@ class fwebh.pas.data.RequestData implements IRequestData:
     end. 
     private set.
   
-  constructor public RequestData():
-    
-  end constructor.
-
 end class.
