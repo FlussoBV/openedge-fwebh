@@ -1,4 +1,3 @@
- 
  /*------------------------------------------------------------------------
     File        : DataHolder
     Purpose     : 
@@ -15,7 +14,7 @@ using Progress.Json.ObjectModel.JsonConstruct.
 using fwebh.pas.data.IDataHolder.
 using fwebh.pas.data.ResponseDataType.
 
-class fwebh.pas.data.DataHolder implements IdataHolder: 
+class fwebh.pas.data.DataHolder implements IDataHolder: 
   
   define public property DatasetHandle as handle no-undo 
     get. 
@@ -59,6 +58,13 @@ class fwebh.pas.data.DataHolder implements IdataHolder:
       this-object:DataType = ResponseDataType:MEMPTR.
     end.
 
+  define public property PlainText as longchar no-undo 
+    get. 
+    set(c as longchar):
+      PlainText = c.
+      this-object:DataType = ResponseDataType:LONGCHAR.
+    end.
+    
   define public property DataType as ResponseDataType no-undo get. set.
   
   constructor public DataHolder():

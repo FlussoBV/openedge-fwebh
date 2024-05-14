@@ -26,13 +26,13 @@ class fwebh.serialize.SimpleJsonDeserializer_UT:
   
   var private SimpleJsonDeserializer deserializer.
   
-  @Setup.
-  method public void beforeTest():   
+  @BeforeEach.
+  method public void _BeforeEach():   
     deserializer = new SimpleJsonDeserializer().
   end method.
   
-  @TearDown.
-  method public void afterTest():   
+  @AfterEach.
+  method public void _AfterEach():   
     delete object deserializer no-error.
   end method.
   
