@@ -26,6 +26,6 @@ So, for a service to be able to handle `GET`'s, it needs to implement `IGetDataS
 
 The sequence diagram involved looks pretty overseeable:
 
-![GET](images/service-get-sequence.png)
+![GET](images/service-get-sequence.svg)
 
 [< back to README.md](../README.md)
