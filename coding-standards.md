@@ -1,4 +1,5 @@
 # 4GL coding standards
+[< back to README.md](README.md)
 
 ## language
 The language for coding is English (American). Domain specific terms can be in local language (eindloonregeling anyone?).
@@ -24,7 +25,6 @@ Correct indentation is essential for readability. There's no excuse to mess this
 
 ## prefixes
 No prefixes for variables, parameters for either their datatype and they're being input/output. If one thinks prefixes are necessary they arguably make their (internal) procedure and/or methods too big. Exceptions for "technical datatypes":
-- `h` for handle
 - `ptr` for memptr
 - `raw` for raw
 
@@ -77,7 +77,7 @@ Try to make them clear, use a variable telling what the (way too long) expressio
 
 NOT:
 ```
-if can-find(first order where order.orderdate < today - 10 and lookup(order.orderstatus, 'open,hold,busy' ) > 0 then
+if can-find(first order where order.orderdate < today - 10 and lookup(order.orderstatus, 'open,hold,busy') > 0 then
     // ...
 ```
 
@@ -85,7 +85,7 @@ but:
 ```
 define variable openOrders as logical no-undo.
 
-openOrders = (can-find(first order where order.orderdate < today - 10 and lookup(order.orderstatus, 'open,hold,busy' ) > 0).
+openOrders = (can-find(first order where order.orderdate < today - 10 and lookup(order.orderstatus, 'open,hold,busy') > 0).
 if (openOrders) then 
     // ...
 ```
@@ -248,3 +248,24 @@ see: https://learn.microsoft.com/en-us/dotnet/standard/design-guidelines/names-o
 - names are NOT plural, unless it a flags enum
 - enums are not prefixed, nor postfixed with `Enum`. So, `OrderType` instead of `OrderTypesEnum` (assuming it's not a flags enum).
 - for each member an integer value is provided. Enums may be persisted and implicit values may lead to errors. 
+
+## unit tests
+unittests are placed next to the classes that are tested and get suffix `_UT`. Note that the execution of the unit test in the CI builds relies on the suffix being `_UT`. To standardize naming:
+
+```
+  @BeforeAll.
+  method public void _BeforeAll():
+
+  @BeforeEach.
+  method public void _BeforeEach():
+  
+  @AfterEach.
+  method public void AfterEach():
+  
+  @AfterAll.
+  method public void AfterAll():
+```
+Note that `@Before`, `@Setup`, `@Teardown` and `@After` are deprecated in favor of the above mentioned.
+The actual `@Test` method are, au contraire the regular guidelines concerning method names, in snake case. This is because the readability in the output in the CI builds vastly improves this way. The method name should describe the success scenario, f.e. `serialized_arrayobj_equal_to_template`. 
+
+[< back to readme](README.md)
