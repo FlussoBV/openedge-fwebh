@@ -1,0 +1,16 @@
+@startuml
+
+actor "HTTP Client" as Client 
+participant "ResourceWebHandler" as PAS
+participant "Service: IGetDataService" as Service
+
+Client -> PAS: GET /resource
+PAS -> PAS : HandleGet(IwebRequest): int
+PAS -> Service : GetData(IRequestData): 
+PAS <-- Service : IResponseData: 
+Client <-- PAS: 200 OK / data
+
+'note : GET request
+' PAS --> ResourseWebHandler: HandleGet: int
+
+@enduml
