@@ -212,6 +212,24 @@ jobs:
            exit 1
           fi
 
+      - name: Test PUT JSON
+        continue-on-error: false
+        run: |
+          CHECKNUMBER=$(curl --silent http://localhost:8810/web/v1/echo --header 'Content-Type: application/json' --data '{ "id": 55, "client": "postman", "version": "0.2" }' -X PUT | jq ".posted.id")
+          if test $CHECKNUMBER -ne 55; then
+            echo "expected .posted.id is 55, got: $CHECKNUMBER"
+            exit 1
+          fi
+
+      - name: Test PUT XML
+        continue-on-error: false
+        run: |
+          XMLTEXT=$(curl --silent http://localhost:8810/web/v1/echo --header 'Content-Type: application/xml' --data '<xml><id>5</id><client>postman</client><version>0.1</version></xml>' -X PUT | jq ".posted.xml")
+          if test $XMLTEXT -ne "<xml><id>55</id><client>postman</client><version>0.2</version></xml>"; then
+           echo "expected .posted.xml is \"<xml><id>55</id><client>postman</client><version>0.2</version></xml>\", got: $XMLTEXT"
+           exit 1
+          fi
+
       - name: Display container logs after call
         run: |
           docker logs $(cat container.id)
