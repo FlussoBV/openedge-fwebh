@@ -11,17 +11,18 @@
 
 block-level on error undo, throw.
 
-using OpenEdge.Core.String.
-using Progress.Lang.AppError.
-using Progress.Json.ObjectModel.JsonObject.
-using fwebh.lang.error.*.
+using fwebh.lang.error.*.  // all exceptions
 using fwebh.pas.data.IRequestData.
 using fwebh.pas.data.IResponseData.
 using fwebh.pas.data.ResponseData.
+using fwebh.pas.service.IDeleteDataService.
 using fwebh.pas.service.IGetDataService.
 using fwebh.serialize.SimpleJsonSerializer.
+using OpenEdge.Core.String.
+using Progress.Lang.AppError.
+using Progress.Json.ObjectModel.JsonObject.
 
-class fwebh.pas.service.system.CiTestService implements IGetDataService: 
+class fwebh.pas.service.system.CiTestService implements IDeleteDataService, IGetDataService: 
 
   method public IResponseData GetData(request as IRequestData):
     
@@ -47,5 +48,37 @@ class fwebh.pas.service.system.CiTestService implements IGetDataService:
     return response.
     
   end method.  // GetData
+
+  method public IResponseData DeleteData(request as IRequestData):
+    
+    var IResponseData response = new ResponseData().
+    var JsonObject jsonIn, jsonOut.
+    var char id.
+    
+    do on error undo, throw:
+      
+      if request:Resource:Id > "" then do:
+        // do nothing, empty 
+      end.
+      else do on error undo, throw: 
+        
+        jsonIn = new JsonObject().
+        jsonOut = new JsonObject().
+        
+        jsonIn = cast(request:Data:JSON, "Progress.Json.ObjectModel.JsonObject").
+        jsonOut:Add("deleted", jsonIn:GetCharacter("id")).
+        
+        response:Data:Json = jsonOut.        
+      end.
+
+      catch err1 as Progress.Lang.Error :
+        undo, throw new InvalidDataException(err1:GetMessage(1)).
+      end catch.           
+      
+    end.
+    
+    return response.
+    
+  end method.  // DeleteData
 
 end class.
