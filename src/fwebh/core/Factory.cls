@@ -58,8 +58,8 @@ class fwebh.core.Factory implements IFactory:
     
   method public void LoadDefinitions(jsonDefinitionFile as character):
         
-    define variable jsonDefintions as JsonObject no-undo.
-    define variable parser as ObjectModelParser no-undo.
+    var JsonObject jsonDefinitions.
+    var ObjectModelParser parser.
     
     do on error undo, throw:
       
@@ -69,9 +69,9 @@ class fwebh.core.Factory implements IFactory:
               
       parser = new ObjectModelParser().
           
-      jsonDefintions = cast(parser:ParseFile(jsonDefinitionFile), JsonObject).
+      jsonDefinitions = cast(parser:ParseFile(jsonDefinitionFile), JsonObject).
           
-      this-object:processDefinitions(jsonDefintions).
+      this-object:processDefinitions(jsonDefinitions).
       
       catch err1 as Progress.Lang.Error :
         undo, throw new InvalidDataException(err1:GetMessage(1)).  
@@ -98,10 +98,9 @@ class fwebh.core.Factory implements IFactory:
     
   method private void processDefinitions(jsonDefintions as JsonObject):
       
-    define variable i as integer no-undo.
-    define variable names as character extent no-undo.
-    define variable propertyType as integer no-undo.
-    define variable defintionObject as JsonObject no-undo.
+    var int i, propertyType.
+    var char[] names.
+    var JsonObject defintionObject.
     
     var char identifier, classname.
     var logical singleton.
@@ -143,9 +142,9 @@ class fwebh.core.Factory implements IFactory:
   */  
   method public Progress.Lang.Object GetInstance(instanceName as character):
         
-    define variable instanceRef as Progress.Lang.Object no-undo.
-    define variable singleInstanceFound as logical no-undo.
-        
+    var Progress.Lang.Object instanceRef.
+    var logical singleInstanceFound.
+    
     find ttdefintion where ttdefintion.indentifier = instanceName no-error.
     if not available(ttdefintion) then 
       undo, throw new NotFoundException(substitute("no definition found for '&1'", instanceName)).

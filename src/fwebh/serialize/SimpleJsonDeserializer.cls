@@ -44,8 +44,8 @@ class fwebh.serialize.SimpleJsonDeserializer implements IDeserializable:
 
   method public Progress.Lang.Object DeserializeFile(jsonFilename as character, className as character):
     
-    define variable parser as ObjectModelParser no-undo.
-    define variable jsonObj as JsonObject no-undo.
+    var ObjectModelParser parser.
+    var JsonObject jsonObj.
     
     parser = new ObjectModelParser().
     jsonObj = cast(parser:ParseFile(jsonFilename), "JsonObject").
@@ -57,8 +57,8 @@ class fwebh.serialize.SimpleJsonDeserializer implements IDeserializable:
   
   method public Progress.Lang.Object DeserializeFile(jsonFilename as character, targetObj as Progress.Lang.Object):
     
-    define variable parser as ObjectModelParser no-undo.
-    define variable jsonObj as JsonObject no-undo.
+    var ObjectModelParser parser.
+    var JsonObject jsonObj.
     
     parser = new ObjectModelParser().
     jsonObj = cast(parser:ParseFile(jsonFilename), "JsonObject").
@@ -71,9 +71,9 @@ class fwebh.serialize.SimpleJsonDeserializer implements IDeserializable:
   // in this method the target class name is expected to the name of the first property
   method public Progress.Lang.Object Deserialize(jsonIn as JsonObject, className as character):
     
-    define variable properties as character extent no-undo.
-    define variable obj as Progress.Lang.Object no-undo.
-    define variable jsonObj as JsonObject no-undo.
+    var char[] properties.
+    var Progress.Lang.Object obj.
+    var JsonObject jsonObj.
        
     do on error undo, throw:
       
@@ -93,8 +93,8 @@ class fwebh.serialize.SimpleJsonDeserializer implements IDeserializable:
   
   method public Progress.Lang.Object DeserializeString(jsonString as longchar, className as character):
     
-    define variable parser as ObjectModelParser no-undo.
-    define variable jsonObj as JsonObject no-undo.
+    var ObjectModelParser parser.
+    var JsonObject jsonObj.
     
     parser = new ObjectModelParser().
     jsonObj = cast(parser:Parse(jsonString), "JsonObject").
@@ -106,8 +106,8 @@ class fwebh.serialize.SimpleJsonDeserializer implements IDeserializable:
   
   method public void DeserializeString(jsonString as longchar, targetObject as Progress.Lang.Object):
     
-    define variable parser as ObjectModelParser no-undo.
-    define variable jsonObj as JsonObject no-undo.
+    var ObjectModelParser parser.
+    var JsonObject jsonObj.
     
     parser = new ObjectModelParser().
     jsonObj = cast(parser:Parse(jsonString), "JsonObject").
@@ -119,15 +119,14 @@ class fwebh.serialize.SimpleJsonDeserializer implements IDeserializable:
   
   method public Progress.Lang.Object Deserialize(jsonIn as JsonObject, targetObj as Progress.Lang.Object): 
 
-    define variable cls as class Class no-undo.
-    define variable props as Property extent no-undo.
-    define variable prop as Property no-undo.
-    define variable jsonOut as JsonObject no-undo.
-    define variable resultList as List no-undo.    
-    define variable resultObj as Progress.Lang.Object no-undo.
-    define variable valueObject as Progress.Lang.Object no-undo.
-    define variable i as integer no-undo.
-    define variable getter as character no-undo.
+    var Progress.Lang.Class cls.
+    var Property[] props.
+    var Property prop.
+    var JsonObject jsonOut.
+    var List resultList.    
+    var Progress.Lang.Object resultObj, valueObject.
+    var int i.
+    var char getter.
     
     var StringStringMap dataMap.
     
@@ -226,11 +225,11 @@ class fwebh.serialize.SimpleJsonDeserializer implements IDeserializable:
   
   method private List deserializeList(targetObject as IListInfo, prop as Property, array as JsonArray):
     
-    define variable listType as character no-undo.   
-    define variable newList as List no-undo.
-    define variable i as integer no-undo.
-    define variable jsonObj as JsonObject no-undo.
-    define variable obj as Progress.Lang.Object no-undo.
+    var char listType.   
+    var List newList.
+    var int i.
+    var JsonObject jsonObj.
+    var Progress.Lang.Object obj.
     
     newList = new List().
     listType = targetObject:GetListType(prop:Name).
@@ -292,14 +291,14 @@ class fwebh.serialize.SimpleJsonDeserializer implements IDeserializable:
   @todo(what="deserialize temp-table").
   method private void deserializeDataStructures(jsonIn as jsonObject, targetObj as ISerializableDataStructure):
     
-    define variable dataStructs as IMap no-undo.
-    define variable structure as IMapEntry no-undo.
-    define variable keyset as ISet no-undo.
-    define variable iterator as IIterator no-undo.
-    define variable keyObject as Progress.Lang.Object no-undo.
-    define variable keyname as character no-undo.
-    define variable dataObject as WidgetHandle no-undo.
-    define variable array as JsonArray no-undo.
+    var IMap dataStructs.
+    var IMapEntry structure.
+    var ISet keyset.
+    var IIterator iterator.
+    var Progress.Lang.Object keyObject.
+    var char keyname.
+    var WidgetHandle dataObject.
+    var JsonArray array.
         
     dataStructs = targetObj:GetDataStructures().
     keyset = dataStructs:KeySet.
@@ -319,12 +318,10 @@ class fwebh.serialize.SimpleJsonDeserializer implements IDeserializable:
   
   method private void jsonArrayToTempTable(array as JsonArray, tthandle as handle):
     
-    define variable i as integer no-undo.
-    define variable j as integer no-undo.
-    define variable bufferHandle as handle no-undo.
-    define variable bufferField as handle no-undo.
-    define variable jsonRecord as JsonObject no-undo.
-    define variable getter as character no-undo.
+    var int i, j.
+    var handle bufferHandle, bufferField.
+    var JsonObject jsonRecord.
+    var char getter.
     
     bufferHandle = tthandle:default-buffer-handle.
     

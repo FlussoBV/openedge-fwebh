@@ -38,7 +38,7 @@ The serializer serializes all the public properties. Temp-tables cannot be found
 ```
   method public IMap GetDataStructures():
 
-    define variable dataStructs as IMap no-undo.
+    var IMap dataStructs.
 
     dataStructs = new Map().
     dataStructs:Put(new String("definitions"), new WidgetHandle(temp-table ttfactorydef:handle)).
@@ -68,9 +68,9 @@ The class will be serialized as:
 Serializing an object is as simple as:
 
 ```
-define variable obj as SimpleObject no-undo.
-define variable serializer as SimpleJsonSerializer no-undo.
-define variable resultString as longchar no-undo.
+var SimpleObject obj.
+var SimpleJsonSerializer serializer.
+var longchar resultString.
 
 obj = new SimpleObject().
 serializer = new SimpleJsonSerializer().
@@ -115,7 +115,7 @@ class lib.serialize.test.CompoundObject implements ISerializableDataStructure:
 
   method public IMap GetDataStructures():
 
-    define variable dataStructs as IMap no-undo.
+    var IMap dataStructs.
 
     dataStructs = new Map().
     dataStructs:Put(new String("rows"), new WidgetHandle(temp-table ttfield:handle)).
