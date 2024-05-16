@@ -51,6 +51,20 @@ success = (returnCode = 'OK')
 ```
 (remember, operators like `+=` are on their way > 12.2)
 
+## define variable vs var
+Use the `var` statement for `no-undo` variables.
+```
+define variable i as integer no-undo.
+var int i.
+```
+Note that as of 12.7 `int` and `char` are considered full keywords.
+
+## use new compound operators
+Use the `+=`, `-=`, `*=` and `/=`.
+```
+i += 1.  // instead of i = i + 1.
+```
+
 ## if-then-else
 `if-then-do` as much as possible on one line, probably most of your audience reads from left to right.
 
@@ -83,7 +97,7 @@ if can-find(first order where order.orderdate < today - 10 and lookup(order.orde
 
 but:
 ```
-define variable openOrders as logical no-undo.
+var logical openOrders.
 
 openOrders = (can-find(first order where order.orderdate < today - 10 and lookup(order.orderstatus, 'open,hold,busy') > 0).
 if (openOrders) then 
@@ -189,7 +203,7 @@ if (isOrderOK(orderNumber)) then
 
 is far preferable to 
 ```
-define variable orderOK as logical no-undo.
+var logical orderOK.
 
 run isOrderOk(output orderOK).
 if (isOrderOK) then

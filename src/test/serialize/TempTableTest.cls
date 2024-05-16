@@ -34,7 +34,7 @@ class test.serialize.TempTableTest implements ISerializableDataStructure:
   
   method public IMap GetDataStructures():
     
-    define variable dataStructs as IMap no-undo.
+    var IMap dataStructs.
     
     dataStructs = new Map().
     dataStructs:Put(new String("temptable"), new WidgetHandle(temp-table tt:handle)).

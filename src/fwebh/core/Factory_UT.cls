@@ -51,7 +51,7 @@ class fwebh.core.Factory_UT:
   @Test(expected="Progress.Lang.AppError").
   method public void non_defined_returns_error():
     
-    define variable inst1 as Progress.Lang.Object no-undo.
+    var Object inst1.
     
     factory:LoadDefinitions("test/core/test-factory.json").
     inst1 = {getinstance.i janedoe as Progress.Lang.Object from factory}.

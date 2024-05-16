@@ -20,8 +20,8 @@ class fwebh.core.JSON:
   
   method public static JsonConstruct ParseFile(filename as character):
     
-    define variable parser as ObjectModelParser no-undo.
-    define variable json   as JsonConstruct     no-undo.
+    var ObjectModelParser parser.
+    var JsonConstruct json.
     
     parser = new ObjectModelParser().
     json = parser:ParseFile(search(fileName)).
@@ -43,8 +43,8 @@ class fwebh.core.JSON:
   
   method public static JsonConstruct ParseString(jsonString as longchar):
     
-    define variable parser as ObjectModelParser no-undo.
-    define variable json   as JsonConstruct     no-undo.
+    var ObjectModelParser parser.
+    var JsonConstruct json.
     
     parser = new ObjectModelParser().
     do on error undo, throw:
@@ -65,21 +65,21 @@ class fwebh.core.JSON:
     
 
   method public static longchar Stringify(json as JsonConstruct, formatJson as logical):
-    define variable resultString as longchar no-undo.
+    var longchar resultString.
     json:Write(resultString, formatJson).
     return resultString.
   end method.  // Stringify
     
 
   method public static longchar Stringify(h as handle):
-    define variable dataString as longchar no-undo.
+    var longchar dataString.
     h:write-json('longchar', dataString, true, ?, ?, true).    
     return dataString.
   end method.  // Stringify
 
 
   method public static JsonArray GetArrayFromTemptable(tempTableHandle as handle):
-    define variable array as JsonArray no-undo.
+    var JsonArray array.
     array = new JsonArray().
     tempTableHandle:write-json("JsonArray", array).
     return array.
