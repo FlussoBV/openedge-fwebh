@@ -230,6 +230,35 @@ jobs:
            exit 1
           fi
 
+      - name: Test DELETE with JSON body returns JSON
+        continue-on-error: false
+        run: |
+          CHECKNUMBER=$(curl --silent http://localhost:8810/web/v1/test --header 'Content-Type: application/json' --data '{ "id": "54321" }' -X DELETE | jq ".deleted")
+          if test $CHECKNUMBER -ne "54321"; then
+            echo "expected .posted.id is 54321, got: $CHECKNUMBER"
+            exit 1
+          fi
+
+      - name: Test DELETE with JSON body returns 200
+        continue-on-error: false
+        run: |
+          STATUSCODE=$(curl --silent http://localhost:8810/web/v1/test -o /dev/null --write-out "%{http_code}" --header 'Content-Type: application/json' --data '{ "id": "54321" }' -X DELETE)
+          httperror=200
+          if test $STATUSCODE -ne ${httperror}; then
+            echo "expected http status ${httperror}, got: $STATUSCODE"
+            exit 1
+          fi
+
+      - name: Test DELETE without JSON body returns 204
+        continue-on-error: false
+        run: |
+          STATUSCODE=$(curl --silent http://localhost:8810/web/v1/test/12345 -o /dev/null --write-out "%{http_code}" -X DELETE)
+          httperror=204
+          if test $STATUSCODE -ne ${httperror}; then
+            echo "expected http status ${httperror}, got: $STATUSCODE"
+            exit 1
+          fi
+
       - name: Display container logs after call
         run: |
           docker logs $(cat container.id)

@@ -61,4 +61,8 @@ class fwebh.pas.data.DataHolder implements IdataHolder:
 
   define public property DataType as ResponseDataType no-undo get. set.
   
+  constructor public DataHolder():
+    this-object:DataType = ResponseDataType:NONE.
+  end.
+  
 end class.
