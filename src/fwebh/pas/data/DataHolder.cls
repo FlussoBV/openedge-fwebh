@@ -65,4 +65,18 @@ class fwebh.pas.data.DataHolder implements IdataHolder:
     this-object:DataType = ResponseDataType:NONE.
   end.
   
+  destructor DataHolder():
+    
+    // an object may hold data. Especially in the case of memptr it is vital 
+    // that these are cleaned.
+    
+    case Datatype:
+      when ResponseDataType:MEMPTR then do:        
+        if get-size(this-object:Memptr) > 0 then  // need to check first, otherwise the session crashes
+          set-size(this-object:Memptr) = 0.
+      end.
+    end case.
+
+  end destructor.
+  
 end class.
