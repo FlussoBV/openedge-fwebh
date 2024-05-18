@@ -64,12 +64,19 @@ class fwebh.pas.webhandlers.ResourceWebHandler inherits WebHandlerCommon:
       
       responseData:ContentType = handleContentType(service, requestData, responseData).
       
-      // write the data to the response       
-      entityWriter = getEntityWriter(responseData).
-      responseObj = entityWriter:Write(responseData).
+      if responseData:Data:DataType <> ResponseDataType:NONE then do:
+        
+        // write the data to the response       
+        entityWriter = getEntityWriter(responseData).
+        responseObj = entityWriter:Write(responseData).
+        
+        response:Entity = responseObj.
+        response:ContentType = responseData:ContentType.
       
-      response:Entity = responseObj.
-      response:ContentType = responseData:ContentType.
+      end.
+      else do:
+        response:StatusCode = 204.
+      end.
                
       catch err1 as Progress.Lang.Error:
         response = handleErrors(err1).  
@@ -106,12 +113,19 @@ class fwebh.pas.webhandlers.ResourceWebHandler inherits WebHandlerCommon:
       
       responseData:ContentType = handleContentType(service, requestData, responseData).
       
-      // write the data to the response       
-      entityWriter = getEntityWriter(responseData).
-      responseObj = entityWriter:Write(responseData).
+      if responseData:Data:DataType <> ResponseDataType:NONE then do:
+        
+        // write the data to the response       
+        entityWriter = getEntityWriter(responseData).
+        responseObj = entityWriter:Write(responseData).
+        
+        response:Entity = responseObj.
+        response:ContentType = responseData:ContentType.
       
-      response:Entity = responseObj.
-      response:ContentType = responseData:ContentType.
+      end.
+      else do:
+        response:StatusCode = 204.
+      end.
                
       catch err1 as Progress.Lang.Error:
         response = handleErrors(err1).  
@@ -148,12 +162,19 @@ class fwebh.pas.webhandlers.ResourceWebHandler inherits WebHandlerCommon:
       
       responseData:ContentType = handleContentType(service, requestData, responseData).
       
-      // write the data to the response       
-      entityWriter = getEntityWriter(responseData).
-      responseObj = entityWriter:Write(responseData).
+      if responseData:Data:DataType <> ResponseDataType:NONE then do:
+        
+        // write the data to the response       
+        entityWriter = getEntityWriter(responseData).
+        responseObj = entityWriter:Write(responseData).
+        
+        response:Entity = responseObj.
+        response:ContentType = responseData:ContentType.
       
-      response:Entity = responseObj.
-      response:ContentType = responseData:ContentType.
+      end.
+      else do:
+        response:StatusCode = 204.
+      end.
                
       catch err1 as Progress.Lang.Error:
         response = handleErrors(err1).  
