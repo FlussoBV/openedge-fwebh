@@ -79,8 +79,6 @@ class fwebh.pas.webhandlers.ResourceWebHandler inherits WebHandlerCommon:
 
     WriteResponse(response).
     
-    @todo(what="garbage collect, certainly in case of memptr's").
-    
     return 0.
 
   end method.  // HandleGet
@@ -123,8 +121,6 @@ class fwebh.pas.webhandlers.ResourceWebHandler inherits WebHandlerCommon:
 
     WriteResponse(response).
     
-    @todo(what="garbage collect, certainly in case of memptr's").
-    
     return 0.
 
   end method.  // HandlePost
@@ -166,8 +162,6 @@ class fwebh.pas.webhandlers.ResourceWebHandler inherits WebHandlerCommon:
     end.  // do on error undo, throw
 
     WriteResponse(response).
-    
-    @todo(what="garbage collect, certainly in case of memptr's").
     
     return 0.
 
@@ -255,7 +249,7 @@ class fwebh.pas.webhandlers.ResourceWebHandler inherits WebHandlerCommon:
         errorNumber = 500.
       end.
     end case.  
-    
+   
     response = new WebResponse().
     response:Entity = new String(errorMessage).
     response:StatusCode = errorNumber.
