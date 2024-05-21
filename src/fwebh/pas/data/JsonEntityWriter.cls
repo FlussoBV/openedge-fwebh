@@ -11,12 +11,13 @@
 
 block-level on error undo, throw.
 
-using Progress.Json.ObjectModel.JsonArray.
-using Progress.Json.ObjectModel.JsonObject.
-using Progress.Lang.AppError.
+using fwebh.lang.error.NotAcceptableException.
 using fwebh.pas.data.IEntityWriter.
 using fwebh.pas.data.IResponseData.
 using fwebh.pas.data.ResponseDataType.
+using Progress.Json.ObjectModel.JsonArray.
+using Progress.Json.ObjectModel.JsonObject.
+using Progress.Lang.AppError.
 
 
 class fwebh.pas.data.JsonEntityWriter implements IEntityWriter: 
@@ -30,7 +31,7 @@ class fwebh.pas.data.JsonEntityWriter implements IEntityWriter:
       when ResponseDataType:TEMP-TABLE then entityData = writeTemptable(responseData:Data:TempTableHandle).
       when ResponseDataType:BUFFER then entityData = writeBuffer(responseData:Data:BufferHandle).
       when ResponseDataType:JSON then entityData = responseData:Data:Json.
-      otherwise undo, throw new AppError(substitute("JsonEntityWriter cannot process EntityDataType '&1'", responseData:Data:DataType), -1).
+      otherwise undo, throw new NotAcceptableException(substitute("JsonEntityWriter cannot process EntityDataType '&1'", responseData:Data:DataType)).
     end case.
     
     return entityData.

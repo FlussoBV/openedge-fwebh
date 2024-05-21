@@ -11,11 +11,12 @@
 
 block-level on error undo, throw.
 
-using OpenEdge.Core.String.
-using Progress.Lang.AppError.
 using fwebh.pas.data.ResponseDataType.
 using fwebh.pas.data.IEntityWriter.
 using fwebh.pas.data.IResponseData.
+using fwebh.lang.error.NotAcceptableException.
+using OpenEdge.Core.String.
+using Progress.Lang.AppError.
 
 class fwebh.pas.data.XmlEntityWriter implements IEntityWriter: 
 
@@ -27,7 +28,7 @@ class fwebh.pas.data.XmlEntityWriter implements IEntityWriter:
       when ResponseDataType:DATASET then entityData = writeDataset(responseData:Data:DatasetHandle).
       when ResponseDataType:TEMP-TABLE then entityData = writeTemptable(responseData:Data:TempTableHandle).
       when ResponseDataType:BUFFER then entityData = writeBuffer(responseData:Data:BufferHandle).
-      otherwise undo, throw new AppError(substitute("XmlEntityWriter cannot process EntityDataType '&1'", responseData:Data:DataType), -1).
+      otherwise undo, throw new NotAcceptableException(substitute("XmlEntityWriter cannot process EntityDataType '&1'", responseData:Data:DataType)).
     end case.
     
     return entityData.
