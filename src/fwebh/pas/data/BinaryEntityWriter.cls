@@ -10,11 +10,12 @@
 
 block-level on error undo, throw.
 
-using OpenEdge.Core.Memptr.
-using Progress.Lang.AppError.
+using fwebh.lang.error.NotAcceptableException.
 using fwebh.pas.data.IEntityWriter.
 using fwebh.pas.data.IResponseData.
 using fwebh.pas.data.ResponseDataType.
+using OpenEdge.Core.Memptr.
+using Progress.Lang.AppError.
 
 class fwebh.pas.data.BinaryEntityWriter implements IEntityWriter: 
 
@@ -24,7 +25,7 @@ class fwebh.pas.data.BinaryEntityWriter implements IEntityWriter:
     
     case responseData:Data:DataType:
       when ResponseDataType:MEMPTR then entityData = new Memptr(responseData:Data:Memptr).
-      otherwise undo, throw new AppError(substitute("BinaryEntityWriter cannot process EntityDataType '&1'", responseData:Data:DataType), -1).
+      otherwise undo, throw new NotAcceptableException(substitute("BinaryEntityWriter cannot process EntityDataType '&1'", responseData:Data:DataType)).
     end case.
     
     return entityData.

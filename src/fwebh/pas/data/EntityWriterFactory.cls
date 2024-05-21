@@ -10,12 +10,12 @@
 
 block-level on error undo, throw.
 
-using Progress.Json.ObjectModel.JsonObject.
-using Progress.Lang.AppError.
 using fwebh.core.IFactory.
 using fwebh.core.JSON.
 using fwebh.lang.error.NotAcceptableException.
 using fwebh.pas.data.IEntityWriter.
+using Progress.Json.ObjectModel.JsonObject.
+using Progress.Lang.AppError.
 
 class fwebh.pas.data.EntityWriterFactory: 
 
