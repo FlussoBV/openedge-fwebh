@@ -47,10 +47,7 @@ class fwebh.pas.webhandlers.ResourceWebHandler inherits WebHandlerCommon:
     var IHttpResponse response.
     var IRequestData requestData.
     var IResponseData responseData.
-    var JsonObject json.
     var IGetDataService service.
-    var IEntityWriter entityWriter.
-    var Progress.Lang.Object responseObj.
     
     do on error undo, throw:
       
@@ -62,22 +59,8 @@ class fwebh.pas.webhandlers.ResourceWebHandler inherits WebHandlerCommon:
       service = serviceFactory:GetGetDataService(requestData:Resource:Name).      
       responseData = service:GetData(requestData).
       
-      responseData:ContentType = handleContentType(service, requestData, responseData).
-      
-      if responseData:Data:DataType <> ResponseDataType:NONE then do:
-        
-        // write the data to the response       
-        entityWriter = getEntityWriter(responseData).
-        responseObj = entityWriter:Write(responseData).
-        
-        response:Entity = responseObj.
-        response:ContentType = responseData:ContentType.
-      
-      end.
-      else do:
-        response:StatusCode = 204.
-      end.
-               
+      response = handleResponse(service, requestData, responseData).
+
       catch err1 as Progress.Lang.Error:
         response = handleErrors(err1).  
       end catch.
@@ -96,10 +79,7 @@ class fwebh.pas.webhandlers.ResourceWebHandler inherits WebHandlerCommon:
     var IHttpResponse response.
     var IRequestData requestData.
     var IResponseData responseData.
-    var JsonObject json.
     var IPostDataService service.
-    var IEntityWriter entityWriter.
-    var Progress.Lang.Object responseObj.
     
     do on error undo, throw:
       
@@ -111,22 +91,8 @@ class fwebh.pas.webhandlers.ResourceWebHandler inherits WebHandlerCommon:
       service = serviceFactory:GetPostDataService(requestData:Resource:Name).      
       responseData = service:PostData(requestData).
       
-      responseData:ContentType = handleContentType(service, requestData, responseData).
-      
-      if responseData:Data:DataType <> ResponseDataType:NONE then do:
-        
-        // write the data to the response       
-        entityWriter = getEntityWriter(responseData).
-        responseObj = entityWriter:Write(responseData).
-        
-        response:Entity = responseObj.
-        response:ContentType = responseData:ContentType.
-      
-      end.
-      else do:
-        response:StatusCode = 204.
-      end.
-               
+      response = handleResponse(service, requestData, responseData).
+           
       catch err1 as Progress.Lang.Error:
         response = handleErrors(err1).  
       end catch.
@@ -145,10 +111,7 @@ class fwebh.pas.webhandlers.ResourceWebHandler inherits WebHandlerCommon:
     var IHttpResponse response.
     var IRequestData requestData.
     var IResponseData responseData.
-    var JsonObject json.
     var IPutDataService service.
-    var IEntityWriter entityWriter.
-    var Progress.Lang.Object responseObj.
     
     do on error undo, throw:
       
@@ -160,21 +123,7 @@ class fwebh.pas.webhandlers.ResourceWebHandler inherits WebHandlerCommon:
       service = serviceFactory:GetPutDataService(requestData:Resource:Name).      
       responseData = service:PutData(requestData).
       
-      responseData:ContentType = handleContentType(service, requestData, responseData).
-      
-      if responseData:Data:DataType <> ResponseDataType:NONE then do:
-        
-        // write the data to the response       
-        entityWriter = getEntityWriter(responseData).
-        responseObj = entityWriter:Write(responseData).
-        
-        response:Entity = responseObj.
-        response:ContentType = responseData:ContentType.
-      
-      end.
-      else do:
-        response:StatusCode = 204.
-      end.
+      response = handleResponse(service, requestData, responseData).
                
       catch err1 as Progress.Lang.Error:
         response = handleErrors(err1).  
@@ -194,37 +143,18 @@ class fwebh.pas.webhandlers.ResourceWebHandler inherits WebHandlerCommon:
     var IHttpResponse response.
     var IRequestData requestData.
     var IResponseData responseData.
-    var JsonObject json.
     var IDeleteDataService service.
-    var IEntityWriter entityWriter.
-    var Progress.Lang.Object responseObj.
     
     do on error undo, throw:
       
-      response = new WebResponse().
-  
       requestData = new RequestDataProcessor():ProcessRequestInfo(request).
       
       // get the service instance and execute the logic
       service = serviceFactory:GetDeleteDataService(requestData:Resource:Name).      
       responseData = service:DeleteData(requestData).
       
-      responseData:ContentType = handleContentType(service, requestData, responseData).
-      
-      if responseData:Data:DataType <> ResponseDataType:NONE then do:
-        
-        // write the data to the response       
-        entityWriter = getEntityWriter(responseData).
-        responseObj = entityWriter:Write(responseData).
-        
-        response:Entity = responseObj.
-        response:ContentType = responseData:ContentType.
-      
-      end.
-      else do:
-        response:StatusCode = 204.
-      end.
-                     
+      response = handleResponse(service, requestData, responseData).
+                           
       catch err1 as Progress.Lang.Error:
         response = handleErrors(err1).  
       end catch.
@@ -233,52 +163,92 @@ class fwebh.pas.webhandlers.ResourceWebHandler inherits WebHandlerCommon:
 
     WriteResponse(response).
     
-    @todo(what="garbage collect, certainly in case of memptr's").
-    
     return 0.
 
   end method.  // HandleDelete
-
+  
+  
+  method private IHttpResponse handleResponse(service as Progress.Lang.Object, requestData as IRequestData, responseData as IResponseData):
+    
+    var IEntityWriter entityWriter.
+    var Progress.Lang.Object responseObj.    
+    var IHttpResponse response = new WebResponse().
+        
+    responseData:ContentType = handleContentType(service, requestData, responseData).
+    
+    if responseData:Data:DataType <> ResponseDataType:NONE then do:
+      
+      // write the data to the response       
+      entityWriter = getEntityWriter(responseData).
+      responseObj = entityWriter:Write(responseData).
+      
+      response:Entity = responseObj.
+      response:ContentType = responseData:ContentType.
+      
+      if valid-object(responseData:Error) then 
+        response:StatusCode = getHttpErrorCode(responseData:Error).
+      
+    end.
+    else do:
+      response:StatusCode = 204.
+    end.
+    
+    return response.
+    
+  end method.  // handleResponse
+  
   
   method private IHttpResponse handleErrors(err as Progress.Lang.Error):
     
     var WebResponse response.
-    var char errorType = err:GetClass():TypeName.
+    
     var char errorMessage, contentType.
-    var int errorNumber.
+    var int errorCode.
   
     contentType = "text/plain".  
-    case errorType:
-      when "fwebh.lang.error.BadRequestException" then do:
-        errorMessage = err:GetMessage(1).
-        errorNumber = 400.
-      end.      
-      when "fwebh.lang.error.NotFoundException" then do:
-        errorMessage = err:GetMessage(1).
-        errorNumber = 404.
-      end.      
-      when "fwebh.lang.error.NotAllowedException" then do:
-        errorMessage = err:GetMessage(1).
-        errorNumber = 405.
-      end.
-      when "fwebh.lang.error.NotAcceptableException" then do:
-        errorMessage = err:GetMessage(1).
-        errorNumber = 406.
-      end.
-      otherwise do:
-        errorMessage = err:GetClass():TypeName + ": " + err:GetMessage(1).
-        errorNumber = 500.
-      end.
-    end case.  
-   
+    
+    errorMessage = err:GetMessage(1).
+    errorCode = getHttpErrorCode(err).
+    
+    if not err:GetClass():TypeName begins "fwebh.lang.error." then
+      errorMessage = err:GetClass():TypeName + ": " + err:GetMessage(1).
+         
     response = new WebResponse().
     response:Entity = new String(errorMessage).
-    response:StatusCode = errorNumber.
+    response:StatusCode = errorCode.
     response:ContentType = contentType.
     
     return response.
     
   end method.  // handleErrors
+  
+  
+  method private int getHttpErrorCode(err as Progress.Lang.Error):
+        
+    var int errorCode.
+    
+    case err:GetClass():TypeName:
+      when "fwebh.lang.error.BadRequestException" then
+        errorCode = 400.
+
+      when "fwebh.lang.error.NotFoundException" then 
+        errorCode = 404.
+
+      when "fwebh.lang.error.NotAllowedException" then
+        errorCode = 405.
+
+      when "fwebh.lang.error.NotAcceptableException" then
+        errorCode = 406.
+
+      otherwise do:
+        errorCode = 500.
+      end.
+      
+    end case.  
+    
+    return errorCode.
+    
+  end method.  // getHttpErrorCode
 
  
   method private char handleContentType(service as Progress.Lang.Object, requestData as IRequestData, responseData as IResponseData):

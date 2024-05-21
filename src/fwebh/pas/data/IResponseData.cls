@@ -17,5 +17,6 @@ interface fwebh.pas.data.IResponseData:
   
   define public property Data as IDataHolder no-undo get.
   define public property ContentType as char no-undo get. set.
+  define public property Error as Progress.Lang.Error no-undo get. set.
   
 end interface.

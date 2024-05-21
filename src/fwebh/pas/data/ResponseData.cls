@@ -27,5 +27,6 @@ class fwebh.pas.data.ResponseData implements IResponseData:
     private set.
 
   define public property ContentType as char no-undo get. set.
+  define public property Error as Progress.Lang.Error no-undo get. set.
   
 end class.

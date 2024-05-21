@@ -259,6 +259,15 @@ jobs:
             exit 1
           fi
 
+      - name: Test DELETE without JSON body returns 204
+        continue-on-error: false
+        run: |
+          CODEFIELD=$(curl --silent http://localhost:8810/web/v1/test?jsonError=true | jq ".code")
+          if test $CODEFIELD -ne "400"; then
+            echo "expected .code field in json to be 400, got: $CODEFIELD"
+            exit 1
+          fi
+
       - name: Display container logs after call
         run: |
           docker logs $(cat container.id)
