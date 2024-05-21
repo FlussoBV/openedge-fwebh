@@ -28,6 +28,7 @@ class fwebh.pas.service.system.CiTestService implements IDeleteDataService, IGet
     
     var IResponseData response = new ResponseData().
     var char errorCode = request:Parameters:Get("error").
+    var logical jsonError = (request:Parameters:Get("jsonError") = "true").
     var JsonObject json.
     
     if errorCode > "" then do:
@@ -41,7 +42,15 @@ class fwebh.pas.service.system.CiTestService implements IDeleteDataService, IGet
     end.
     else do:
       json = new JsonObject().
-      json:Add("test", "ok").
+      // test the JSON body for error response
+      if jsonError then do:
+        json:Add("code", "400").
+        json:Add("message", "custom JSON error, check!").
+        response:Error = new fwebh.lang.error.BadRequestException("").
+      end.
+      else  
+        json:Add("test", "ok").
+      
       response:Data:Json = json.
     end. 
     

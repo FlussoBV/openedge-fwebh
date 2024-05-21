@@ -184,7 +184,10 @@ class fwebh.pas.webhandlers.ResourceWebHandler inherits WebHandlerCommon:
       
       response:Entity = responseObj.
       response:ContentType = responseData:ContentType.
-    
+      
+      if valid-object(responseData:Error) then 
+        response:StatusCode = getHttpErrorCode(responseData:Error).
+      
     end.
     else do:
       response:StatusCode = 204.
@@ -198,42 +201,54 @@ class fwebh.pas.webhandlers.ResourceWebHandler inherits WebHandlerCommon:
   method private IHttpResponse handleErrors(err as Progress.Lang.Error):
     
     var WebResponse response.
-    var char errorType = err:GetClass():TypeName.
+    
     var char errorMessage, contentType.
-    var int errorNumber.
+    var int errorCode.
   
     contentType = "text/plain".  
-    case errorType:
-      when "fwebh.lang.error.BadRequestException" then do:
-        errorMessage = err:GetMessage(1).
-        errorNumber = 400.
-      end.      
-      when "fwebh.lang.error.NotFoundException" then do:
-        errorMessage = err:GetMessage(1).
-        errorNumber = 404.
-      end.      
-      when "fwebh.lang.error.NotAllowedException" then do:
-        errorMessage = err:GetMessage(1).
-        errorNumber = 405.
-      end.
-      when "fwebh.lang.error.NotAcceptableException" then do:
-        errorMessage = err:GetMessage(1).
-        errorNumber = 406.
-      end.
-      otherwise do:
-        errorMessage = err:GetClass():TypeName + ": " + err:GetMessage(1).
-        errorNumber = 500.
-      end.
-    end case.  
-   
+    
+    errorMessage = err:GetMessage(1).
+    errorCode = getHttpErrorCode(err).
+    
+    if not err:GetClass():TypeName begins "fwebh.lang.error." then
+      errorMessage = err:GetClass():TypeName + ": " + err:GetMessage(1).
+         
     response = new WebResponse().
     response:Entity = new String(errorMessage).
-    response:StatusCode = errorNumber.
+    response:StatusCode = errorCode.
     response:ContentType = contentType.
     
     return response.
     
   end method.  // handleErrors
+  
+  
+  method private int getHttpErrorCode(err as Progress.Lang.Error):
+        
+    var int errorCode.
+    
+    case err:GetClass():TypeName:
+      when "fwebh.lang.error.BadRequestException" then
+        errorCode = 400.
+
+      when "fwebh.lang.error.NotFoundException" then 
+        errorCode = 404.
+
+      when "fwebh.lang.error.NotAllowedException" then
+        errorCode = 405.
+
+      when "fwebh.lang.error.NotAcceptableException" then
+        errorCode = 406.
+
+      otherwise do:
+        errorCode = 500.
+      end.
+      
+    end case.  
+    
+    return errorCode.
+    
+  end method.  // getHttpErrorCode
 
  
   method private char handleContentType(service as Progress.Lang.Object, requestData as IRequestData, responseData as IResponseData):
