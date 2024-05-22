@@ -32,7 +32,7 @@ class fwebh.pas.data.EntityWriterFactory:
     var char tmp.
 
     if (factory:Has(mimeType)) then
-      entityWriter = cast(factory:GetInstance(mimeType), IEntityWriter).
+      entityWriter = cast(factory:GetInstance(mimeType), IEntityWriter).      
     else do:
       tmp = entry(1, mimeType, "/") + "/*".
       entityWriter = cast(factory:GetInstance(tmp), IEntityWriter).

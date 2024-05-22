@@ -39,6 +39,13 @@ class fwebh.pas.data.EntityWriterFactory_UT:
   end method.
 
   @Test.
+  method public void text_plain_returns_correct_writer():
+    var IEntityWriter entityWriter.
+    entityWriter = factory:GetEntityWriter("text/plain").
+    Assert:Equals(entityWriter:GetClass():TypeName, "fwebh.pas.data.PlainTextEntityWriter").
+  end method.
+
+  @Test.
   method public void text_xml_returns_correct_writer():
     var IEntityWriter entityWriter.
     entityWriter = factory:GetEntityWriter("text/xml").

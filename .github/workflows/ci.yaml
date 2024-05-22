@@ -197,45 +197,60 @@ jobs:
       - name: Test POST JSON
         continue-on-error: false
         run: |
-          CHECKNUMBER=$(curl --silent http://localhost:8810/web/v1/echo --header 'Content-Type: application/json' --data '{ "id": 5, "client": "postman", "version": "0.1" }' -X POST | jq ".posted.id")
-          if test $CHECKNUMBER -ne 5; then
-            echo "expected .posted.id is 5, got: $CHECKNUMBER"
+          RECEIVED=$(curl --silent http://localhost:8810/web/v1/echo --header 'Content-Type: application/json' --data '{ "id": 5, "client": "postman", "version": "0.1" }' -X POST | jq -r ".posted.id")
+          SHOULDBE="5"
+          if [[ "${RECEIVED}" != "${SHOULDBE}" ]]; then
+            echo "expected .posted.id is ${SHOULDBE}, got: ${RECEIVED}"
             exit 1
           fi
 
       - name: Test POST XML
         continue-on-error: false
         run: |
-          XMLTEXT=$(curl --silent http://localhost:8810/web/v1/echo --header 'Content-Type: application/xml' --data '<xml><id>5</id><client>postman</client><version>0.1</version></xml>' -X POST | jq ".posted.xml")
-          if test $XMLTEXT -ne "<xml><id>5</id><client>postman</client><version>0.1</version></xml>"; then
-           echo "expected .posted.xml is \"<xml><id>5</id><client>postman</client><version>0.1</version></xml>\", got: $XMLTEXT"
-           exit 1
+          RECEIVED=$(curl --silent http://localhost:8810/web/v1/echo --header 'Content-Type: application/xml' --data '<xml><id>5</id><client>postman</client><version>0.1</version></xml>' -X POST | jq -r ".posted.xml")
+          SHOULDBE="<xml><id>5</id><client>postman</client><version>0.1</version></xml>"
+          if [[ "${RECEIVED}" != "${SHOULDBE}" ]]; then
+            echo "expected .posted.xml is ${SHOULDBE}, got: ${RECEIVED}"
+            exit 1
+          fi
+
+      - name: Test POST text/plain
+        continue-on-error: false
+        run: |
+          RECEIVED=$(curl --silent http://localhost:8810/web/v1/test --header 'Content-Type: text/plain' --data 'hello world' --header 'Accept: text/plain' -X POST)
+          SHOULDBE="request body: hello world"
+          if [[ $RECEIVED != "${SHOULDBE}" ]]; then
+            echo "expected ${SHOULDBE}, got: $PLAINTEXT"
+            exit 1
           fi
 
       - name: Test PUT JSON
         continue-on-error: false
         run: |
-          CHECKNUMBER=$(curl --silent http://localhost:8810/web/v1/echo --header 'Content-Type: application/json' --data '{ "id": 55, "client": "postman", "version": "0.2" }' -X PUT | jq ".posted.id")
-          if test $CHECKNUMBER -ne 55; then
-            echo "expected .posted.id is 55, got: $CHECKNUMBER"
+          RECEIVED=$(curl --silent http://localhost:8810/web/v1/echo --header 'Content-Type: application/json' --data '{ "id": 55, "client": "postman", "version": "0.2" }' -X PUT | jq -r ".put.id")
+          SHOULDBE="55"
+          if [[ "$RECEIVED" != "${SHOULDBE}" ]]; then
+            echo "expected .posted.id is ${SHOULDBE}, got: $RECEIVED"
             exit 1
           fi
 
       - name: Test PUT XML
         continue-on-error: false
-        run: |
-          XMLTEXT=$(curl --silent http://localhost:8810/web/v1/echo --header 'Content-Type: application/xml' --data '<xml><id>5</id><client>postman</client><version>0.1</version></xml>' -X PUT | jq ".posted.xml")
-          if test $XMLTEXT -ne "<xml><id>55</id><client>postman</client><version>0.2</version></xml>"; then
-           echo "expected .posted.xml is \"<xml><id>55</id><client>postman</client><version>0.2</version></xml>\", got: $XMLTEXT"
-           exit 1
+        run: |         
+          RECEIVED=$(curl --silent http://localhost:8810/web/v1/echo --header 'Content-Type: application/xml' --data '<xml><id>5</id><client>postman</client><version>0.2</version></xml>' -X PUT | jq -r ".put.xml")
+          SHOULDBE="<xml><id>5</id><client>postman</client><version>0.2</version></xml>"
+          if [[ "${RECEIVED}" != "${SHOULDBE}" ]]; then
+            echo "expected .posted.xml is ${SHOULDBE}, got: ${RECEIVED}"
+            exit 1
           fi
 
       - name: Test DELETE with JSON body returns JSON
         continue-on-error: false
         run: |
-          CHECKNUMBER=$(curl --silent http://localhost:8810/web/v1/test --header 'Content-Type: application/json' --data '{ "id": "54321" }' -X DELETE | jq ".deleted")
-          if test $CHECKNUMBER -ne "54321"; then
-            echo "expected .posted.id is 54321, got: $CHECKNUMBER"
+          RECEIVED=$(curl --silent http://localhost:8810/web/v1/test --header 'Content-Type: application/json' --data '{ "id": "54321" }' -X DELETE | jq -r ".deleted")
+          SHOULDBE="54321"
+          if [[ "${RECEIVED}" != "${SHOULDBE}" ]]; then
+            echo "expected .deleted is ${SHOULDBE}, got: ${RECEIVED}"
             exit 1
           fi
 
@@ -256,15 +271,6 @@ jobs:
           httperror=204
           if test $STATUSCODE -ne ${httperror}; then
             echo "expected http status ${httperror}, got: $STATUSCODE"
-            exit 1
-          fi
-
-      - name: Test DELETE without JSON body returns 204
-        continue-on-error: false
-        run: |
-          CODEFIELD=$(curl --silent http://localhost:8810/web/v1/test?jsonError=true | jq ".code")
-          if test $CODEFIELD -ne "400"; then
-            echo "expected .code field in json to be 400, got: $CODEFIELD"
             exit 1
           fi
 

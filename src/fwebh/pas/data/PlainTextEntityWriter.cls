@@ -15,6 +15,7 @@ using Progress.Lang.AppError.
 using fwebh.pas.data.IEntityWriter.
 using fwebh.pas.data.IResponseData.
 using fwebh.pas.data.ResponseDataType.
+using fwebh.lang.error.NotAcceptableException.
 
 class fwebh.pas.data.PlainTextEntityWriter implements IEntityWriter: 
 
@@ -24,7 +25,7 @@ class fwebh.pas.data.PlainTextEntityWriter implements IEntityWriter:
     
     case responseData:Data:DataType:
       when ResponseDataType:LONGCHAR then entityData = new String(responseData:Data:PlainText).
-      otherwise undo, throw new AppError(substitute("PlainTextWriter cannot process EntityDataType '&1'", responseData:Data:DataType), -1).
+      otherwise undo, throw new NotAcceptableException(substitute("PlainTextWriter cannot process EntityDataType '&1'", responseData:Data:DataType)).
     end case.
     
     return entityData.
