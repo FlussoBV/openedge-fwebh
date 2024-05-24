@@ -69,7 +69,7 @@ jobs:
           ls -l ${PWD}/artifacts 
 
       - name: Check unit tests
-        uses: bfv/ablunit-results@f2240cbab5ae09ead8567ac91ed660943b2a2d9c  # v0.1.0
+        uses: bfv/ablunit-results@9cfe2a9b92e39427a66571c915bfd954373f077a  # v0.2.0
         id: unit-tests
         with:
           file: artifacts/results.xml
