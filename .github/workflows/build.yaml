@@ -39,14 +39,15 @@ jobs:
         run: |
           docker pull ${IMAGE_NAME}
 
-          - name: Get flattened version  # get the flattened minor version 12.2.10 --> 122
-          id: getflatversion
-          uses: bfv/openedge-flatversion@6f7ed9e19b0ef3b2eece00b4d056f26d89a6ebd8  # v1.0.1
-          with:
-            version: ${{ matrix.version }}
+      - name: Get flattened version  # get the flattened minor version 12.2.10 --> 122
+        id: getflatversion
+        uses: bfv/openedge-flatversion@6f7ed9e19b0ef3b2eece00b4d056f26d89a6ebd8  # v1.0.1
+        with:
+          version: ${{ inputs.version }}
   
       - name: License unpack  # get progress.cfg from secret PROGRESS_CFG_12x
         run: |
+          mkdir license
           echo fetching progress.cfg from secret PROGRESS_CFG_${{steps.getflatversion.outputs.flat-version}}
           echo "${{ secrets[format('PROGRESS_CFG_{0}', steps.getflatversion.outputs.flat-version)] }}" | base64 --decode > license/progress.cfg
           ls -l license | grep -v '^total'

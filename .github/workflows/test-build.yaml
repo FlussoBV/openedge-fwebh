@@ -7,20 +7,21 @@ on:
         required: true
         type: string
         description: 'OpenEdge version to use'
+        default: '12.8.2'
 
 jobs:
+
   build:
     uses: ./.github/workflows/build.yaml
     with:
       version: ${{ github.event.inputs.version }}
+    secrets: inherit
 
   test:
     runs-on: ubuntu-latest
+    needs: build
     steps:
-    #   - name: build
-    #     uses: ./.github/workflows/build.yaml
-    #     with:
-    #       version: ${{ github.event.inputs.version }}
+ 
       - name: results
         run: |
           ls -l ${PWD}/
