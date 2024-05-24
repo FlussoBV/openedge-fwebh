@@ -77,27 +77,27 @@ class fwebh.pas.service.ServiceFactory_UT:
     factory:GetGetDataService("i-do-not-exist").
   end method.
 
-  @Test(expected="fwebh.lang.error.NotImplementedException").
+  @Test(expected="fwebh.lang.error.NotAllowedException").
   method public void service_with_DELETE_not_implemented_should_throw():
     factory:GetDeleteDataService("empty").  
   end.
   
-  @Test(expected="fwebh.lang.error.NotImplementedException").
+  @Test(expected="fwebh.lang.error.NotAllowedException").
   method public void service_with_GET_not_implemented_should_throw():
     factory:GetGetDataService("empty").  
   end.
   
-  @Test(expected="fwebh.lang.error.NotImplementedException").
+  @Test(expected="fwebh.lang.error.NotAllowedException").
   method public void service_with_PATCH_not_implemented_should_throw():
     factory:GetPatchDataService("empty").  
   end.
   
-  @Test(expected="fwebh.lang.error.NotImplementedException").
+  @Test(expected="fwebh.lang.error.NotAllowedException").
   method public void service_with_POST_not_implemented_should_throw():
     factory:GetPostDataService("empty").  
   end.
   
-  @Test(expected="fwebh.lang.error.NotImplementedException").
+  @Test(expected="fwebh.lang.error.NotAllowedException").
   method public void service_with_PUT_not_implemented_should_throw():
     factory:GetPutDataService("empty").  
   end.
