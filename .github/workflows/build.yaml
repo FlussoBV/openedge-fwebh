@@ -19,7 +19,10 @@ on:
         type: string
         description: 'Build artifacts'
         default: 'build-artifacts-${{ inputs.version }}.${{ github.run_number }}'
-
+    outputs:
+      build_artifacts_name: 
+        description: 'Build artifiacts name'
+        value:  ${{ inputs.build_artifacts_name }}
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -94,13 +97,12 @@ jobs:
           echo "sha=${GITHUB_SHA}" > artifacts/version.git.info
           echo "branch=${GITHUB_REF}" >> artifacts/version.git.info
           echo "buildnr=${{ github.run_number }}" >> artifacts/version.git.info
-          echo "openedge=${{ env.OPENEDGE_VERSION }}" >> artifacts/version.git.info
+          echo "openedge=${{ inputs.version }}" >> artifacts/version.git.info
           cat artifacts/version.git.info
   
       - name: Save build artifacts
         uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808  # v4.3.3
         with:
-          #name: build-artifacts-${{ inputs.version }}.${{ github.run_number }}
           name: ${{ inputs.build_artifacts_name }}
           path: artifacts/*
           retention-days: 1
