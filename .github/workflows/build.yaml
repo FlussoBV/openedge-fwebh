@@ -7,6 +7,14 @@ on:
         required: true
         type: string
         description: 'OpenEdge version to use'
+      execute_unittests:
+        type: boolean
+        description: 'Execute unit tests'
+        default: false
+      build_artifacts_name:
+        type: string
+        description: 'Build artifacts'
+        default: 'build-artifacts-${{ inputs.version }}.${{ github.run_number }}'
 
 jobs:
   build:
@@ -29,7 +37,7 @@ jobs:
         env:
           OPENEDGE_VERSION: "${{ inputs.version }}"
           IMAGE_REF: "devbfvio/openedge-compiler"       
-          EXECUTE_UNITTESTS: "true"      
+          EXECUTE_UNITTESTS: "${{ inputs.execute_unittests }}"      
         run: |
           echo "OPENEDGE_VERSION=${OPENEDGE_VERSION}" >> $GITHUB_ENV
           echo "IMAGE_NAME=${IMAGE_REF}:${OPENEDGE_VERSION}" >> $GITHUB_ENV
@@ -57,5 +65,14 @@ jobs:
           mkdir artifacts
           ls -l ${PWD}/license/
           docker run -v ${PWD}/src:/app/src -v ${PWD}/artifacts:/app/artifacts -v ${PWD}/license/progress.cfg:/usr/dlc/progress.cfg --env ANT_HOME=/usr/dlc/ant --env EXECUTE_UNITTESTS=${EXECUTE_UNITTESTS} ${IMAGE_NAME} /app/src/fwebh/scripts/build.sh
-          cp src/fwebh/results.xml ${PWD}/artifacts
+          [[ -e src/fwebh/results.xml ]] && cp src/fwebh/results.xml ${PWD}/artifacts
           ls -l ${PWD}/artifacts 
+
+      - name: Save build artifacts
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808  # v4.3.3
+        with:
+          #name: build-artifacts-${{ inputs.version }}.${{ github.run_number }}
+          name: ${{ inputs.build_artifacts_name }}
+          path: artifacts/*
+          retention-days: 1
+  

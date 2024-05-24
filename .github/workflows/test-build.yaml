@@ -8,13 +8,19 @@ on:
         type: string
         description: 'OpenEdge version to use'
         default: '12.8.2'
+      execute_unittests:
+        type: boolean
+        description: 'Execute unit tests'
+        default: false
 
 jobs:
 
   build:
     uses: ./.github/workflows/build.yaml
     with:
-      version: ${{ github.event.inputs.version }}
+      version: ${{ inputs.version }}
+      execute_unittests: ${{ inputs.execute_unittests }}
+      build_artifacts_name: 'bla'
     secrets: inherit
 
   test:
@@ -22,9 +28,23 @@ jobs:
     needs: build
     steps:
  
+      - name: Download build artifacts
+        uses: actions/download-artifact@65a9edc5881444af0b9093a5e628f2fe47ea3b2e  # v4.1.7
+        with:
+          #name: build-artifacts-${{ inputs.version }}.${{ github.run_number }}
+          name: bla
+          path: .
+
       - name: results
         run: |
           ls -l ${PWD}/
-          ls -l ${PWD}/artifacts/
-  
 
+      - name: Check unit tests
+        uses: bfv/ablunit-results@f2240cbab5ae09ead8567ac91ed660943b2a2d9c  # v0.1.0
+        id: unit-tests
+        with:
+          file: results.xml
+          fail-on-error: "true"
+          errors-only: "false"
+          debug: "false"
+        
