@@ -1,0 +1,29 @@
+name: Test Build workflow
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        required: true
+        type: string
+        description: 'OpenEdge version to use'
+
+jobs:
+  # build:
+  #   uses: ./.github/workflows/build.yaml
+  #   with:
+  #     version: ${{ github.event.inputs.version }}
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: build
+        uses: ./.github/workflows/build.yaml
+        with:
+          version: ${{ github.event.inputs.version }}
+      - name: results
+        run: |
+          ls -l ${PWD}/
+          ls -l ${PWD}/artifacts/
+  
+
