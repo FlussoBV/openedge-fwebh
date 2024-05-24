@@ -11,6 +11,10 @@ on:
         type: boolean
         description: 'Execute unit tests'
         default: false
+      evaluate_unittests:
+        type: boolean
+        description: 'Evaluate unit test results'
+        default: false
       build_artifacts_name:
         type: string
         description: 'Build artifacts'
@@ -59,7 +63,7 @@ jobs:
           echo fetching progress.cfg from secret PROGRESS_CFG_${{steps.getflatversion.outputs.flat-version}}
           echo "${{ secrets[format('PROGRESS_CFG_{0}', steps.getflatversion.outputs.flat-version)] }}" | base64 --decode > license/progress.cfg
           ls -l license | grep -v '^total'
-
+      
       - name: Build
         run: | 
           mkdir artifacts
@@ -68,6 +72,16 @@ jobs:
           [[ -e src/fwebh/results.xml ]] && cp src/fwebh/results.xml ${PWD}/artifacts
           ls -l ${PWD}/artifacts 
 
+      - name: Check unit tests
+        if: ${{ inputs.execute_unittests == true && inputs.evaluate_unittests == true }}
+        uses: bfv/ablunit-results@9cfe2a9b92e39427a66571c915bfd954373f077a  # v0.2.0
+        id: unit-tests
+        with:
+          file: artifacts/results.xml
+          fail-on-error: true
+          errors-only: false
+          debug: false
+  
       - name: Save build artifacts
         uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808  # v4.3.3
         with:
