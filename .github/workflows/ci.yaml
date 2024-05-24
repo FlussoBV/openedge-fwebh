@@ -48,18 +48,16 @@ jobs:
           path: src/fwebh
 
       - name: Get flattened version  # get the flattened minor version 12.2.10 --> 122
-        run: |
-          mkdir license
-          a=${{matrix.version}} 
-          echo matrix.version: $a
-          flatversion=`echo ${a%\.*} | sed "s/\.//g"`
-          echo flattened minor version: $flatversion
-          echo "FLATVERSION=${flatversion}" >> $GITHUB_ENV
-
+        id: getflatversion
+        uses: bfv/openedge-flatversion@6f7ed9e19b0ef3b2eece00b4d056f26d89a6ebd8  # v1.0.1
+        with:
+          version: ${{ matrix.version }}
+            
       - name: License unpack  # get progress.cfg from secret PROGRESS_CFG_12x
         run: |
-          echo fetching progress.cfg from secret PROGRESS_CFG_${{env.FLATVERSION}}
-          echo "${{ secrets[format('PROGRESS_CFG_{0}', env.FLATVERSION)] }}" | base64 --decode > license/progress.cfg
+          mkdir license
+          echo fetching progress.cfg from secret PROGRESS_CFG_${{steps.getflatversion.outputs.flat-version}}
+          echo "${{ secrets[format('PROGRESS_CFG_{0}', steps.getflatversion.outputs.flat-version)] }}" | base64 --decode > license/progress.cfg
           ls -l license | grep -v '^total'
 
       - name: Build
@@ -119,14 +117,14 @@ jobs:
           ls -l ${PWD}
           
       - name: Get flattened version  # get the flattened minor version 12.2.10 --> 122
-        run: |
-          a=${{matrix.version}}
-          flatversion=`echo ${a%\.*} | sed "s/\.//g"`
-          echo "FLATVERSION=${flatversion}" >> $GITHUB_ENV
+        id: getflatversion
+        uses: bfv/openedge-flatversion@6f7ed9e19b0ef3b2eece00b4d056f26d89a6ebd8  # v1.0.1
+        with:
+          version: ${{ matrix.version }}
 
       - name: License unpack  # get progress.cfg from secret PROGRESS_CFG_12x
         run: |
-          echo "${{ secrets[format('PROGRESS_CFG_{0}', env.FLATVERSION)] }}" | base64 --decode > progress.cfg
+          echo "${{ secrets[format('PROGRESS_CFG_{0}', steps.getflatversion.outputs.flat-version)] }}" | base64 --decode > progress.cfg
           ls -l 
 
       - name: Start PAS container

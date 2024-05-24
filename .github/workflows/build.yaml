@@ -1,0 +1,63 @@
+name: Build
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        required: true
+        type: string
+        description: 'OpenEdge version to use'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11  # v4.1.1
+        with:
+          path: src/fwebh
+
+      - name: Login to Docker registry
+        uses: docker/login-action@e92390c5fb421da1463c202d546fed0ec5c39f20  # v3.1.0
+        with:
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+
+      - name: Build Docker image name
+        env:
+          OPENEDGE_VERSION: "${{ inputs.version }}"
+          IMAGE_REF: "devbfvio/openedge-compiler"       
+          EXECUTE_UNITTESTS: "true"      
+        run: |
+          echo "OPENEDGE_VERSION=${OPENEDGE_VERSION}" >> $GITHUB_ENV
+          echo "IMAGE_NAME=${IMAGE_REF}:${OPENEDGE_VERSION}" >> $GITHUB_ENV
+          echo "EXECUTE_UNITTESTS=${EXECUTE_UNITTESTS}" >> $GITHUB_ENV
+          
+      - name: Docker pull image
+        run: |
+          docker pull ${IMAGE_NAME}
+
+      - name: Get flattened version  # get the flattened minor version 12.2.10 --> 122
+        run: |
+          mkdir license
+          a=${{matrix.version}} 
+          echo matrix.version: $a
+          flatversion=`echo ${a%\.*} | sed "s/\.//g"`
+          echo flattened minor version: $flatversion
+          echo "FLATVERSION=${flatversion}" >> $GITHUB_ENV
+
+      - name: License unpack  # get progress.cfg from secret PROGRESS_CFG_12x
+        run: |
+          echo fetching progress.cfg from secret PROGRESS_CFG_${{env.FLATVERSION}}
+          echo "${{ secrets[format('PROGRESS_CFG_{0}', env.FLATVERSION)] }}" | base64 --decode > license/progress.cfg
+          ls -l license | grep -v '^total'
+
+      - name: Build
+        run: | 
+          mkdir artifacts
+          ls -l ${PWD}/license/
+          docker run -v ${PWD}/src:/app/src -v ${PWD}/artifacts:/app/artifacts -v ${PWD}/license/progress.cfg:/usr/dlc/progress.cfg --env ANT_HOME=/usr/dlc/ant --env EXECUTE_UNITTESTS=${EXECUTE_UNITTESTS} ${IMAGE_NAME} /app/src/fwebh/scripts/build.sh
+          cp src/fwebh/results.xml ${PWD}/artifacts
+          ls -l ${PWD}/artifacts 
