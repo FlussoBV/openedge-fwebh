@@ -82,6 +82,21 @@ jobs:
           errors-only: false
           debug: false
   
+      - name: Copy extra files
+        run: |
+          cp ${PWD}/src/fwebh/src/services.json ${PWD}/artifacts
+          cp ${PWD}/src/fwebh/src/entitywriter.json ${PWD}/artifacts
+          cp ${PWD}/src/fwebh/src/fwebh/pas/webhandlers/ROOT.handlers ${PWD}/artifacts
+          ls -l artifacts | grep -v '^total'
+
+      - name: Add Git info
+        run: |
+          echo "sha=${GITHUB_SHA}" > artifacts/version.git.info
+          echo "branch=${GITHUB_REF}" >> artifacts/version.git.info
+          echo "buildnr=${{ github.run_number }}" >> artifacts/version.git.info
+          echo "openedge=${{ env.OPENEDGE_VERSION }}" >> artifacts/version.git.info
+          cat artifacts/version.git.info
+  
       - name: Save build artifacts
         uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808  # v4.3.3
         with:
