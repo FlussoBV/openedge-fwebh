@@ -17,12 +17,14 @@ using fwebh.pas.data.IResponseData.
 using fwebh.pas.data.ResponseData.
 using fwebh.pas.service.IDeleteDataService.
 using fwebh.pas.service.IGetDataService.
+using fwebh.pas.service.IPostDataService.
 using fwebh.serialize.SimpleJsonSerializer.
 using OpenEdge.Core.String.
 using Progress.Lang.AppError.
 using Progress.Json.ObjectModel.JsonObject.
+using fwebh.pas.data.RequestData.
 
-class fwebh.pas.service.system.CiTestService implements IDeleteDataService, IGetDataService: 
+class fwebh.pas.service.system.CiTestService implements IDeleteDataService, IGetDataService, IPostDataService: 
 
   method public IResponseData GetData(request as IRequestData):
     
@@ -40,7 +42,7 @@ class fwebh.pas.service.system.CiTestService implements IDeleteDataService, IGet
         otherwise undo, throw new AppError("unforseen error", -1).
       end case.
     end.
-    else do:
+    else if request:Accept = "application/json" or request:Accept = "*/*" then do:
       json = new JsonObject().
       // test the JSON body for error response
       if jsonError then do:
@@ -52,7 +54,10 @@ class fwebh.pas.service.system.CiTestService implements IDeleteDataService, IGet
         json:Add("test", "ok").
       
       response:Data:Json = json.
-    end. 
+    end.
+    else if request:Accept = "text/plain" then do:
+      response:Data:PlainText = "text test OK".
+    end.
     
     return response.
     
@@ -89,5 +94,18 @@ class fwebh.pas.service.system.CiTestService implements IDeleteDataService, IGet
     return response.
     
   end method.  // DeleteData
+  
+  
+  method public IResponseData PostData(request as IRequestData):
+    
+    var IResponseData response = new ResponseData().
+    
+    if request:ContentType = "text/plain" then do:
+      response:Data:PlainText = substitute("request body: &1", request:Data:PlainText).
+    end.
+    
+    return response.
+    
+  end method.  // PostData
 
 end class.

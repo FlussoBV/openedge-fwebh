@@ -13,6 +13,6 @@ using fwebh.pas.data.IResponseData.
 
 interface fwebh.pas.data.IEntityWriter:  
   
-  method public Progress.Lang.Object Write( responseData as IResponseData ).
+  method public Progress.Lang.Object Write(responseData as IResponseData).
   
 end interface.

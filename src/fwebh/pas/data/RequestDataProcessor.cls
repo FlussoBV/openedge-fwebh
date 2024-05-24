@@ -1,4 +1,3 @@
- 
  /*------------------------------------------------------------------------
     File        : RequestDataProcessor
     Purpose     : 
@@ -22,6 +21,8 @@ using fwebh.net.UrlHelper.
 using fwebh.pas.resource.ResourceDescriptor.
 using OpenEdge.Net.HTTP.HttpHeader.
 using OpenEdge.Core.Collections.IStringStringMap.
+using fwebh.pas.data.IDataHolder.
+using fwebh.pas.data.ResponseDataType.
 
 class fwebh.pas.data.RequestDataProcessor: 
   
@@ -47,6 +48,7 @@ class fwebh.pas.data.RequestDataProcessor:
     return data.
     
   end method.  // ProcessRequest
+
   
   method private void processBody(request as IWebRequest, data as RequestData):
     
@@ -60,8 +62,10 @@ class fwebh.pas.data.RequestDataProcessor:
       when "Progress.Json.ObjectModel.JsonObject" or when "Progress.Json.ObjectModel.JsonArray" then
         data:Data:Json = cast(request:Entity, Progress.Json.ObjectModel.JsonConstruct).
         
-      when "OpenEdge.Core.Memptr" then 
-        data:Data:Memptr = cast(request:Entity, OpenEdge.Core.Memptr):Value.    
+      when "OpenEdge.Core.Memptr" then
+        processMemptr(cast(request:Entity, OpenEdge.Core.Memptr), 
+                      request:ContentType, 
+                      data:Data).
       
       when "OpenEdge.Core.WidgetHandle" then do:
         h = cast(request:Entity, OpenEdge.Core.WidgetHandle):Value.
@@ -69,9 +73,39 @@ class fwebh.pas.data.RequestDataProcessor:
       end.
         
     end case.
-    
+
   end method.  // processBody
   
+
+  // see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Type
+  // Content-Type: text/html; charset=utf-8
+  // Content-Type: multipart/form-data; boundary=something
+  method private void processMemptr(entity as OpenEdge.Core.Memptr, contentType as character, data as IDataHolder):
+
+    var char mimeType, charset = "utf-8".  // assume utf-8.
+    
+    mimeType = trim(entry(1, contentType, ";")).
+    
+    case mimeType:
+      
+      when "text/plain" then do:
+          
+        if num-entries(contentType, ";") = 2 and trim(entry(2, contentType, ";")) begins "charset=" then
+          charset = trim(entry(2, entry(2, contentType, ";"), "=")).
+    
+        // no codepage convert, consumer must use get-codepage function and handle it accordingly 
+        fix-codepage(data:PlainText) = charset.
+        copy-lob from entity:Value to data:PlainText. 
+        
+      end.
+        
+      otherwise 
+        data:Memptr = entity:Value.
+          
+    end case.
+
+  end method. // processMemptr
+
 
   method private ResourceDescriptor getResourceInfo(request as IWebRequest):
     

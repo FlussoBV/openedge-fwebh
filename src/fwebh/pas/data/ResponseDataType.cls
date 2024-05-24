@@ -17,6 +17,7 @@ enum fwebh.pas.data.ResponseDataType :
     JSON
     MEMPTR
     WIDGET-HANDLE
+    LONGCHAR
     NONE
     .
 end enum.

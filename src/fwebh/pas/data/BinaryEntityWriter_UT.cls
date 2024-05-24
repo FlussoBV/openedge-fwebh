@@ -16,10 +16,11 @@ using OpenEdge.Core.Assert.
 using OpenEdge.Core.Assertion.AssertObject.
 using OpenEdge.Core.Memptr.
 using Progress.Lang.Object.
+using fwebh.pas.data.IEntityWriter.
 
 class fwebh.pas.data.BinaryEntityWriter_UT: 
   
-  var BinaryEntityWriter writer.
+  var IEntityWriter writer.
   var ResponseData response.
 
   @BeforeEach.
