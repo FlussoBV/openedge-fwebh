@@ -9,18 +9,18 @@ on:
         description: 'OpenEdge version to use'
 
 jobs:
-  # build:
-  #   uses: ./.github/workflows/build.yaml
-  #   with:
-  #     version: ${{ github.event.inputs.version }}
+  build:
+    uses: ./.github/workflows/build.yaml
+    with:
+      version: ${{ github.event.inputs.version }}
 
   test:
     runs-on: ubuntu-latest
     steps:
-      - name: build
-        uses: ./.github/workflows/build.yaml
-        with:
-          version: ${{ github.event.inputs.version }}
+    #   - name: build
+    #     uses: ./.github/workflows/build.yaml
+    #     with:
+    #       version: ${{ github.event.inputs.version }}
       - name: results
         run: |
           ls -l ${PWD}/
