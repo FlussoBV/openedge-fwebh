@@ -14,267 +14,37 @@ permissions:
 run-name: ci - ${{ github.event.head_commit.message }}
 
 jobs:
+
   build:
-    runs-on: ubuntu-latest
-    if: ${{ !contains(github.event.head_commit.message, '#wip') }}
     strategy:
+      fail-fast: false
       matrix:
-        version: [ 12.8.1, 12.8.2 ]
-    steps:
+        version: [ '12.8.1', '12.8.2']
+    uses: ./.github/workflows/build.yaml
+    with:
+      version: ${{ matrix.version }}
+      execute_unittests: true
+      build_artifacts_name: 'build-artifacts-${{ matrix.version }}.${{ github.run_number }}'
+    secrets: inherit
 
-      - name: Login to registry
-        uses: docker/login-action@e92390c5fb421da1463c202d546fed0ec5c39f20  # v3.1.0
-        with:
-          username: ${{ secrets.REGISTRY_USERNAME }}
-          password: ${{ secrets.REGISTRY_PASSWORD }}
-
-      - name: Build Docker image name
-        env:
-          OPENEDGE_VERSION: "${{ matrix.version }}"
-          IMAGE_REF: "devbfvio/openedge-compiler"       
-          EXECUTE_UNITTESTS: "true"      
-        run: |
-          echo "OPENEDGE_VERSION=${OPENEDGE_VERSION}" >> $GITHUB_ENV
-          echo "IMAGE_NAME=${IMAGE_REF}:${OPENEDGE_VERSION}" >> $GITHUB_ENV
-          echo "EXECUTE_UNITTESTS=${EXECUTE_UNITTESTS}" >> $GITHUB_ENV
-          
-      - name: Docker pull image
-        run: |
-          docker pull ${IMAGE_NAME}
-
-      - name: Checkout
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11  # v4.1.1
-        with:
-          path: src/fwebh
-
-      - name: Get flattened version  # get the flattened minor version 12.2.10 --> 122
-        id: getflatversion
-        uses: bfv/openedge-flatversion@6f7ed9e19b0ef3b2eece00b4d056f26d89a6ebd8  # v1.0.1
-        with:
-          version: ${{ matrix.version }}
-            
-      - name: License unpack  # get progress.cfg from secret PROGRESS_CFG_12x
-        run: |
-          mkdir license
-          echo fetching progress.cfg from secret PROGRESS_CFG_${{steps.getflatversion.outputs.flat-version}}
-          echo "${{ secrets[format('PROGRESS_CFG_{0}', steps.getflatversion.outputs.flat-version)] }}" | base64 --decode > license/progress.cfg
-          ls -l license | grep -v '^total'
-
-      - name: Build
-        run: | 
-          mkdir artifacts
-          ls -l ${PWD}/license/
-          docker run -v ${PWD}/src:/app/src -v ${PWD}/artifacts:/app/artifacts -v ${PWD}/license/progress.cfg:/usr/dlc/progress.cfg --env ANT_HOME=/usr/dlc/ant --env EXECUTE_UNITTESTS=${EXECUTE_UNITTESTS} ${IMAGE_NAME} /app/src/fwebh/scripts/build.sh
-          cp src/fwebh/results.xml ${PWD}/artifacts
-          ls -l ${PWD}/artifacts 
-
-      - name: Check unit tests
-        uses: bfv/ablunit-results@9cfe2a9b92e39427a66571c915bfd954373f077a  # v0.2.0
-        id: unit-tests
-        with:
-          file: artifacts/results.xml
-          fail-on-error: true
-          errors-only: false
-          debug: false
-
-      - name: Copy extra files
-        run: |
-          cp ${PWD}/src/fwebh/src/services.json ${PWD}/artifacts
-          cp ${PWD}/src/fwebh/src/entitywriter.json ${PWD}/artifacts
-          cp ${PWD}/src/fwebh/src/fwebh/pas/webhandlers/ROOT.handlers ${PWD}/artifacts
-          ls -l artifacts | grep -v '^total'
-
-      - name: Add Git info
-        run: |
-          echo "sha=${GITHUB_SHA}" > artifacts/version.git.info
-          echo "branch=${GITHUB_REF}" >> artifacts/version.git.info
-          echo "buildnr=${{ github.run_number }}" >> artifacts/version.git.info
-          echo "openedge=${{ env.OPENEDGE_VERSION }}" >> artifacts/version.git.info
-          cat artifacts/version.git.info
-
-      - name: Save build artifacts
-        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808  # v4.3.3
-        with:
-          name: build-artifacts-${{ matrix.version }}.${{ github.run_number }}
-          path: artifacts/*
-          retention-days: 5
-
-  runtests:
+  unittest:
     needs: build
-    runs-on: ubuntu-latest
-    if: ${{ !contains(github.event.head_commit.message, '#wip') }}
     strategy:
+      fail-fast: false
       matrix:
-        version: [ 12.8.1, 12.8.2 ]
-    steps:
-      - uses: actions/download-artifact@65a9edc5881444af0b9093a5e628f2fe47ea3b2e  # v4.1.7
-        with:
-          name: build-artifacts-${{ matrix.version }}.${{ github.run_number }}
-          path: .
+        version: [ '12.8.1', '12.8.2']
+    uses: ./.github/workflows/unittest.yaml
+    with:
+      build_artifacts_name: 'build-artifacts-${{ matrix.version }}.${{ github.run_number }}'
 
-      - name: Inspect artifacts
-        run: |
-          ls -l ${PWD}
-          
-      - name: Get flattened version  # get the flattened minor version 12.2.10 --> 122
-        id: getflatversion
-        uses: bfv/openedge-flatversion@6f7ed9e19b0ef3b2eece00b4d056f26d89a6ebd8  # v1.0.1
-        with:
-          version: ${{ matrix.version }}
-
-      - name: License unpack  # get progress.cfg from secret PROGRESS_CFG_12x
-        run: |
-          echo "${{ secrets[format('PROGRESS_CFG_{0}', steps.getflatversion.outputs.flat-version)] }}" | base64 --decode > progress.cfg
-          ls -l 
-
-      - name: Start PAS container
-        run: |
-          docker run -d -p 8810:8810 -v ${PWD}/progress.cfg:/usr/dlc/progress.cfg -v ${PWD}:/app/src -v ${PWD}/fwebh.pl:/app/lib/logic.pl --env PASWEBHANDLERS=/app/src/ROOT.handlers docker.io/devbfvio/openedge-pas:${{ matrix.version }}-dev /app/pas/start.sh > container.id
-          sleep 30   # unfortunately necessary to wait for the container to start
-          docker ps -a
-
-      - name: Display container logs before call
-        run: |
-          docker logs $(cat container.id)
-
-      - name: Test echo service (200 response)
-        continue-on-error: false
-        run: |
-          curl http://localhost:8810/web/v1/echo --max-time 30
-
-      - name: Test 400 error response
-        continue-on-error: false
-        run: |
-          httperror=400
-          STATUSCODE=$(curl --silent --output /dev/stderr --write-out "%{http_code}" http://localhost:8810/web/v1/test?error=${httperror})
-          if test $STATUSCODE -ne ${httperror}; then
-            echo "expected http error ${httperror}, got: $STATUSCODE"
-            exit 1
-          fi
-
-      - name: Test 404 error response
-        continue-on-error: false
-        run: |
-          httperror=404
-          STATUSCODE=$(curl --silent --output /dev/stderr --write-out "%{http_code}" http://localhost:8810/web/v1/test?error=${httperror})
-          if test $STATUSCODE -ne ${httperror}; then
-            echo "expected http error ${httperror}, got: $STATUSCODE"
-            exit 1
-          fi
-
-      - name: Test 405 error response
-        continue-on-error: false
-        run: |
-          httperror=405
-          STATUSCODE=$(curl --silent --output /dev/stderr --write-out "%{http_code}" http://localhost:8810/web/v1/test?error=${httperror})
-          if test $STATUSCODE -ne ${httperror}; then
-            echo "expected http error ${httperror}, got: $STATUSCODE"
-            exit 1
-          fi
-
-      - name: Test 500 error response
-        continue-on-error: false
-        run: |
-          httperror=500
-          STATUSCODE=$(curl --silent --output /dev/stderr --write-out "%{http_code}" http://localhost:8810/web/v1/test?error=${httperror})
-          if test $STATUSCODE -ne ${httperror}; then
-            echo "expected http error ${httperror}, got: $STATUSCODE"
-            exit 1
-          fi
-
-      - name: Test other errors return 500
-        continue-on-error: false
-        run: |
-          httperror=500
-          STATUSCODE=$(curl --silent --output /dev/stderr --write-out "%{http_code}" http://localhost:8810/web/v1/test?error=555)
-          if test $STATUSCODE -ne ${httperror}; then
-            echo "expected http error ${httperror}, got: $STATUSCODE"
-            exit 1
-          fi
-      
-      - name: Test POST JSON
-        continue-on-error: false
-        run: |
-          RECEIVED=$(curl --silent http://localhost:8810/web/v1/echo --header 'Content-Type: application/json' --data '{ "id": 5, "client": "postman", "version": "0.1" }' -X POST | jq -r ".posted.id")
-          SHOULDBE="5"
-          if [[ "${RECEIVED}" != "${SHOULDBE}" ]]; then
-            echo "expected .posted.id is ${SHOULDBE}, got: ${RECEIVED}"
-            exit 1
-          fi
-
-      - name: Test POST XML
-        continue-on-error: false
-        run: |
-          RECEIVED=$(curl --silent http://localhost:8810/web/v1/echo --header 'Content-Type: application/xml' --data '<xml><id>5</id><client>postman</client><version>0.1</version></xml>' -X POST | jq -r ".posted.xml")
-          SHOULDBE="<xml><id>5</id><client>postman</client><version>0.1</version></xml>"
-          if [[ "${RECEIVED}" != "${SHOULDBE}" ]]; then
-            echo "expected .posted.xml is ${SHOULDBE}, got: ${RECEIVED}"
-            exit 1
-          fi
-
-      - name: Test POST text/plain
-        continue-on-error: false
-        run: |
-          RECEIVED=$(curl --silent http://localhost:8810/web/v1/test --header 'Content-Type: text/plain' --data 'hello world' --header 'Accept: text/plain' -X POST)
-          SHOULDBE="request body: hello world"
-          if [[ $RECEIVED != "${SHOULDBE}" ]]; then
-            echo "expected ${SHOULDBE}, got: $PLAINTEXT"
-            exit 1
-          fi
-
-      - name: Test PUT JSON
-        continue-on-error: false
-        run: |
-          RECEIVED=$(curl --silent http://localhost:8810/web/v1/echo --header 'Content-Type: application/json' --data '{ "id": 55, "client": "postman", "version": "0.2" }' -X PUT | jq -r ".put.id")
-          SHOULDBE="55"
-          if [[ "$RECEIVED" != "${SHOULDBE}" ]]; then
-            echo "expected .posted.id is ${SHOULDBE}, got: $RECEIVED"
-            exit 1
-          fi
-
-      - name: Test PUT XML
-        continue-on-error: false
-        run: |         
-          RECEIVED=$(curl --silent http://localhost:8810/web/v1/echo --header 'Content-Type: application/xml' --data '<xml><id>5</id><client>postman</client><version>0.2</version></xml>' -X PUT | jq -r ".put.xml")
-          SHOULDBE="<xml><id>5</id><client>postman</client><version>0.2</version></xml>"
-          if [[ "${RECEIVED}" != "${SHOULDBE}" ]]; then
-            echo "expected .posted.xml is ${SHOULDBE}, got: ${RECEIVED}"
-            exit 1
-          fi
-
-      - name: Test DELETE with JSON body returns JSON
-        continue-on-error: false
-        run: |
-          RECEIVED=$(curl --silent http://localhost:8810/web/v1/test --header 'Content-Type: application/json' --data '{ "id": "54321" }' -X DELETE | jq -r ".deleted")
-          SHOULDBE="54321"
-          if [[ "${RECEIVED}" != "${SHOULDBE}" ]]; then
-            echo "expected .deleted is ${SHOULDBE}, got: ${RECEIVED}"
-            exit 1
-          fi
-
-      - name: Test DELETE with JSON body returns 200
-        continue-on-error: false
-        run: |
-          STATUSCODE=$(curl --silent http://localhost:8810/web/v1/test -o /dev/null --write-out "%{http_code}" --header 'Content-Type: application/json' --data '{ "id": "54321" }' -X DELETE)
-          httperror=200
-          if test $STATUSCODE -ne ${httperror}; then
-            echo "expected http status ${httperror}, got: $STATUSCODE"
-            exit 1
-          fi
-
-      - name: Test DELETE without JSON body returns 204
-        continue-on-error: false
-        run: |
-          STATUSCODE=$(curl --silent http://localhost:8810/web/v1/test/12345 -o /dev/null --write-out "%{http_code}" -X DELETE)
-          httperror=204
-          if test $STATUSCODE -ne ${httperror}; then
-            echo "expected http status ${httperror}, got: $STATUSCODE"
-            exit 1
-          fi
-
-      - name: Display container logs after call
-        run: |
-          docker logs $(cat container.id)
-
-
-
+  integrationtest:
+    needs: build
+    strategy:
+      fail-fast: false
+      matrix:
+        version: [ '12.8.1', '12.8.2']
+    uses: ./.github/workflows/integrationtest.yaml
+    with:
+      version: ${{ matrix.version }}
+      build_artifacts_name: 'build-artifacts-${{ matrix.version }}.${{ github.run_number }}'
+    secrets: inherit
