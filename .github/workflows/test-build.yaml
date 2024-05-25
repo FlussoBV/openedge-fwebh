@@ -17,32 +17,25 @@ jobs:
       build_artifacts_name: 'build-artifacts-${{ matrix.version }}.${{ github.run_number }}'
     secrets: inherit
 
-  test:
-    runs-on: ubuntu-latest
+  unittest:
     needs: build
     strategy:
       fail-fast: false
       matrix:
         version: [ '12.8.1', '12.8.2']
+    uses: ./.github/workflows/unittest.yaml
+    with:
+      build_artifacts_name: 'build-artifacts-${{ matrix.version }}.${{ github.run_number }}'
+
+  integrationtest:
+    needs: build
+    strategy:
+      fail-fast: false
+      matrix:
+        version: [ '12.8.1', '12.8.2']
+    runs-on: ubuntu-latest
     steps:
-      - name: Download build artifacts
-        uses: actions/download-artifact@65a9edc5881444af0b9093a5e628f2fe47ea3b2e  # v4.1.7
-        with:
-          name: build-artifacts-${{ matrix.version }}.${{ github.run_number }}
-          path: .
-
-      - name: Display artifacts content
+      - name: Display version
         run: |
-          ls -l ${PWD}/
-
-      - name: Check unit tests
-        if: ${{ inputs.execute_unittests == true && inputs.evaluate_unittests_in_build == false }}
-        uses: bfv/ablunit-results@9cfe2a9b92e39427a66571c915bfd954373f077a  # v0.2.0
-        id: unit-tests
-        with:
-          file: results.xml
-          fail-on-error: true
-          errors-only: false
-          debug: false
-
+          echo "Version: ${{ matrix.version }}"
     
