@@ -1,0 +1,186 @@
+name: Integration tests
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        required: true
+        type: string
+        description: 'OpenEdge version to use'
+      build_artifacts_name:
+        type: string
+        description: 'Build artifacts'
+        required: true
+
+jobs:
+  runtests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@65a9edc5881444af0b9093a5e628f2fe47ea3b2e  # v4.1.7
+        with:
+          name: build-artifacts-${{ inputs.version }}.${{ github.run_number }}
+          path: .
+
+      - name: Inspect artifacts
+        run: |
+          ls -l ${PWD}
+          
+      - name: Get flattened version  # get the flattened minor version 12.2.10 --> 122
+        id: getflatversion
+        uses: bfv/openedge-flatversion@6f7ed9e19b0ef3b2eece00b4d056f26d89a6ebd8  # v1.0.1
+        with:
+          version: ${{ inputs.version }}
+
+      - name: License unpack  # get progress.cfg from secret PROGRESS_CFG_12x
+        run: |
+          echo "${{ secrets[format('PROGRESS_CFG_{0}', steps.getflatversion.outputs.flat-version)] }}" | base64 --decode > progress.cfg
+          ls -l 
+
+      - name: Start PAS container
+        run: |
+          docker run -d -p 8810:8810 -v ${PWD}/progress.cfg:/usr/dlc/progress.cfg -v ${PWD}:/app/src -v ${PWD}/fwebh.pl:/app/lib/logic.pl --env PASWEBHANDLERS=/app/src/ROOT.handlers docker.io/devbfvio/openedge-pas:${{ inputs.version }}-dev /app/pas/start.sh > container.id
+          sleep 30   # unfortunately necessary to wait for the container to start
+          docker ps -a
+
+      - name: Display container logs before call
+        run: |
+          docker logs $(cat container.id)
+
+      - name: Test echo service (200 response)
+        continue-on-error: false
+        run: |
+          curl http://localhost:8810/web/v1/echo --max-time 30
+
+      - name: Test 400 error response
+        continue-on-error: false
+        run: |
+          httperror=400
+          STATUSCODE=$(curl --silent --output /dev/stderr --write-out "%{http_code}" http://localhost:8810/web/v1/test?error=${httperror})
+          if test $STATUSCODE -ne ${httperror}; then
+            echo "expected http error ${httperror}, got: $STATUSCODE"
+            exit 1
+          fi
+
+      - name: Test 404 error response
+        continue-on-error: false
+        run: |
+          httperror=404
+          STATUSCODE=$(curl --silent --output /dev/stderr --write-out "%{http_code}" http://localhost:8810/web/v1/test?error=${httperror})
+          if test $STATUSCODE -ne ${httperror}; then
+            echo "expected http error ${httperror}, got: $STATUSCODE"
+            exit 1
+          fi
+
+      - name: Test 405 error response
+        continue-on-error: false
+        run: |
+          httperror=405
+          STATUSCODE=$(curl --silent --output /dev/stderr --write-out "%{http_code}" http://localhost:8810/web/v1/test?error=${httperror})
+          if test $STATUSCODE -ne ${httperror}; then
+            echo "expected http error ${httperror}, got: $STATUSCODE"
+            exit 1
+          fi
+
+      - name: Test 500 error response
+        continue-on-error: false
+        run: |
+          httperror=500
+          STATUSCODE=$(curl --silent --output /dev/stderr --write-out "%{http_code}" http://localhost:8810/web/v1/test?error=${httperror})
+          if test $STATUSCODE -ne ${httperror}; then
+            echo "expected http error ${httperror}, got: $STATUSCODE"
+            exit 1
+          fi
+
+      - name: Test other errors return 500
+        continue-on-error: false
+        run: |
+          httperror=500
+          STATUSCODE=$(curl --silent --output /dev/stderr --write-out "%{http_code}" http://localhost:8810/web/v1/test?error=555)
+          if test $STATUSCODE -ne ${httperror}; then
+            echo "expected http error ${httperror}, got: $STATUSCODE"
+            exit 1
+          fi
+      
+      - name: Test POST JSON
+        continue-on-error: false
+        run: |
+          RECEIVED=$(curl --silent http://localhost:8810/web/v1/echo --header 'Content-Type: application/json' --data '{ "id": 5, "client": "postman", "version": "0.1" }' -X POST | jq -r ".posted.id")
+          SHOULDBE="5"
+          if [[ "${RECEIVED}" != "${SHOULDBE}" ]]; then
+            echo "expected .posted.id is ${SHOULDBE}, got: ${RECEIVED}"
+            exit 1
+          fi
+
+      - name: Test POST XML
+        continue-on-error: false
+        run: |
+          RECEIVED=$(curl --silent http://localhost:8810/web/v1/echo --header 'Content-Type: application/xml' --data '<xml><id>5</id><client>postman</client><version>0.1</version></xml>' -X POST | jq -r ".posted.xml")
+          SHOULDBE="<xml><id>5</id><client>postman</client><version>0.1</version></xml>"
+          if [[ "${RECEIVED}" != "${SHOULDBE}" ]]; then
+            echo "expected .posted.xml is ${SHOULDBE}, got: ${RECEIVED}"
+            exit 1
+          fi
+
+      - name: Test POST text/plain
+        continue-on-error: false
+        run: |
+          RECEIVED=$(curl --silent http://localhost:8810/web/v1/test --header 'Content-Type: text/plain' --data 'hello world' --header 'Accept: text/plain' -X POST)
+          SHOULDBE="request body: hello world"
+          if [[ $RECEIVED != "${SHOULDBE}" ]]; then
+            echo "expected ${SHOULDBE}, got: $PLAINTEXT"
+            exit 1
+          fi
+
+      - name: Test PUT JSON
+        continue-on-error: false
+        run: |
+          RECEIVED=$(curl --silent http://localhost:8810/web/v1/echo --header 'Content-Type: application/json' --data '{ "id": 55, "client": "postman", "version": "0.2" }' -X PUT | jq -r ".put.id")
+          SHOULDBE="55"
+          if [[ "$RECEIVED" != "${SHOULDBE}" ]]; then
+            echo "expected .posted.id is ${SHOULDBE}, got: $RECEIVED"
+            exit 1
+          fi
+
+      - name: Test PUT XML
+        continue-on-error: false
+        run: |         
+          RECEIVED=$(curl --silent http://localhost:8810/web/v1/echo --header 'Content-Type: application/xml' --data '<xml><id>5</id><client>postman</client><version>0.2</version></xml>' -X PUT | jq -r ".put.xml")
+          SHOULDBE="<xml><id>5</id><client>postman</client><version>0.2</version></xml>"
+          if [[ "${RECEIVED}" != "${SHOULDBE}" ]]; then
+            echo "expected .posted.xml is ${SHOULDBE}, got: ${RECEIVED}"
+            exit 1
+          fi
+
+      - name: Test DELETE with JSON body returns JSON
+        continue-on-error: false
+        run: |
+          RECEIVED=$(curl --silent http://localhost:8810/web/v1/test --header 'Content-Type: application/json' --data '{ "id": "54321" }' -X DELETE | jq -r ".deleted")
+          SHOULDBE="54321"
+          if [[ "${RECEIVED}" != "${SHOULDBE}" ]]; then
+            echo "expected .deleted is ${SHOULDBE}, got: ${RECEIVED}"
+            exit 1
+          fi
+
+      - name: Test DELETE with JSON body returns 200
+        continue-on-error: false
+        run: |
+          STATUSCODE=$(curl --silent http://localhost:8810/web/v1/test -o /dev/null --write-out "%{http_code}" --header 'Content-Type: application/json' --data '{ "id": "54321" }' -X DELETE)
+          httperror=200
+          if test $STATUSCODE -ne ${httperror}; then
+            echo "expected http status ${httperror}, got: $STATUSCODE"
+            exit 1
+          fi
+
+      - name: Test DELETE without JSON body returns 204
+        continue-on-error: false
+        run: |
+          STATUSCODE=$(curl --silent http://localhost:8810/web/v1/test/12345 -o /dev/null --write-out "%{http_code}" -X DELETE)
+          httperror=204
+          if test $STATUSCODE -ne ${httperror}; then
+            echo "expected http status ${httperror}, got: $STATUSCODE"
+            exit 1
+          fi
+
+      - name: Display container logs after call
+        run: |
+          docker logs $(cat container.id)

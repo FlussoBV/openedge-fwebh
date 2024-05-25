@@ -33,9 +33,9 @@ jobs:
       fail-fast: false
       matrix:
         version: [ '12.8.1', '12.8.2']
-    runs-on: ubuntu-latest
-    steps:
-      - name: Display version
-        run: |
-          echo "Version: ${{ matrix.version }}"
-    
+    uses: ./.github/workflows/integrationtest.yaml
+    with:
+      version: ${{ matrix.version }}
+      build_artifacts_name: 'build-artifacts-${{ matrix.version }}.${{ github.run_number }}'
+    secrets: inherit
+
