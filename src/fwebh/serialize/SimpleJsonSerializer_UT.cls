@@ -164,7 +164,7 @@ class fwebh.serialize.SimpleJsonSerializer_UT:
     tst:pairs = new StringStringMap().
     tst:pairs:Put("key1", "value1").
     tst:pairs:Put("key2", "value2").
-    copy-lob file "src/test/serialize/map-string.txt" to originalString.
+    copy-lob file "src/test/serialize/map-string1.txt" to originalString.
     
     str = serializer:SerializeToLongchar(tst, false).
     

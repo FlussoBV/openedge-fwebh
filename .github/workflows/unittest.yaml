@@ -1,0 +1,33 @@
+name: Unit tests
+
+on:
+  workflow_call:
+    inputs:
+      build_artifacts_name:
+        type: string
+        description: 'Build artifacts'
+        required: true
+
+jobs:
+  unittest:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@65a9edc5881444af0b9093a5e628f2fe47ea3b2e  # v4.1.7
+        with:
+          name: ${{ inputs.build_artifacts_name }}
+          path: .
+
+      - name: Display artifacts content
+        run: |
+          ls -l ${PWD}/
+
+      - name: Check unit tests
+        uses: bfv/ablunit-results@9cfe2a9b92e39427a66571c915bfd954373f077a  # v0.2.0
+        id: unit-tests
+        with:
+          file: results.xml
+          fail-on-error: true
+          errors-only: false
+          debug: false
+   

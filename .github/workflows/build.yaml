@@ -7,7 +7,22 @@ on:
         required: true
         type: string
         description: 'OpenEdge version to use'
-
+      execute_unittests:
+        type: boolean
+        description: 'Execute unit tests'
+        default: false
+      evaluate_unittests:
+        type: boolean
+        description: 'Evaluate unit test results'
+        default: false
+      build_artifacts_name:
+        type: string
+        description: 'Build artifacts'
+        default: 'build-artifacts-${{ inputs.version }}.${{ github.run_number }}'
+    outputs:
+      build_artifacts_name: 
+        description: 'Build artifiacts name'
+        value:  ${{ inputs.build_artifacts_name }}
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -29,7 +44,7 @@ jobs:
         env:
           OPENEDGE_VERSION: "${{ inputs.version }}"
           IMAGE_REF: "devbfvio/openedge-compiler"       
-          EXECUTE_UNITTESTS: "true"      
+          EXECUTE_UNITTESTS: "${{ inputs.execute_unittests }}"      
         run: |
           echo "OPENEDGE_VERSION=${OPENEDGE_VERSION}" >> $GITHUB_ENV
           echo "IMAGE_NAME=${IMAGE_REF}:${OPENEDGE_VERSION}" >> $GITHUB_ENV
@@ -39,22 +54,56 @@ jobs:
         run: |
           docker pull ${IMAGE_NAME}
 
-          - name: Get flattened version  # get the flattened minor version 12.2.10 --> 122
-          id: getflatversion
-          uses: bfv/openedge-flatversion@6f7ed9e19b0ef3b2eece00b4d056f26d89a6ebd8  # v1.0.1
-          with:
-            version: ${{ matrix.version }}
+      - name: Get flattened version  # get the flattened minor version 12.2.10 --> 122
+        id: getflatversion
+        uses: bfv/openedge-flatversion@6f7ed9e19b0ef3b2eece00b4d056f26d89a6ebd8  # v1.0.1
+        with:
+          version: ${{ inputs.version }}
   
       - name: License unpack  # get progress.cfg from secret PROGRESS_CFG_12x
         run: |
+          mkdir license
           echo fetching progress.cfg from secret PROGRESS_CFG_${{steps.getflatversion.outputs.flat-version}}
           echo "${{ secrets[format('PROGRESS_CFG_{0}', steps.getflatversion.outputs.flat-version)] }}" | base64 --decode > license/progress.cfg
           ls -l license | grep -v '^total'
-
+      
       - name: Build
         run: | 
           mkdir artifacts
           ls -l ${PWD}/license/
           docker run -v ${PWD}/src:/app/src -v ${PWD}/artifacts:/app/artifacts -v ${PWD}/license/progress.cfg:/usr/dlc/progress.cfg --env ANT_HOME=/usr/dlc/ant --env EXECUTE_UNITTESTS=${EXECUTE_UNITTESTS} ${IMAGE_NAME} /app/src/fwebh/scripts/build.sh
-          cp src/fwebh/results.xml ${PWD}/artifacts
+          [[ -e src/fwebh/results.xml ]] && cp src/fwebh/results.xml ${PWD}/artifacts
           ls -l ${PWD}/artifacts 
+
+      - name: Check unit tests
+        if: ${{ inputs.execute_unittests == true && inputs.evaluate_unittests == true }}
+        uses: bfv/ablunit-results@9cfe2a9b92e39427a66571c915bfd954373f077a  # v0.2.0
+        id: unit-tests
+        with:
+          file: artifacts/results.xml
+          fail-on-error: true
+          errors-only: false
+          debug: false
+  
+      - name: Copy extra files
+        run: |
+          cp ${PWD}/src/fwebh/src/services.json ${PWD}/artifacts
+          cp ${PWD}/src/fwebh/src/entitywriter.json ${PWD}/artifacts
+          cp ${PWD}/src/fwebh/src/fwebh/pas/webhandlers/ROOT.handlers ${PWD}/artifacts
+          ls -l artifacts | grep -v '^total'
+
+      - name: Add Git info
+        run: |
+          echo "sha=${GITHUB_SHA}" > artifacts/version.git.info
+          echo "branch=${GITHUB_REF}" >> artifacts/version.git.info
+          echo "buildnr=${{ github.run_number }}" >> artifacts/version.git.info
+          echo "openedge=${{ inputs.version }}" >> artifacts/version.git.info
+          cat artifacts/version.git.info
+  
+      - name: Save build artifacts
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808  # v4.3.3
+        with:
+          name: ${{ inputs.build_artifacts_name }}
+          path: artifacts/*
+          retention-days: 1
+  
