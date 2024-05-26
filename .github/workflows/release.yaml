@@ -13,21 +13,38 @@ permissions:
 
 jobs:
 
-  echo:
+  wait:
     runs-on: ubuntu-latest
+    name: Wait for CI
     steps:
+      - name: Wait for CI
+        uses: lewagon/wait-on-check-action@ccfb013c15c8afb7bf2b7c028fb74dc5a068cccc  #v1.3.4
+        with:
+          ref: ${{ github.ref }}
+          check-name: 'Test passed'
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          wait-interval: 10
       - name: Echo version
         run: |
           tag=`echo ${{ github.ref }} | cut -d / -f 3`
           echo tag: ${tag}
 
-  # build:
-  #   strategy:
-  #     fail-fast: false
-  #     matrix:
-  #       version: [ '12.8.2' ]
-  #   uses: ./.github/workflows/build.yaml
-  #   with:
-  #     version: ${{ github.event.ref }}
-  #     execute_unittests: true
-  #     build_artifacts_name: 'build-artifacts-${{ github.event.ref }}.${{ github.run_number }}'
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        version: [ '12.8.2' ]
+    uses: ./.github/workflows/build.yaml
+    with:
+      version: ${{ github.event.ref }}
+      execute_unittests: true
+      build_artifacts_name: 'build-artifacts-${{ github.event.ref }}.${{ github.run_number }}'
+  
+  package:
+    needs: [ build, wait ]
+    runs-on: ubuntu-latest
+    steps:
+      - name: result
+        run: |
+          echo "package done"
+          
