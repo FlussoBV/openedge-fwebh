@@ -1,0 +1,33 @@
+name: Release
+
+on:
+  push:
+    tags: 
+      - v*
+  workflow_dispatch:
+
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+
+  echo:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Echo version
+        run: |
+          tag=`echo ${{ github.ref }} | cut -d / -f 3`
+          echo tag: ${tag}
+
+  # build:
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       version: [ '12.8.2' ]
+  #   uses: ./.github/workflows/build.yaml
+  #   with:
+  #     version: ${{ github.event.ref }}
+  #     execute_unittests: true
+  #     build_artifacts_name: 'build-artifacts-${{ github.event.ref }}.${{ github.run_number }}'
