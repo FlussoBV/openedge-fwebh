@@ -1,4 +1,4 @@
-name: Test Build workflow
+name: Tester for Build workflow
 
 on:
   workflow_call:

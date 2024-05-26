@@ -4,30 +4,73 @@ on:
   push:
     tags: 
       - v*
-  workflow_dispatch:
-
+    
 
 permissions:
   contents: write
   packages: write
 
+run-name: create release ${{ github.event.ref }} 
+
+# NOTE: in the matrics only one per release is allowed (adding 12.8.1 AND 12.8.2 will fail the workflow)
+
 jobs:
 
-  echo:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        version: [ '12.8.2' ]
+    uses: ./.github/workflows/build.yaml
+    with:
+      version: ${{ matrix.version }}
+      execute_unittests: true
+      build_artifacts_name: 'build-artifacts-${{ matrix.version }}.${{ github.run_number }}'
+    secrets: inherit
+
+  package:
+    needs: build
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        version: [ '12.8.2' ]
     steps:
-      - name: Echo version
+
+      - name: setup environment
         run: |
+          echo github.ref: ${{ github.ref }}
           tag=`echo ${{ github.ref }} | cut -d / -f 3`
           echo tag: ${tag}
+          echo "RELEASE_VERSION=${tag}" >> $GITHUB_ENV
 
-  # build:
-  #   strategy:
-  #     fail-fast: false
-  #     matrix:
-  #       version: [ '12.8.2' ]
-  #   uses: ./.github/workflows/build.yaml
-  #   with:
-  #     version: ${{ github.event.ref }}
-  #     execute_unittests: true
-  #     build_artifacts_name: 'build-artifacts-${{ github.event.ref }}.${{ github.run_number }}'
+      - name: Download build artifacts
+        uses: actions/download-artifact@65a9edc5881444af0b9093a5e628f2fe47ea3b2e  # v4.1.7
+        with:
+          name: 'build-artifacts-${{ matrix.version }}.${{ github.run_number }}'
+          path: .
+
+      - name: Get flattened version  # get the flattened minor version 12.2.10 --> 122
+        id: getversion
+        uses: bfv/openedge-flatversion@15a31eb3215fabc117263096b4f895c47181a823  # v1.1.0
+        with:
+          version: ${{ matrix.version }}
+
+      - name: Bundle release artifacts
+        run: |
+          zip -r fwebh_${{ env.RELEASE_VERSION }}_${{ steps.getversion.outputs.release-version }}.zip ./* 
+
+      - name: Create Release
+        uses: ncipollo/release-action@2c591bcc8ecdcd2db72b97d6147f871fcd833ba5    # v1.14.0
+        id: create_release
+        with:
+          name: ${{ env.RELEASE_VERSION }}
+          artifacts: fwebh_${{ env.RELEASE_VERSION }}_${{ steps.getversion.outputs.release-version }}.zip
+          draft: false
+          prerelease: false
+          token: ${{ github.token }}
+          allowUpdates: true
+            
+
+            
+    
