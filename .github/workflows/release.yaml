@@ -11,23 +11,8 @@ permissions:
   contents: write
   packages: write
 
+# NOTE: in the matrics only one per release is allowed (adding 12.8.1 AND 12.8.2 will fail the workflow)
 jobs:
-
-  wait:
-    runs-on: ubuntu-latest
-    name: Wait for CI
-    steps:
-      - name: Wait for CI
-        uses: lewagon/wait-on-check-action@ccfb013c15c8afb7bf2b7c028fb74dc5a068cccc  #v1.3.4
-        with:
-          ref: ${{ github.ref }}
-          check-name: 'Test passed'
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          wait-interval: 10
-      - name: Echo version
-        run: |
-          tag=`echo ${{ github.ref }} | cut -d / -f 3`
-          echo tag: ${tag}
 
   build:
     strategy:
@@ -38,13 +23,43 @@ jobs:
     with:
       version: ${{ github.event.ref }}
       execute_unittests: true
-      build_artifacts_name: 'build-artifacts-${{ github.event.ref }}.${{ github.run_number }}'
+      build_artifacts_name: 'build-artifacts-${{ matrix.version }}.${{ github.run_number }}'
   
   package:
-    needs: [ build, wait ]
+    needs: [ build ]
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        version: [ '12.8.2' ]
     steps:
-      - name: result
+      - name: Download build artifacts
+        uses: actions/download-artifact@65a9edc5881444af0b9093a5e628f2fe47ea3b2e  # v4.1.7
+        with:
+          name: 'build-artifacts-${{ matrix.version }}.${{ github.run_number }}'
+          path: .
+
+      - name: Get flattened version  # get the flattened minor version 12.2.10 --> 122
+        id: getversion
+        uses: bfv/openedge-flatversion@15a31eb3215fabc117263096b4f895c47181a823  # v1.1.0
+        with:
+          version: ${{ matrix.version }}
+
+      - name: Bundle release artifacts
         run: |
-          echo "package done"
-          
+          zip -r fwebh-${{ github.event.ref }}-${{ steps.getversion.outputs.release-version }}.zip ./* 
+
+      - name: Create Release
+        uses: ncipollo/release-action@2c591bcc8ecdcd2db72b97d6147f871fcd833ba5    # v1.14.0
+        id: create_release
+        with:
+          name: ${{ github.event.ref }}
+          artifacts: fwebh-${{ github.event.ref }}-${{ steps.getversion.outputs.release-version }}.zip
+          draft: false
+          prerelease: false
+          token: ${{ github.token }}
+          allowUpdates: true
+            
+
+            
+    

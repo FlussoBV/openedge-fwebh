@@ -56,7 +56,7 @@ jobs:
 
       - name: Get flattened version  # get the flattened minor version 12.2.10 --> 122
         id: getflatversion
-        uses: bfv/openedge-flatversion@6f7ed9e19b0ef3b2eece00b4d056f26d89a6ebd8  # v1.0.1
+        uses: bfv/openedge-flatversion@15a31eb3215fabc117263096b4f895c47181a823  # v1.1.0
         with:
           version: ${{ inputs.version }}
   
