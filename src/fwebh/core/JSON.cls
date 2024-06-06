@@ -9,12 +9,12 @@
    Notes       : 
  ----------------------------------------------------------------------*/
 
-using Progress.Json.ObjectModel.JsonConstruct.
-using Progress.Json.ObjectModel.ObjectModelParser.
-using Progress.Json.ObjectModel.JsonArray.
-using Progress.Json.ObjectModel.JsonObject.
-
 block-level on error undo, throw.
+
+using Progress.Json.ObjectModel.JsonArray.
+using Progress.Json.ObjectModel.JsonConstruct.
+using Progress.Json.ObjectModel.JsonObject.
+using Progress.Json.ObjectModel.ObjectModelParser.
 
 class fwebh.core.JSON: 
   

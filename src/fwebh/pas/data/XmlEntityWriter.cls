@@ -11,10 +11,10 @@
 
 block-level on error undo, throw.
 
-using fwebh.pas.data.ResponseDataType.
+using fwebh.lang.error.NotAcceptableException.
 using fwebh.pas.data.IEntityWriter.
 using fwebh.pas.data.IResponseData.
-using fwebh.lang.error.NotAcceptableException.
+using fwebh.pas.data.ResponseDataType.
 using OpenEdge.Core.String.
 using Progress.Lang.AppError.
 

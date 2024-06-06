@@ -12,12 +12,11 @@
 
 block-level on error undo, throw.
 
+using fwebh.serialize.ISerializableDataStructure.
 using OpenEdge.Core.Collections.IMap.
 using OpenEdge.Core.Collections.Map.
 using OpenEdge.Core.String.
 using OpenEdge.Core.WidgetHandle.
-
-using fwebh.serialize.ISerializableDataStructure.
 
 class test.serialize.TempTableTest implements ISerializableDataStructure: 
   

@@ -11,11 +11,11 @@
 
 block-level on error undo, throw.
 
-using OpenEdge.Core.Collections.IStringStringMap.
 using fwebh.pas.data.DataHolder.
 using fwebh.pas.data.IDataHolder.
 using fwebh.pas.data.IRequestData.
 using fwebh.pas.resource.ResourceDescriptor.
+using OpenEdge.Core.Collections.IStringStringMap.
 
 class fwebh.pas.data.RequestData implements IRequestData: 
   

@@ -11,12 +11,12 @@
 block-level on error undo, throw.
 
 using fwebh.pas.data.BinaryEntityWriter.
+using fwebh.pas.data.IEntityWriter.
 using fwebh.pas.data.ResponseData.
 using OpenEdge.Core.Assert.
 using OpenEdge.Core.Assertion.AssertObject.
 using OpenEdge.Core.Memptr.
 using Progress.Lang.Object.
-using fwebh.pas.data.IEntityWriter.
 
 class fwebh.pas.data.BinaryEntityWriter_UT: 
   

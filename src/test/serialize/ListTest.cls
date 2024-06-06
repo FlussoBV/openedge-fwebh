@@ -11,9 +11,9 @@
 
 block-level on error undo, throw.
 
+using fwebh.serialize.IListInfo.
 using OpenEdge.Core.Collections.List.
 using OpenEdge.Core.String.
-using fwebh.serialize.IListInfo.
 
 
 class test.serialize.ListTest implements IListInfo: 

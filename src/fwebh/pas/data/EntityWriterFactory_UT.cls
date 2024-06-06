@@ -8,12 +8,12 @@
     Notes       : 
   ----------------------------------------------------------------------*/
 
+block-level on error undo, throw.
+
 using fwebh.core.ProPathHelper.
 using fwebh.pas.data.EntityWriterFactory.
 using fwebh.pas.data.IEntityWriter.
 using OpenEdge.Core.Assert.
-
-block-level on error undo, throw.
 
 class fwebh.pas.data.EntityWriterFactory_UT: 
   

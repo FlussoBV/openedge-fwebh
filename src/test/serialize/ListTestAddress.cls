@@ -11,8 +11,8 @@
 
 block-level on error undo, throw.
 
-using OpenEdge.Core.Collections.List.
 using fwebh.serialize.IListInfo.
+using OpenEdge.Core.Collections.List.
 using test.serialize.Address.
 
 

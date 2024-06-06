@@ -11,9 +11,9 @@
 
 block-level on error undo, throw.
 
+using fwebh.pas.data.IEntityWriter.
 using fwebh.pas.data.PlainTextEntityWriter.
 using fwebh.pas.data.ResponseData.
-using fwebh.pas.data.IEntityWriter.
 using OpenEdge.Core.Assert.
 
 class fwebh.pas.data.PlainTextEntityWriter_UT: 

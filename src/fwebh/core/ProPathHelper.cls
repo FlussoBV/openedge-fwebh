@@ -9,8 +9,6 @@
     Notes       : 
   ----------------------------------------------------------------------*/
 
-using Progress.Lang.*.
-
 block-level on error undo, throw.
 
 class fwebh.core.ProPathHelper: 

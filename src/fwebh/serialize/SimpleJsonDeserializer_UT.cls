@@ -11,10 +11,9 @@
 
 block-level on error undo, throw.
 
+using fwebh.serialize.SimpleJsonDeserializer.
 using OpenEdge.Core.Assert.
 using OpenEdge.Core.String.
-
-using fwebh.serialize.SimpleJsonDeserializer.
 using test.serialize.Address.
 using test.serialize.ArrayObject.
 using test.serialize.ListTest.

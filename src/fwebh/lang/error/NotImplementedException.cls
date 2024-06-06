@@ -13,7 +13,6 @@ block-level on error undo, throw.
 
 using Progress.Lang.AppError.
 
-
 class fwebh.lang.error.NotImplementedException inherits AppError: 
   
   constructor public NotImplementedException(errorMessage as character):

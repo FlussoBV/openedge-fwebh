@@ -9,6 +9,11 @@
     Notes       : 
   ----------------------------------------------------------------------*/
 
+block-level on error undo, throw.
+
+using fwebh.serialize.IDeserializable.
+using fwebh.serialize.IListInfo.
+using fwebh.serialize.ISerializableDataStructure.
 using OpenEdge.Core.Collections.IIterator.
 using OpenEdge.Core.Collections.IMap.
 using OpenEdge.Core.Collections.IMapEntry.
@@ -22,15 +27,8 @@ using Progress.Json.ObjectModel.JsonObject.
 using Progress.Json.ObjectModel.ObjectModelParser.
 using Progress.Lang.AppError.
 using Progress.Lang.Class.
-using Progress.Reflect.Property.
 using Progress.Reflect.DataType.
-
-using fwebh.serialize.IListInfo.
-using fwebh.serialize.ISerializableDataStructure.
-using fwebh.serialize.IDeserializable.
-using fwebh.core.JSON.
-
-block-level on error undo, throw.
+using Progress.Reflect.Property.
 
 class fwebh.serialize.SimpleJsonDeserializer implements IDeserializable: 
   

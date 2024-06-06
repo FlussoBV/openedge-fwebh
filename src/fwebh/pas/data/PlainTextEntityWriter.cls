@@ -10,12 +10,12 @@
 
 block-level on error undo, throw.
 
-using OpenEdge.Core.String.
-using Progress.Lang.AppError.
+using fwebh.lang.error.NotAcceptableException.
 using fwebh.pas.data.IEntityWriter.
 using fwebh.pas.data.IResponseData.
 using fwebh.pas.data.ResponseDataType.
-using fwebh.lang.error.NotAcceptableException.
+using OpenEdge.Core.String.
+using Progress.Lang.AppError.
 
 class fwebh.pas.data.PlainTextEntityWriter implements IEntityWriter: 
 

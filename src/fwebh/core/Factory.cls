@@ -30,9 +30,9 @@ using fwebh.lang.error.InvalidDataException.
 using fwebh.lang.error.NotFoundException.
 using OpenEdge.Core.Assert.
 using OpenEdge.Core.JsonDataTypeEnum.
+using Progress.Json.ObjectModel.JsonConstruct.
 using Progress.Json.ObjectModel.JsonObject.
 using Progress.Json.ObjectModel.ObjectModelParser.
-using Progress.Json.ObjectModel.JsonConstruct.
 using Progress.Lang.AppError.
 
 class fwebh.core.Factory implements IFactory: 

@@ -12,15 +12,16 @@
 
 block-level on error undo, throw.
 
+using fwebh.serialize.SimpleJsonSerializer.
 using OpenEdge.Core.Assert.
 using OpenEdge.Core.Collections.StringStringMap.
-using fwebh.serialize.SimpleJsonSerializer.
 using test.serialize.Address.
 using test.serialize.ArrayObject.
-using test.serialize.TempTableTest.
 using test.serialize.ListTest.
 using test.serialize.ListTestAddress.
 using test.serialize.StringStringMapTest.
+using test.serialize.TempTableTest.
+
 class fwebh.serialize.SimpleJsonSerializer_UT: 
   
   var private SimpleJsonSerializer serializer.

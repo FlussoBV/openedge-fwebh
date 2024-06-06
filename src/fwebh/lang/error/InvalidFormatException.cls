@@ -9,9 +9,9 @@
     Notes       : 
   ----------------------------------------------------------------------*/
 
-using Progress.Lang.AppError.
-
 block-level on error undo, throw.
+
+using Progress.Lang.AppError.
 
 class fwebh.lang.error.InvalidFormatException inherits AppError: 
 

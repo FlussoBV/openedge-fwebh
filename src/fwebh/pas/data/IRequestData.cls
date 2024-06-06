@@ -10,9 +10,9 @@
   ----------------------------------------------------------------------*/
 
 
-using OpenEdge.Core.Collections.IStringStringMap.
 using fwebh.pas.data.IDataHolder.
 using fwebh.pas.resource.ResourceDescriptor.
+using OpenEdge.Core.Collections.IStringStringMap.
 
 @DefaultImplementation(class="fwebh.pas.data.RequestData").
 interface fwebh.pas.data.IRequestData:  

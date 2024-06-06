@@ -9,10 +9,9 @@
     Notes       : 
   ----------------------------------------------------------------------*/
 
-using Progress.Lang.*.
-using Progress.Lang.AppError.
-
 block-level on error undo, throw.
+
+using Progress.Lang.AppError.
 
 class fwebh.lang.error.InvalidDataException inherits AppError: 
 

@@ -13,7 +13,6 @@ block-level on error undo, throw.
 
 using Progress.Lang.AppError.
 
-
 class fwebh.lang.error.NotFoundException inherits AppError: 
   
   constructor public NotFoundException(errorMessage as character):

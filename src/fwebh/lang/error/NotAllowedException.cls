@@ -13,7 +13,6 @@ block-level on error undo, throw.
 
 using Progress.Lang.AppError.
 
-
 class fwebh.lang.error.NotAllowedException inherits AppError: 
 
   constructor public NotAllowedException(errorMessage as character):
