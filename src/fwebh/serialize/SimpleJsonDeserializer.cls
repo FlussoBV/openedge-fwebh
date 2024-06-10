@@ -21,6 +21,7 @@ using OpenEdge.Core.Collections.ISet.
 using OpenEdge.Core.Collections.KeySet.
 using OpenEdge.Core.Collections.List.
 using OpenEdge.Core.Collections.StringStringMap.
+using OpenEdge.Core.String.
 using OpenEdge.Core.WidgetHandle.
 using Progress.Json.ObjectModel.JsonArray.
 using Progress.Json.ObjectModel.JsonObject.
@@ -293,7 +294,7 @@ class fwebh.serialize.SimpleJsonDeserializer implements IDeserializable:
     var IMapEntry structure.
     var ISet keyset.
     var IIterator iterator.
-    var Progress.Lang.Object keyObject.
+    var Progress.Lang.Object keyObject, valueObject.
     var char keyname.
     var WidgetHandle dataObject.
     var JsonArray array.
@@ -305,22 +306,26 @@ class fwebh.serialize.SimpleJsonDeserializer implements IDeserializable:
     do while (iterator:HasNext()):
       keyObject = iterator:Next().
       keyname = string(cast(keyObject, "OpenEdge.Core.String"):Value).
-      dataObject = cast(dataStructs:Get(keyObject), "OpenEdge.Core.WidgetHandle").
+      
+      valueObject = dataStructs:Get(keyObject).
+      if (valueObject:GetClass():TypeName <> "OpenEdge.Core.WidgetHandle") then
+        next.
+        
+      dataObject = cast(valueObject, "OpenEdge.Core.WidgetHandle").
       
       array = jsonIn:GetJsonArray(keyname).
-      this-object:jsonArrayToTempTable(array, dataObject:Value).
+      this-object:jsonArrayToTempTable(array, dataObject:Value, dataStructs).
     end.
        
   end method.  // deserializeDataStructures
   
   
-  method private void jsonArrayToTempTable(array as JsonArray, tthandle as handle):
-    
+  method private void jsonArrayToTempTable(array as JsonArray, tthandle as handle, dataStructs as IMap):
     var int i, j.
     var handle bufferHandle, bufferField.
     var JsonObject jsonRecord.
-    var char getter.
-    
+    var char getter, targetClass, mapExpression.
+
     bufferHandle = tthandle:default-buffer-handle.
     
     do i = 1 to array:Length:
@@ -329,7 +334,15 @@ class fwebh.serialize.SimpleJsonDeserializer implements IDeserializable:
       
       do j = 1 to bufferHandle:num-fields:
         bufferField = bufferHandle:buffer-field(j).
-        bufferField:buffer-value = dynamic-invoke(jsonRecord, "Get" + bufferField:data-type, bufferField:serialize-name).
+        if (bufferField:data-type = "Progress.Lang.Object") then do:
+          mapExpression = tthandle:serialize-name + "." + bufferField:serialize-name.
+          targetClass = string(cast(dataStructs:Get(new String(mapExpression)), "OpenEdge.Core.String"):Value) no-error.         
+          if (targetClass = "") then
+            undo, throw new AppError(substitute("mapping error: '&1' not found (GetDataStructures)", mapExpression), -1).
+          bufferField:buffer-value = Deserialize(dynamic-invoke(jsonRecord, "GetJsonObject", bufferField:serialize-name), targetClass).
+        end.  
+        else  
+          bufferField:buffer-value = dynamic-invoke(jsonRecord, "Get" + bufferField:data-type, bufferField:serialize-name).          
       end.
       
       bufferHandle:buffer-release().

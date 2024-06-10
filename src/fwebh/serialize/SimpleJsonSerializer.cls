@@ -158,7 +158,7 @@ class fwebh.serialize.SimpleJsonSerializer implements ISerializable:
     var IIterator iterator.
     var char keyname.
     var handle dataHandle.
-    var Progress.Lang.Object keyObject.
+    var Progress.Lang.Object keyObject, valueObject.
     var WidgetHandle dataObject.
     var int i.
     
@@ -169,7 +169,10 @@ class fwebh.serialize.SimpleJsonSerializer implements ISerializable:
     do while (iterator:HasNext()):
       keyObject = iterator:Next().
       keyname = string(cast(keyObject, "OpenEdge.Core.String"):Value).
-      dataObject = cast(dataStructs:Get(keyObject), "OpenEdge.Core.WidgetHandle").
+      valueObject = dataStructs:Get(keyObject).
+      if (valueObject:GetClass():TypeName <> "OpenEdge.Core.WidgetHandle") then
+        next.
+      dataObject = cast(valueObject, "OpenEdge.Core.WidgetHandle").
       dataHandle = dataObject:Value.
       serializeDataObject(keyname, datahandle, jsonOut).
     end.
@@ -240,6 +243,7 @@ class fwebh.serialize.SimpleJsonSerializer implements ISerializable:
     var int i.
     var JsonArray array = new JsonArray().
     var JsonObject record.
+    var Progress.Lang.Object obj.
     
     create query queryHandle.
     bufferHandle = data:default-buffer-handle.
@@ -250,14 +254,21 @@ class fwebh.serialize.SimpleJsonSerializer implements ISerializable:
     
     queryHandle:get-first().
     do while (not queryHandle:query-off-end):
+      
       record = new JsonObject().
-      do i = 1 to bufferHandle:num-fields:
+      
+      do i = 1 to bufferHandle:num-fields on error undo, throw:
         fieldHandle = bufferHandle:buffer-field(i).
         record:Add(fieldHandle:serialize-name, fieldHandle:buffer-value).
-      end.  
+        catch err1 as Progress.Lang.Error:
+          obj = fieldHandle:buffer-value.
+          record:Add(fieldHandle:serialize-name, Serialize(obj)).
+        end catch.
+      end.
+        
       array:Add(record).
       queryHandle:get-next().
-    end.
+    end.  // do while...
     
     jsonOut:Add(propertyName, array).
       
