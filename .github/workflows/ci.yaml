@@ -19,7 +19,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        version: [ '12.8.1', '12.8.2']
+        version: [ '12.8.1', '12.8.2', '12.8.3']
     uses: ./.github/workflows/build.yaml
     with:
       version: ${{ matrix.version }}
