@@ -59,7 +59,7 @@ class fwebh.serialize.SimpleJsonDeserializer implements IDeserializable:
     var JsonObject jsonObj.
     
     parser = new ObjectModelParser().
-    jsonObj = cast(parser:ParseFile(jsonFilename), "JsonObject").
+    jsonObj = cast(parser:ParseFile(search(jsonFilename)), "JsonObject").
     
     return Deserialize(jsonObj, targetObj).
     
@@ -335,6 +335,27 @@ class fwebh.serialize.SimpleJsonDeserializer implements IDeserializable:
       bufferHandle:buffer-release().
       
     end.  
+    
+  end method.  // jsonArrayToTempTable
+
+  method public void JsonObjectToTempTable(json as JsonObject, tthandle as handle):
+    
+    var int i, j.
+    var handle bufferHandle, bufferField.
+    var JsonObject jsonRecord.
+    var char getter.
+    
+    bufferHandle = tthandle:default-buffer-handle.
+    
+    bufferHandle:buffer-create().
+    
+    do j = 1 to bufferHandle:num-fields:
+      bufferField = bufferHandle:buffer-field(j).
+      getter = "Get" + (if bufferField:data-type = "datetime-tz" then "DatetimeTz" else bufferField:data-type).
+      bufferField:buffer-value = dynamic-invoke(json, getter, bufferField:serialize-name).
+    end.
+    
+    bufferHandle:buffer-release().
     
   end method.  // jsonArrayToTempTable
 
