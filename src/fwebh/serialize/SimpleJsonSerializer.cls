@@ -250,11 +250,7 @@ class fwebh.serialize.SimpleJsonSerializer implements ISerializable:
     
     queryHandle:get-first().
     do while (not queryHandle:query-off-end):
-      record = new JsonObject().
-      do i = 1 to bufferHandle:num-fields:
-        fieldHandle = bufferHandle:buffer-field(i).
-        record:Add(fieldHandle:serialize-name, fieldHandle:buffer-value).
-      end.  
+      record = SerializeBuffer(bufferHandle). 
       array:Add(record).
       queryHandle:get-next().
     end.
@@ -268,6 +264,21 @@ class fwebh.serialize.SimpleJsonSerializer implements ISerializable:
   end method.  // serializeTempTable
   
   
+  method public JsonObject SerializeBuffer(bufferHandle as handle):
+    
+    var JsonObject json = new JsonObject().
+    var int i.
+    var handle fieldHandle.
+    
+    do i = 1 to bufferHandle:num-fields:
+      fieldHandle = bufferHandle:buffer-field(i).
+      json:Add(fieldHandle:serialize-name, fieldHandle:buffer-value).
+    end.  
+    
+    return json.
+    
+  end method.
+    
   method private JsonArray serializeExtent(objectToSerialize as Progress.Lang.Object, prop as Property):
     
     var JsonArray serializedExtent = new JsonArray().
