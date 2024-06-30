@@ -365,7 +365,8 @@ class fwebh.serialize.SimpleJsonDeserializer implements IDeserializable:
     do j = 1 to bufferHandle:num-fields:
       bufferField = bufferHandle:buffer-field(j).
       getter = "Get" + (if bufferField:data-type = "datetime-tz" then "DatetimeTz" else bufferField:data-type).
-      bufferField:buffer-value = dynamic-invoke(json, getter, bufferField:serialize-name).
+      if json:Has(bufferField:serialize-name) then 
+        bufferField:buffer-value = dynamic-invoke(json, getter, bufferField:serialize-name).
     end.
     
     bufferHandle:buffer-release().
