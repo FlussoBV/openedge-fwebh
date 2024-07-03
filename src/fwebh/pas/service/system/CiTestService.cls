@@ -17,6 +17,7 @@ using fwebh.lang.error.BadRequestException.
 using fwebh.lang.error.ConcurrencyException.
 using fwebh.lang.error.ForbiddenException.
 using fwebh.lang.error.InvalidDataException.
+using fwebh.lang.error.NotAcceptableException.
 using fwebh.lang.error.NotAllowedException.
 using fwebh.lang.error.NotFoundException.
 using fwebh.lang.error.UnauthorizedException.
@@ -26,6 +27,7 @@ using fwebh.pas.data.ResponseData.
 using fwebh.pas.service.IDeleteDataService.
 using fwebh.pas.service.IGetDataService.
 using fwebh.pas.service.IPostDataService.
+
 // all exceptions
 
 class fwebh.pas.service.system.CiTestService implements IDeleteDataService, IGetDataService, IPostDataService: 
@@ -44,6 +46,7 @@ class fwebh.pas.service.system.CiTestService implements IDeleteDataService, IGet
         when "403" then undo, throw new ForbiddenException("forbidden").
         when "404" then undo, throw new NotFoundException("not found").
         when "405" then undo, throw new NotAllowedException("not allowed").
+        when "406" then undo, throw new NotAcceptableException("not acceptable").
         when "409" then undo, throw new ConcurrencyException("test-resource", -1).
         when "500" then undo, throw new Progress.Lang.AppError("requested 500 error", -1).
         otherwise undo, throw new AppError("unforseen error", -1).
