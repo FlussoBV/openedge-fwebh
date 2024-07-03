@@ -230,7 +230,13 @@ class fwebh.pas.webhandlers.ResourceWebHandler inherits WebHandlerCommon:
     case err:GetClass():TypeName:
       when "fwebh.lang.error.BadRequestException" then
         errorCode = 400.
+      
+      when "fwebh.lang.error.UnauthorizedException" then
+        errorCode = 401.
 
+      when "fwebh.lang.error.ForbiddenException" then
+        errorCode = 403.
+        
       when "fwebh.lang.error.NotFoundException" then 
         errorCode = 404.
 
