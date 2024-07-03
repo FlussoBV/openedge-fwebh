@@ -61,6 +61,27 @@ jobs:
             exit 1
           fi
 
+      - name: Test 401 error response
+        continue-on-error: false
+        run: |
+          httperror=401
+          STATUSCODE=$(curl --silent --output /dev/stderr --write-out "%{http_code}" http://localhost:8810/web/v1/test?error=${httperror})
+          if test $STATUSCODE -ne ${httperror}; then
+            echo "expected http error ${httperror}, got: $STATUSCODE"
+            exit 1
+          fi
+
+      - name: Test 403 error response
+        continue-on-error: false
+        run: |
+          httperror=403
+          STATUSCODE=$(curl --silent --output /dev/stderr --write-out "%{http_code}" http://localhost:8810/web/v1/test?error=${httperror})
+          if test $STATUSCODE -ne ${httperror}; then
+            echo "expected http error ${httperror}, got: $STATUSCODE"
+            exit 1
+          fi
+  
+  
       - name: Test 404 error response
         continue-on-error: false
         run: |
@@ -81,6 +102,26 @@ jobs:
             exit 1
           fi
 
+      - name: Test 406 error response
+        continue-on-error: false
+        run: |
+          httperror=406
+          STATUSCODE=$(curl --silent --output /dev/stderr --write-out "%{http_code}" http://localhost:8810/web/v1/test?error=${httperror})
+          if test $STATUSCODE -ne ${httperror}; then
+            echo "expected http error ${httperror}, got: $STATUSCODE"
+            exit 1
+          fi
+
+      - name: Test 409 error response
+        continue-on-error: false
+        run: |
+          httperror=409
+          STATUSCODE=$(curl --silent --output /dev/stderr --write-out "%{http_code}" http://localhost:8810/web/v1/test?error=${httperror})
+          if test $STATUSCODE -ne ${httperror}; then
+            echo "expected http error ${httperror}, got: $STATUSCODE"
+            exit 1
+          fi
+  
       - name: Test 500 error response
         continue-on-error: false
         run: |

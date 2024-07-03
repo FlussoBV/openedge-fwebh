@@ -11,18 +11,24 @@
 
 block-level on error undo, throw.
 
-using fwebh.lang.error.*.  // all exceptions
+using Progress.Json.ObjectModel.JsonObject.
+using Progress.Lang.AppError.
+using fwebh.lang.error.BadRequestException.
+using fwebh.lang.error.ConcurrencyException.
+using fwebh.lang.error.ForbiddenException.
+using fwebh.lang.error.InvalidDataException.
+using fwebh.lang.error.NotAcceptableException.
+using fwebh.lang.error.NotAllowedException.
+using fwebh.lang.error.NotFoundException.
+using fwebh.lang.error.UnauthorizedException.
 using fwebh.pas.data.IRequestData.
 using fwebh.pas.data.IResponseData.
 using fwebh.pas.data.ResponseData.
 using fwebh.pas.service.IDeleteDataService.
 using fwebh.pas.service.IGetDataService.
 using fwebh.pas.service.IPostDataService.
-using fwebh.serialize.SimpleJsonSerializer.
-using OpenEdge.Core.String.
-using Progress.Lang.AppError.
-using Progress.Json.ObjectModel.JsonObject.
-using fwebh.pas.data.RequestData.
+
+// all exceptions
 
 class fwebh.pas.service.system.CiTestService implements IDeleteDataService, IGetDataService, IPostDataService: 
 
@@ -36,8 +42,12 @@ class fwebh.pas.service.system.CiTestService implements IDeleteDataService, IGet
     if errorCode > "" then do:
       case errorCode:
         when "400" then undo, throw new BadRequestException("bad request").
+        when "401" then undo, throw new UnauthorizedException("unauthorized").
+        when "403" then undo, throw new ForbiddenException("forbidden").
         when "404" then undo, throw new NotFoundException("not found").
         when "405" then undo, throw new NotAllowedException("not allowed").
+        when "406" then undo, throw new NotAcceptableException("not acceptable").
+        when "409" then undo, throw new ConcurrencyException("test-resource", -1).
         when "500" then undo, throw new Progress.Lang.AppError("requested 500 error", -1).
         otherwise undo, throw new AppError("unforseen error", -1).
       end case.
