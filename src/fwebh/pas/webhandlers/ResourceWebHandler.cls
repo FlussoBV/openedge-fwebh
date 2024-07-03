@@ -239,10 +239,12 @@ class fwebh.pas.webhandlers.ResourceWebHandler inherits WebHandlerCommon:
 
       when "fwebh.lang.error.NotAcceptableException" then
         errorCode = 406.
-
-      otherwise do:
+      
+      when "fwebh.lang.error.ConcurrencyException" then
+        errorCode = 409.
+        
+      otherwise
         errorCode = 500.
-      end.
       
     end case.  
     
