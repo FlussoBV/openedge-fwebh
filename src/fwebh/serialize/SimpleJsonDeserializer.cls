@@ -202,19 +202,35 @@ class fwebh.serialize.SimpleJsonDeserializer implements IDeserializable:
   end method.  // Deserialize
   
   method private void deserializeExtent(targetObj as Progress.Lang.Object, prop as Property, array as JsonArray):
-    
+
     var int i.
-    
+    var char []charExt.
+    var int []intExt.
+           
     if (valid-object(array)) then do:
+      
+      if prop:Extent = ? and array:Length > 0 then do:
+        case prop:DataType:
+          when DataType:Character then do:
+            extent(charExt) = array:Length.
+            prop:Set(targetObj, charExt).
+          end.
+          when DataType:Integer then do:
+            extent(intExt) = array:Length.
+            prop:Set(targetObj, intExt).
+          end.
+        end case.
+      end.
+        
       do i = 1 to array:Length:
         case prop:DataType:
-          when DataType:Integer then dynamic-property(targetObj, prop:Name, i) = array:GetInteger(i).
           when DataType:Character then dynamic-property(targetObj, prop:Name, i) = array:GetCharacter(i).
           when DataType:Decimal then dynamic-property(targetObj, prop:Name, i) = array:GetDecimal(i).
           when DataType:Date then dynamic-property(targetObj, prop:Name, i) = array:GetDate(i).
           when DataType:DateTime then dynamic-property(targetObj, prop:Name, i) = array:GetDatetime(i).
           when DataType:DateTimeTZ then dynamic-property(targetObj, prop:Name, i) = array:GetDatetimeTZ(i).
-          when DataType:Decimal then dynamic-property(targetObj, prop:Name, i) = array:GetDecimal(i).
+          when DataType:Integer then dynamic-property(targetObj, prop:Name, i) = array:GetInteger(i).
+          when DataType:Int64 then dynamic-property(targetObj, prop:Name, i) = array:GetInt64(i).
           when DataType:Logical then dynamic-property(targetObj, prop:Name, i) = array:GetLogical(i).
         end case.
       end. 
