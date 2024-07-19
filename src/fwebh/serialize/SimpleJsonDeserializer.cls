@@ -161,7 +161,7 @@ class fwebh.serialize.SimpleJsonDeserializer implements IDeserializable:
         else do:
           
           if (prop:DataTypeName begins "Progress.Collections.List") then do:
-            message "eval:" prop:DataTypeName view-as alert-box.
+            deserializeGenericList(targetObj, prop, jsonIn:GetJsonArray(prop:Name)).
           end. 
           else if (prop:DataTypeName = "OpenEdge.Core.Collections.List" and targetObj:GetClass():IsA("fwebh.serialize.IListInfo")) then do:
             //add list entries to object
@@ -237,6 +237,33 @@ class fwebh.serialize.SimpleJsonDeserializer implements IDeserializable:
     end.
     
   end method.  // deserializeExtent
+  
+  method private void deserializeGenericList(targetObj as Progress.Lang.Object, prop as Property, array as JsonArray):
+    
+    var Progress.Lang.Object listObject, obj.
+    var char listType, typeT.  // the generic type (T) of List<T>
+    var int i, pos1, pos2.
+    
+    listType = prop:DataTypeName.
+    listObject = dynamic-new(listType)().
+    dynamic-property(targetObj, Prop:Name) = listObject.
+    
+    typeT = getTypeT(listType).
+    
+    do i = 1 to array:Length:
+      obj = dynamic-new(typeT)().
+      Deserialize(array:GetJsonObject(i), obj).
+      dynamic-invoke(listObject, "Add", obj).
+    end.
+    
+  end method.  // deserializeGenericList
+  
+  method private char getTypeT(listType as char):
+    var int pos1, pos2.
+    pos1 = index(listType, "<") + 1.
+    pos2 = length(listType) - pos1.
+    return substring(listType, pos1, pos2).
+  end method.
   
   method private List deserializeList(targetObject as IListInfo, prop as Property, array as JsonArray):
     
