@@ -210,6 +210,13 @@ class fwebh.pas.webhandlers.ResourceWebHandler inherits WebHandlerCommon:
     errorMessage = err:GetMessage(1).
     errorCode = getHttpErrorCode(err).
     
+    if errorCode = 500 then do:
+      message "******************** start 500 error ********************".
+      message err:GetMessage(1).
+      message replace(err:CallStack, ",", "~n  ").
+      message "******************** end 500 error ********************".  
+    end.
+    
     if not err:GetClass():TypeName begins "fwebh.lang.error." then
       errorMessage = err:GetClass():TypeName + ": " + err:GetMessage(1).
          

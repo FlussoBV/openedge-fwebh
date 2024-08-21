@@ -10,6 +10,8 @@
 
 block-level on error undo, throw.
 
+using OpenEdge.Core.String.
+using Progress.Collections.HashMap.
 using Progress.Json.ObjectModel.JsonObject.
 using fwebh.core.Factory.
 using fwebh.core.JSON.
@@ -25,10 +27,13 @@ using fwebh.serialize.SimpleJsonDeserializer.
 
 class fwebh.pas.service.ServiceFactory: 
   
-  define private variable factory as Factory no-undo.
+  define public property Services as HashMap<String, ServiceDescription> no-undo get. private set.
+   
+  var private Factory factory.
   
   constructor public ServiceFactory():
     factory = new Factory().
+    services = new HashMap<String, ServiceDescription>().
     loadDefinitions().
   end constructor.
   
@@ -68,9 +73,7 @@ class fwebh.pas.service.ServiceFactory:
     
     return obj.
     
-  end method.
-  
-  
+  end method.  // getFromFactory  
 
   method private void loadDefinitions():
     
@@ -79,26 +82,33 @@ class fwebh.pas.service.ServiceFactory:
     var ServiceDescription svcDef.
     var int i.
     var char[] names.
+    var char errorMessage. 
     
     deserializer = new SimpleJsonDeserializer().
     defs = JSON:ParseFileToObject("services.json").
-    
+      
     names = defs:GetNames().
     do i = 1 to extent(names):
+
       svcDef = cast(deserializer:Deserialize(defs:GetJsonObject(names[i]), "fwebh.pas.service.ServiceDescription"), ServiceDescription).
-      
-      // the actual class must exist
-      do on error undo, throw:
-        Progress.Lang.Class:GetClass(svcDef:classname).
-        catch err as Progress.Lang.Error:
-          undo, throw new NotFoundException(substitute("ServiceFactory definition '&1', class not found: '&2'", names[i], svcDef:classname)).
-        end catch.
+      if classExists(svcDef:classname) then do:
+        factory:AddDefinition(names[i], svcDef:classname, svcDef:singleton).
+        services:Add(new String(names[i]), svcDef).
       end.
-              
-      factory:AddDefinition(names[i], svcDef:classname, svcDef:singleton).
+      else              
+        message substitute("service: &1, class not found: &2", names[i], svcDef:classname).
       
-    end.
+    end.  // do i = ...
     
   end method.  // loadDefinitions
+  
+  method private logical classExists(FQClassName as char):
+    
+    var char classFile = replace(FQClassName, ".", "/") + ".cls".
+    var logical found = (search(classFile) <> ?).
+    
+    return found.
+    
+  end method.  // classExists
     
 end class.  // ServiceFactory

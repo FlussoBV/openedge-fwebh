@@ -158,10 +158,10 @@ class fwebh.core.Factory implements IFactory:
     end. 
     
     if not valid-object(instanceRef) then
-      instanceRef = dynamic-new(ttdefintion.classname)().
+      instanceRef = dynamic-new(ttdefintion.classname)() no-error.
                   
     if (not valid-object(instanceRef)) then 
-      undo, throw new AppError(substitute("class not found: &1", ttdefintion.classname)).
+      undo, throw new AppError(substitute("class not found: &1", ttdefintion.classname), -1).
             
     if ttdefintion.singleton and not singleInstanceFound then do:
       create ttinstance.
