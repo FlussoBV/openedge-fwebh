@@ -161,7 +161,7 @@ class fwebh.serialize.SimpleJsonDeserializer implements IDeserializable:
         else do:
           
           if (prop:DataTypeName begins "Progress.Collections.List") then do:
-            message "eval:" prop:DataTypeName view-as alert-box.
+            deserializeGenericList(targetObj, prop, jsonIn:GetJsonArray(prop:Name)).
           end. 
           else if (prop:DataTypeName = "OpenEdge.Core.Collections.List" and targetObj:GetClass():IsA("fwebh.serialize.IListInfo")) then do:
             //add list entries to object
@@ -202,25 +202,68 @@ class fwebh.serialize.SimpleJsonDeserializer implements IDeserializable:
   end method.  // Deserialize
   
   method private void deserializeExtent(targetObj as Progress.Lang.Object, prop as Property, array as JsonArray):
-    
+
     var int i.
-    
+    var char []charExt.
+    var int []intExt.
+           
     if (valid-object(array)) then do:
+      
+      if prop:Extent = ? and array:Length > 0 then do:
+        case prop:DataType:
+          when DataType:Character then do:
+            extent(charExt) = array:Length.
+            prop:Set(targetObj, charExt).
+          end.
+          when DataType:Integer then do:
+            extent(intExt) = array:Length.
+            prop:Set(targetObj, intExt).
+          end.
+        end case.
+      end.
+        
       do i = 1 to array:Length:
         case prop:DataType:
-          when DataType:Integer then dynamic-property(targetObj, prop:Name, i) = array:GetInteger(i).
           when DataType:Character then dynamic-property(targetObj, prop:Name, i) = array:GetCharacter(i).
           when DataType:Decimal then dynamic-property(targetObj, prop:Name, i) = array:GetDecimal(i).
           when DataType:Date then dynamic-property(targetObj, prop:Name, i) = array:GetDate(i).
           when DataType:DateTime then dynamic-property(targetObj, prop:Name, i) = array:GetDatetime(i).
           when DataType:DateTimeTZ then dynamic-property(targetObj, prop:Name, i) = array:GetDatetimeTZ(i).
-          when DataType:Decimal then dynamic-property(targetObj, prop:Name, i) = array:GetDecimal(i).
+          when DataType:Integer then dynamic-property(targetObj, prop:Name, i) = array:GetInteger(i).
+          when DataType:Int64 then dynamic-property(targetObj, prop:Name, i) = array:GetInt64(i).
           when DataType:Logical then dynamic-property(targetObj, prop:Name, i) = array:GetLogical(i).
         end case.
       end. 
     end.
     
   end method.  // deserializeExtent
+  
+  method private void deserializeGenericList(targetObj as Progress.Lang.Object, prop as Property, array as JsonArray):
+    
+    var Progress.Lang.Object listObject, obj.
+    var char listType, typeT.  // the generic type (T) of List<T>
+    var int i, pos1, pos2.
+    
+    listType = prop:DataTypeName.
+    listObject = dynamic-new(listType)().
+    dynamic-property(targetObj, Prop:Name) = listObject.
+    
+    typeT = getTypeT(listType).
+    
+    do i = 1 to array:Length:
+      obj = dynamic-new(typeT)().
+      Deserialize(array:GetJsonObject(i), obj).
+      dynamic-invoke(listObject, "Add", obj).
+    end.
+    
+  end method.  // deserializeGenericList
+  
+  method private char getTypeT(listType as char):
+    var int pos1, pos2.
+    pos1 = index(listType, "<") + 1.
+    pos2 = length(listType) - pos1.
+    return substring(listType, pos1, pos2).
+  end method.
   
   method private List deserializeList(targetObject as IListInfo, prop as Property, array as JsonArray):
     
