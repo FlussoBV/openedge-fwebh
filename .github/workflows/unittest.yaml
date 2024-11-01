@@ -28,6 +28,6 @@ jobs:
         with:
           file: results.xml
           fail-on-error: true
-          errors-only: false
+          errors-only: true
           debug: false
    
