@@ -1,6 +1,7 @@
 
 .builder/
 .settings/
+as/
 bin/
 sandbox/
 workspace/
