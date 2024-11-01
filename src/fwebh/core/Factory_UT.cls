@@ -88,7 +88,7 @@ class fwebh.core.Factory_UT:
     
   end method.
 
-  @Test(expected="Progress.Lang.SysError").  // = standard error (14284)
+  @Test(expected="Progress.Lang.AppError").  // = standard error (14284)
   method public void class_not_found_returns_error():
     
     var Object inst1.
