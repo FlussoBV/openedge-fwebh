@@ -95,8 +95,8 @@ class fwebh.pas.service.ServiceFactory:
         factory:AddDefinition(names[i], svcDef:classname, svcDef:singleton).
         services:Add(new String(names[i]), svcDef).
       end.
-      else              
-        message substitute("service: &1, class not found: &2", names[i], svcDef:classname).
+      else    
+        undo, throw new NotFoundException(substitute("service: &1, class not found: &2", names[i], svcDef:classname)).          
       
     end.  // do i = ...
     
