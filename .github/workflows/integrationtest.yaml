@@ -58,6 +58,7 @@ jobs:
           STATUSCODE=$(curl --silent --output /dev/stderr --write-out "%{http_code}" http://localhost:8810/web/v1/test?error=${httperror})
           if test $STATUSCODE -ne ${httperror}; then
             echo "expected http error ${httperror}, got: $STATUSCODE"
+            docker logs $(cat container.id)
             exit 1
           fi
 
