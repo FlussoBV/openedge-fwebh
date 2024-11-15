@@ -88,6 +88,7 @@ class fwebh.pas.service.ServiceFactory:
     defs = JSON:ParseFileToObject("services.json").
       
     names = defs:GetNames().
+    message substitute("Loading &1 services", extent(names)).
     do i = 1 to extent(names):
 
       svcDef = cast(deserializer:Deserialize(defs:GetJsonObject(names[i]), "fwebh.pas.service.ServiceDescription"), ServiceDescription).
@@ -95,17 +96,21 @@ class fwebh.pas.service.ServiceFactory:
         factory:AddDefinition(names[i], svcDef:classname, svcDef:singleton).
         services:Add(new String(names[i]), svcDef).
       end.
-      else    
-        undo, throw new NotFoundException(substitute("service: &1, class not found: &2", names[i], svcDef:classname)).          
-      
+      else do:
+        message substitute("Service &1, class &2 not found", names[i], svcDef:classname).
+        undo, throw new NotFoundException(substitute("service: &1, class not found: &2", names[i], svcDef:classname)).  /* should throwing an error be parameterized? */
+      end.
+
     end.  // do i = ...
     
   end method.  // loadDefinitions
   
   method private logical classExists(FQClassName as char):
     
-    var char classFile = replace(FQClassName, ".", "/") + ".cls".
-    var logical found = (search(classFile) <> ?).
+    var char classSourceFile = replace(FQClassName, ".", "/") + ".cls".
+    var char classRcodeFile = replace(FQClassName, ".", "/") + ".r".
+
+    var logical found = (search(classSourceFile) <> ? or search(classRcodeFile) <> ?).
     
     return found.
     
