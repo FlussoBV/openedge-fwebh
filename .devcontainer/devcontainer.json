@@ -46,11 +46,11 @@
 		//"source=c:/docker/license/oe-12.8/progress.cfg,target=/usr/dlc/progress.cfg,type=bind,consistency=cached"
 	],
 	"containerEnv": {
-		"PROPATH": "./src"
+		"PROPATH": "./src,/usr/dlc/tty/netlib/OpenEdge.Net.pl",
 	},
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	"forwardPorts": [ 3099 ],
-
+  
 	"features": {
 		"ghcr.io/devcontainers/features/git:1": {}
 	},
