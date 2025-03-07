@@ -9,8 +9,9 @@ The language for coding is English (American). Domain specific terms can be in l
 - directory names: lowercase (so also for package of `using`)
 - `.p`, `.i` & `.w` filenames in lowercase
 - Class names: PascalCase
-- public, protected members: PascalCase
-- private members: camelCase
+- methods: PascalCase
+- public/protected properties: PascalCase
+- private variables/properties: camelCase
 - acronyms in PascalCase, with the exception of 2 letters ones. So for example: HttpVerbs and IOStream.
 
 ## abbreviations
@@ -27,6 +28,11 @@ Correct indentation is essential for readability. There's no excuse to mess this
 No prefixes for variables, parameters for either their datatype and they're being input/output. If one thinks prefixes are necessary they arguably make their (internal) procedure and/or methods too big. Exceptions for "technical datatypes":
 - `ptr` for memptr
 - `raw` for raw
+As an alternative for `prt` the postfix `Bytes` is sometime more explanatory. 
+For example:
+``` 
+copy-lob bodyString to bodyBytes.  // longchar --> memptr
+```
 
 ### buffers 
 Buffers are prefixed by `b-`. So:
@@ -34,7 +40,7 @@ Buffers are prefixed by `b-`. So:
 If more than one buffer is necessary then postfix them, `b-customer2`.
 
 ### temp-tables 
-Temp-tables are prefixed with `tt`
+Temp-tables are prefixed with `tt`. (not `tt-`)
 
 ### datasets 
 Datasets are prefixed with `ds`
@@ -152,7 +158,7 @@ An added bonus is that it's easier to search for the use of classes (without hav
 
 ### from
 Classes are searched for first in the `propath` and then in the assemblies (if applicable). Compiling sources can be a lot quicker if .NET using's are post fixed with `from assembly.`. This way the compiler can skip searching the propath.
-Tip: don't use .NET classes, it wil bite you somewhere along the line.
+Tip: avoid using .NET classes, although sometimes there are good use cases. 
 
 Remove `from propath`, it just clutters your source without benefits.
 
