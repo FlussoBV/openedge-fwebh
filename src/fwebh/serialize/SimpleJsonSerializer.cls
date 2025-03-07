@@ -54,7 +54,7 @@ class fwebh.serialize.SimpleJsonSerializer implements ISerializable:
     var Property prop.
     var JsonObject jsonOut, jsonSerialized.
     var JsonConstruct jc.
-    var Progress.Lang.Object valueObject.
+    var Progress.Lang.Object valueObject, obj.
     var int i.
    
 
@@ -88,7 +88,7 @@ class fwebh.serialize.SimpleJsonSerializer implements ISerializable:
       else do:
           
         if (prop:DataTypeName = "OpenEdge.Core.Collections.List") then do:
-          jsonSerialized:Add(prop:Name, serializeList(dynamic-property(objectToSerialize, prop:Name))).
+          jsonSerialized:Add(prop:Name, SerializeList(dynamic-property(objectToSerialize, prop:Name))).
         end.
         else if (prop:DataTypeName = "OpenEdge.Core.Collections.StringStringMap") then do:
           jsonSerialized:Add(prop:Name, serializeStringStringMap(dynamic-property(objectToSerialize, prop:Name))).
@@ -103,6 +103,13 @@ class fwebh.serialize.SimpleJsonSerializer implements ISerializable:
                 jsonSerialized:Add(prop:Name, dynamic-property(objectToSerialize, prop:Name)).
             end.
             
+            when (prop:DataTypeName begins "Progress.Collections.List") then do:
+              def var listObj as Progress.Collections.List<Progress.Lang.Object> no-undo.
+              obj = dynamic-property(objectToSerialize, prop:Name).
+              listObj = dynamic-cast(obj, "Progress.Collections.List<Progress.Lang.Object>").
+              jsonSerialized:Add(prop:Name, SerializeGenericList(listObj)).              
+            end.
+                        
             otherwise do:
               // nothing   
             end.
@@ -191,6 +198,20 @@ class fwebh.serialize.SimpleJsonSerializer implements ISerializable:
     
   end method.  // serializeDataObject
   
+  
+  method public JsonArray SerializeGenericList(dataArray as Progress.Collections.List<Progress.Lang.Object>):
+
+    var Progress.Collections.IIterator<Progress.Lang.Object> iter. 
+    var JsonArray array = new JsonArray().
+
+    iter = dataArray:GetIterator().    
+    do while iter:MoveNext():
+      array:Add(Serialize(iter:Current)).  
+    end.
+    
+    return array.
+    
+  end method.
   
   method public JsonArray SerializeList(dataArray as List):
     
