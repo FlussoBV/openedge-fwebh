@@ -20,7 +20,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        version: [ '12.8.3' ]
+        version: [ '12.8.6' ]
     uses: ./.github/workflows/build.yaml
     with:
       version: ${{ matrix.version }}
@@ -34,7 +34,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        version: [ '12.8.3' ]
+        version: [ '12.8.6' ]
     steps:
 
       - name: setup environment
