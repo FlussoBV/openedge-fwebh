@@ -13,11 +13,11 @@ block-level on error undo, throw.
 
 class fwebh.core.ProPathHelper: 
 
-  method public static void addFirstEntry(dir as char):
+  method public static void AddFirstEntry(dir as char):
     propath = dir + "," + propath.
   end method.
   
-  method public static void removeFirstEntry():
+  method public static void RemoveFirstEntry():
     propath = substring(propath, index(propath, ",") + 1).
   end method.
 

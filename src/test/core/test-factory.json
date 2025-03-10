@@ -1,5 +1,6 @@
 {
-  "single": {"class": "fwebh.core.Factory", "singleton": true},
+  "single": {"class": "fwebh.core.Factory", "singleton": true, "config": { "test": "ok"}},
   "johndoe": "Progress.Lang.Object",
-  "classnotfound": "i.am.not.found"
+  "classnotfound": "i.am.not.found",
+  "testconfig": "test.core.Configurable"
 }

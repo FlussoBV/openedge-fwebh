@@ -62,7 +62,7 @@ class fwebh.pas.data.EntityWriterFactory:
     
     names = defs:GetNames().
     do i = 1 to extent(names):
-      factory:AddDefinition(names[i], defs:GetCharacter(names[i]), true).
+      factory:AddDefinition(names[i], defs:GetCharacter(names[i]), true, ?).
     end.
 
   end method.  // loadDefinitions
