@@ -93,7 +93,7 @@ class fwebh.pas.service.ServiceFactory:
 
       svcDef = cast(deserializer:Deserialize(defs:GetJsonObject(names[i]), "fwebh.pas.service.ServiceDescription"), ServiceDescription).
       if classExists(svcDef:classname) then do:
-        factory:AddDefinition(names[i], svcDef:classname, svcDef:singleton).
+        factory:AddDefinition(names[i], svcDef:classname, svcDef:singleton, ?).
         services:Add(new String(names[i]), svcDef).
       end.
       else do:

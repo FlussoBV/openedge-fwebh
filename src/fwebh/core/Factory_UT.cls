@@ -14,6 +14,7 @@ using fwebh.core.Factory.
 using fwebh.core.IFactory.
 using OpenEdge.Core.Assert.
 using Progress.Lang.Object.
+using test.core.Configurable.
 
 
 class fwebh.core.Factory_UT: 
@@ -108,6 +109,18 @@ class fwebh.core.Factory_UT:
     
     inst1 = {getinstance.i notdefined as Progress.Lang.Object from factory}.
         
+  end method.
+  
+  @Test.
+  method public void configuration_passed_to_object():
+    
+    var Configurable cfg.
+    
+    factory:LoadDefinitions("test/core/test-factory.json").
+    cfg = {getinstance.i testconfig as Configurable from factory}.
+    
+    Assert:Equals("ok", cfg:Test).
+    
   end method.
   
 end class.

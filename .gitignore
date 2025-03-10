@@ -2,6 +2,7 @@
 .builder/
 .settings/
 as/
+db/
 bin/
 sandbox/
 workspace/
@@ -10,6 +11,5 @@ workspace/
 
 build.config
 progress.cfg
-results.xml
 
 results.xml

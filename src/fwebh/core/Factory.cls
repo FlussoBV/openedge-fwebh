@@ -25,6 +25,7 @@
 block-level on error undo, throw.
 
 using fwebh.core.Factory.
+using fwebh.core.IConfigurable.
 using fwebh.core.IFactory.
 using fwebh.lang.error.InvalidDataException.
 using fwebh.lang.error.NotFoundException.
@@ -71,7 +72,7 @@ class fwebh.core.Factory implements IFactory:
           
       jsonDefinitions = cast(parser:ParseFile(jsonDefinitionFile), JsonObject).
           
-      this-object:processDefinitions(jsonDefinitions).
+      this-object:ProcessDefinitions(jsonDefinitions).
       
       catch err1 as Progress.Lang.Error :
         undo, throw new InvalidDataException(err1:GetMessage(1)).  
@@ -82,7 +83,7 @@ class fwebh.core.Factory implements IFactory:
   end method.  // LoadDefinitions
   
   
-  method public void AddDefinition(identifier as char, classname as char, singleton as logical):
+  method public void AddDefinition(identifier as char, classname as char, singleton as logical, config as JsonObject):
     
     find ttdefintion where ttdefintion.indentifier = identifier no-error.
     if (not available(ttdefintion)) then do:
@@ -92,15 +93,17 @@ class fwebh.core.Factory implements IFactory:
     
     ttdefintion.classname = classname.
     ttdefintion.singleton = singleton.  
+    ttdefintion.config = config.
     
   end method.  // AddDefinitions
     
     
-  method private void processDefinitions(jsonDefintions as JsonObject):
+  method private void ProcessDefinitions(jsonDefintions as JsonObject):
       
     var int i, propertyType.
     var char[] names.
     var JsonObject defintionObject.
+    var JsonObject config.
     
     var char identifier, classname.
     var logical singleton.
@@ -121,7 +124,9 @@ class fwebh.core.Factory implements IFactory:
         when JsonDataTypeEnum:Object:GetValue() then do:
           defintionObject = jsonDefintions:GetJsonObject(identifier).
           classname = defintionObject:GetCharacter("class").
-          singleton = (defintionObject:Has("singleton") and defintionObject:GetLogical("singleton")).  
+          singleton = (defintionObject:Has("singleton") and defintionObject:GetLogical("singleton")).
+          if defintionObject:Has("config") then
+            config = defintionObject:GetJsonObject("config").
         end.
                 
         otherwise do:
@@ -130,11 +135,11 @@ class fwebh.core.Factory implements IFactory:
              
       end case.
       
-      AddDefinition(identifier, classname, singleton).
+      AddDefinition(identifier, classname, singleton, config).
         
     end.  // do i = 1 to extent(names)...
       
-  end method.  // processDefinitions
+  end method.  // ProcessDefinitions
     
   /**
   * @param instanceName   the logical name of the requested object
@@ -157,12 +162,16 @@ class fwebh.core.Factory implements IFactory:
       end.    
     end. 
     
-    if not valid-object(instanceRef) then
+    if not valid-object(instanceRef) then do:
       instanceRef = dynamic-new(ttdefintion.classname)() no-error.
-                  
-    if (not valid-object(instanceRef)) then 
-      undo, throw new AppError(substitute("class not found: &1", ttdefintion.classname), -1).
             
+      if not error-status:error and instanceRef:GetClass():IsA("fwebh.core.IConfigurable") and valid-object(ttdefintion.config) then
+        cast(instanceRef, IConfigurable):Configure(cast(ttdefintion.config, JsonObject)).
+    end.              
+    
+    if (not valid-object(instanceRef)) then      
+      undo, throw new AppError(substitute("class not found: &1", ttdefintion.classname), -1).
+    
     if ttdefintion.singleton and not singleInstanceFound then do:
       create ttinstance.
       assign
