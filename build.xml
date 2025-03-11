@@ -18,6 +18,7 @@
     <property name="builddir" location="${rootdir}/build" />
     <property name="artifactdir" location="${rootdir}/artifacts" />
     <property name="scriptsdir" location="${srcdir}/../scripts" />
+    <property name="tmpdir" location="${rootdir}/tmp" />
     <property name="DLC" value="${env.DLC}" />
 
     <echo message="rootdir:          ${rootdir}" />
@@ -34,6 +35,7 @@
     <mkdir dir="${builddir}" />  
     <delete dir="${artifactdir}" failonerror="false" />
     <mkdir dir="${artifactdir}" />  
+    <mkdir dir="${tmpdir}" />
     <property name="initialized" value="true" />    
   </target>
   
@@ -47,7 +49,7 @@
         graphicalMode="false" forceCompile="true" MD5="true" 
         keepXref="true" xrefDir="${builddir}/xref_out" 
         requireFullKeywords="true" requireFullNames="true" requireFieldQualifiers="true"
-        paramfile="${scriptsdir}/build-ci.compile.pf">
+        tempDir="${tmpdir}" paramfile="${scriptsdir}/build-ci.compile.pf">
       
       <propath>
         <pathelement path="${srcdir}" />
@@ -70,7 +72,7 @@
 
   <target name="unittest" if="executeUnittests">
 
-    <ABLUnit haltOnFailure="false" writeLog="true" dlchome="${DLC}">
+    <ABLUnit haltOnFailure="false" writeLog="true" dlchome="${DLC}" tempDir="${tmpdir}" destDir="${artifactdir}">
       <fileset dir="${srcdir}">
         <include name="**/*_UT.cls" />
       </fileset> 

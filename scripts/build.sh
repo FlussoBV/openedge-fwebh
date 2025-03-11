@@ -11,6 +11,6 @@ if [ "$EXECUTE_UNITTESTS" = "true" ]; then
   unittestExpr="-DexecuteUnittests=true"
 fi
 
-${ANT_HOME}/bin/ant -f ${scriptpath}/../build.xml -lib /usr/dlc/pct ${unittestExpr}
+${ANT_HOME}/bin/ant -f ${scriptpath}/../build.xml -Dtmpdir=/usr/wrk -lib /usr/dlc/pct ${unittestExpr} 
 
 $DLC/bin/prolib /app/artifacts/fwebh.pl -list > /app/artifacts/fwebh-rcode.list
