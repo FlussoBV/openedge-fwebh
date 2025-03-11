@@ -70,6 +70,8 @@ jobs:
       - name: Build
         run: | 
           mkdir artifacts
+          chmod ugo=rwx -R ${PWD}/artifacts
+          chmod u=rwx,og=rx -R ${PWD}/src   # don't write to src!
           ls -l ${PWD}/license/
           docker run -v ${PWD}/src:/app/src -v ${PWD}/artifacts:/app/artifacts -v ${PWD}/license/progress.cfg:/usr/dlc/progress.cfg --env ANT_HOME=/usr/dlc/ant --env EXECUTE_UNITTESTS=${EXECUTE_UNITTESTS} ${IMAGE_NAME} /app/src/fwebh/scripts/build.sh
           [[ -e src/fwebh/results.xml ]] && cp src/fwebh/results.xml ${PWD}/artifacts
