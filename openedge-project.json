@@ -13,5 +13,5 @@
     ],
     "dbConnections": [  ],
     "buildDirectory": "./bin",
-    "numThreads": 8
+    "numThreads": 1
 }

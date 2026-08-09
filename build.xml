@@ -14,10 +14,10 @@
 
   <target name="initvars">
     <property name="srcdir" location="./src" />
-    <property name="rootdir" location="./../.." />
+    <property name="rootdir" location="." />
     <property name="builddir" location="${rootdir}/build" />
     <property name="artifactdir" location="${rootdir}/artifacts" />
-    <property name="scriptsdir" location="${srcdir}/../scripts" />
+    <property name="scriptsdir" location="${rootdir}/scripts" />
     <property name="tmpdir" location="${rootdir}/tmp" />
     <property name="DLC" value="${env.DLC}" />
 

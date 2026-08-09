@@ -1,14 +1,24 @@
 
 .builder/
-.settings/
+.gradle/
+.settigs/
+
+artifacts/
 as/
-db/
 bin/
+config/
+build/
+db/
+log/
 sandbox/
+src/.settings/
+tmp/
 workspace/
 
 *.r
 
+.project
+.propath
 build.config
 progress.cfg
 

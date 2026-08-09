@@ -3,12 +3,13 @@ version: '3.8'
 services:
 
   devcontainer:
-    image: docker.io/devbfvio/openedge-devcontainer:12.8.1-rc1
+    image: docker.io/devbfvio/openedge-devcontainer:12.8
+    pull_policy: always
     volumes:
-      - ../..:/workspaces:cached
+      - ../:/workspaces/content:cached
       - ${LICENSE_FILE}:/usr/dlc/progress.cfg
-    ports:
-      - 3099:3099
+    # ports:
+    #   - 3099:3099
     command: sleep infinity
   
   plantuml:
@@ -22,10 +23,9 @@ services:
       - ${LICENSE_FILE}:/usr/dlc/progress.cfg
       - ../src:/app/src
     ports:
-      - ${PAS_PORT}:8810
+      - ${PAS_PORT:-8810}:8810
     environment:
       - PASWEBHANDLERS=/app/src/fwebh/pas/webhandlers/ROOT.handlers
     command:
       - /app/pas/start.sh
-
-    
+   
