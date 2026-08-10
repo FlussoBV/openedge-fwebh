@@ -5,7 +5,7 @@
 	// Docker compose
 	"dockerComposeFile": "docker-compose.yaml",
 	"service": "devcontainer",
-	"workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+	"workspaceFolder": "/workspaces/content",
 	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
 	//
 	// Docker only
@@ -36,8 +36,7 @@
 				"plantuml.render": "PlantUMLServer"
 			},
 			"extensions": [
-				"riversidesoftware.openedge-abl-lsp@prerelease",
-				"formulahendry.code-runner",
+				"riversidesoftware.openedge-abl-lsp@release",
 				"jebbs.plantuml"
 			]
 		}
@@ -66,7 +65,6 @@
 
 	// Use 'postCreateCommand' to run commands after the container is created.
 	"initializeCommand": "echo Initialize....",
-	"postCreateCommand": "proDebugEnable -enable-all",
 	"shutdownAction": "none"
 
 	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
