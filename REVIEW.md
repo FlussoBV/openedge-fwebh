@@ -10,6 +10,8 @@ The library is evaluated against its own stated goals in `README.md`: a standard
 
 > **Note on verification.** Findings are derived from reading the code, not from executing it. `F-01` in particular is a reasoned code-path analysis; the maintainers may wish to confirm it with a test before acting. Items that depend on design intent rather than fact are flagged **Needs confirmation**.
 
+> **Note on locations.** Line numbers are given as an aid only and will drift as the code changes. Every quoted snippet includes its enclosing `method` or `constructor` statement, which is the reliable way to locate it.
+
 ---
 
 ## Index
@@ -66,16 +68,39 @@ The library is evaluated against its own stated goals in `README.md`: a standard
 The `Accept` header is captured verbatim and used directly as a single MIME type:
 
 ```
-data:Accept = getContextValue(request, "HTTP_ACCEPT").     // RequestDataProcessor.cls:40
-...
-else if requestData:Accept > "" and requestData:Accept <> "*/*" then
-  contentType = requestData:Accept.                        // ResourceWebHandler.cls:275-276
+// RequestDataProcessor.cls
+method public IRequestData ProcessRequestInfo(request as IWebRequest):
+  ...
+  data:Accept = getContextValue(request, "HTTP_ACCEPT").
+  ...
+end method.  // ProcessRequest
+
+// ResourceWebHandler.cls
+method private char handleContentType(service as Progress.Lang.Object, requestData as IRequestData, responseData as IResponseData):
+  ...
+  else if requestData:Accept > "" and requestData:Accept <> "*/*" then
+    contentType = requestData:Accept.
+  ...
+end method.  // handleContentType
 ```
 
 There is no comma splitting, no `q=` weighting and no ordered preference walk. `EntityWriterFactory:GetEntityWriter` then does an exact lookup, falling back to a single `type/*` guess:
 
 ```
-tmp = entry(1, mimeType, "/") + "/*".                      // EntityWriterFactory.cls:37
+// EntityWriterFactory.cls
+method public IEntityWriter GetEntityWriter(mimeType as character):
+  ...
+  if (factory:Has(mimeType)) then
+    entityWriter = cast(factory:GetInstance(mimeType), IEntityWriter).
+  else do:
+    tmp = entry(1, mimeType, "/") + "/*".
+    entityWriter = cast(factory:GetInstance(tmp), IEntityWriter).
+  end.
+  ...
+  catch err as Progress.Lang.Error :
+    undo, throw new NotAcceptableException(mimeType).
+  end catch.
+end method.  // GetEntityWriter
 ```
 
 Traced with a browser's `Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8`:
@@ -127,28 +152,36 @@ Any consumer calling the API from a browser, or from an HTTP client that sends a
 `classname`, `singleton` and `config` are declared once, outside the loop, and are not reset per iteration:
 
 ```
-var JsonObject defintionObject.
-var JsonObject config.
-var char identifier, classname.
-var logical singleton.
+method private void ProcessDefinitions(jsonDefintions as JsonObject):
 
-names = jsonDefintions:GetNames().
-do i = 1 to extent(names):
-  identifier = names[i].
-  case (propertyType):
-    when ...String then do: classname = ...  singleton = false. end.
-    when ...Object then do:
-      classname = defintionObject:GetCharacter("class").
-      singleton = ...
-      if defintionObject:Has("config") then
-        config = defintionObject:GetJsonObject("config").   // never cleared
-    end.
-    otherwise do:
-      // nothing                                             // classname keeps previous value
-    end.
-  end case.
-  AddDefinition(identifier, classname, singleton, config).
-end.
+  var int i, propertyType.
+  var char[] names.
+  var JsonObject defintionObject.
+  var JsonObject config.
+
+  var char identifier, classname.
+  var logical singleton.
+
+  names = jsonDefintions:GetNames().
+  do i = 1 to extent(names):
+    identifier = names[i].
+    propertyType = jsonDefintions:GetType(identifier).
+    case (propertyType):
+      when ...String then do: classname = ...  singleton = false. end.
+      when ...Object then do:
+        classname = defintionObject:GetCharacter("class").
+        singleton = ...
+        if defintionObject:Has("config") then
+          config = defintionObject:GetJsonObject("config").   // never cleared
+      end.
+      otherwise do:
+        // nothing                                             // classname keeps previous value
+      end.
+    end case.
+    AddDefinition(identifier, classname, singleton, config).
+  end.
+
+end method.  // ProcessDefinitions
 ```
 
 Two concrete bugs:
@@ -187,14 +220,21 @@ Both failures are silent and order-dependent. They produce misconfiguration that
 Four sites in library code report errors with `view-as alert-box`:
 
 ```
-catch err1 as Progress.Lang.Error :
-  message substitute("error serializing '&1': &2", prop:Name, err1:GetMessage(1)) view-as alert-box.
-end catch.
+// SimpleJsonSerializer.cls
+method public JsonObject Serialize(objectToSerialize as Progress.Lang.Object, includeClassName as logical):
+  ...
+    catch err1 as Progress.Lang.Error :
+      message substitute("error serializing '&1': &2", prop:Name, err1:GetMessage(1)) view-as alert-box.
+    end catch.
+  ...
+end method.  // Serialize
 ```
+
+The other three are in `SimpleJsonDeserializer.cls`, in `Deserialize(jsonIn as JsonObject, className as character)`, `Deserialize(jsonIn as JsonObject, targetObj as Progress.Lang.Object)` and `deserializeList(targetObject as IListInfo, prop as Property, array as JsonArray)`.
 
 In a PAS agent this is at best log noise and at worst a blocked session. Independently of the alert-box, **all four sites swallow the error and continue the loop**, so a partially serialized or partially deserialized object is returned to the caller with no indication that data was lost.
 
-`SimpleJsonDeserializer.cls:133-136` compounds this by returning `?` on invalid input rather than throwing, and `SimpleJsonDeserializer.cls:153-155` uses `no-error` twice with no failure path, silently leaving the property unset if both attempts fail.
+`Deserialize(jsonIn as JsonObject, targetObj as Progress.Lang.Object)` compounds this: it returns `?` on invalid input rather than throwing (`SimpleJsonDeserializer.cls:133-136`), and later uses `no-error` twice with no failure path, silently leaving the property unset if both attempts fail (`:153-155`).
 
 **Why it matters**
 
@@ -204,8 +244,8 @@ Silent partial data loss in a serialization layer is the worst class of bug for 
 
 - Remove every `view-as alert-box` from `src/fwebh/**`.
 - Decide an explicit policy per site: either propagate (`undo, throw`) or log-and-continue via the injected logger from **F-14**. For a serializer, propagate is almost certainly correct.
-- Replace the `? `-return in `SimpleJsonDeserializer.cls:133-136` with a thrown `InvalidDataException`.
-- Give the double-`no-error` block at `:153-155` a real failure branch.
+- Replace the `?`-return at the top of `Deserialize(jsonIn, targetObj)` with a thrown `InvalidDataException`.
+- Give the double-`no-error` block in the same method a real failure branch.
 
 **Acceptance criteria**
 - [ ] `grep -r "view-as alert-box" src/fwebh` returns nothing.
@@ -261,10 +301,16 @@ Separately, decide whether these messages should reach the HTTP client at all �
 **Problem**
 
 ```
-if not err:GetClass():TypeName begins "fwebh.lang.error." then
-  errorMessage = err:GetClass():TypeName + ": " + err:GetMessage(1).
-...
-response:Entity = new String(errorMessage).
+method private IHttpResponse handleErrors(err as Progress.Lang.Error):
+  ...
+  if not err:GetClass():TypeName begins "fwebh.lang.error." then
+    errorMessage = err:GetClass():TypeName + ": " + err:GetMessage(1).
+
+  response = new WebResponse().
+  response:Entity = new String(errorMessage).
+  response:StatusCode = errorCode.
+  ...
+end method.  // handleErrors
 ```
 
 Any error that is not one of the library's own types is returned to the client with its ABL class name and raw runtime message — which routinely includes table names, file paths, propath fragments and `dynamic-new` failures.
@@ -596,12 +642,16 @@ There are 10 `_UT` classes against roughly 50 source classes. The entire HTTP bo
 `SimpleJsonDeserializer` matches JSON keys to ABL property names case-sensitively, with an `lc()` fallback applied only to primitive types:
 
 ```
-dynamic-property(targetObj, prop:Name) = dynamic-invoke(jsonIn, getter, prop:Name) no-error.
-if (error-status:error) then
-  dynamic-property(targetObj, prop:Name) = dynamic-invoke(jsonIn, getter, lc(prop:Name)) no-error.
+method public Progress.Lang.Object Deserialize(jsonIn as JsonObject, targetObj as Progress.Lang.Object):
+  ...
+  dynamic-property(targetObj, prop:Name) = dynamic-invoke(jsonIn, getter, prop:Name) no-error.
+  if (error-status:error) then
+    dynamic-property(targetObj, prop:Name) = dynamic-invoke(jsonIn, getter, lc(prop:Name)) no-error.
+  ...
+end method.  // Deserialize
 ```
 
-Nested object deserialization (`:183`) has no fallback at all.
+Nested object deserialization, further down the same method (`:183`), has no fallback at all.
 
 The consequence is visible in the library's own public API: `ServiceDescription` declares `classname` and `singleton` in lowercase, violating the project's own standard —
 
@@ -641,10 +691,16 @@ An implementation detail of the serializer is dictating the naming of the public
 `message` is the logging mechanism throughout. `ResourceWebHandler` writes a fixed banner on every 500:
 
 ```
-message "******************** start 500 error ********************".
-message err:GetMessage(1).
-message replace(err:CallStack, ",", "~n  ").
-message "******************** end 500 error ********************".
+method private IHttpResponse handleErrors(err as Progress.Lang.Error):
+  ...
+  if errorCode = 500 then do:
+    message "******************** start 500 error ********************".
+    message err:GetMessage(1).
+    message replace(err:CallStack, ",", "~n  ").
+    message "******************** end 500 error ********************".
+  end.
+  ...
+end method.  // handleErrors
 ```
 
 `ServiceFactory` logs `"Loading &1 services"` unconditionally on every construction — once per session in production, once per request under `srvrDebug=1` (see **F-06**).
@@ -675,7 +731,7 @@ This is an agnosticism failure. Middleware must not monopolise the consumer's lo
 
 **Problem**
 
-`jsonArrayToTempTable` calls `bufferHandle:buffer-create()` per JSON record with no preceding `empty temp-table`. Deserializing twice into the same target accumulates rows rather than replacing them.
+`jsonArrayToTempTable(array as JsonArray, bufferHandle as handle)` calls `bufferHandle:buffer-create()` per JSON record with no preceding `empty temp-table`. Deserializing twice into the same target accumulates rows rather than replacing them.
 
 **Why it matters**
 
@@ -942,13 +998,18 @@ Extract a single private dispatch method taking the verb, resolving the service 
 The mapping dispatches on exact `TypeName` string equality:
 
 ```
-case err:GetClass():TypeName:
-  when "fwebh.lang.error.BadRequestException" then errorCode = 400.
+method private int getHttpErrorCode(err as Progress.Lang.Error):
   ...
-  otherwise errorCode = 500.
+  case err:GetClass():TypeName:
+    when "fwebh.lang.error.BadRequestException" then errorCode = 400.
+    ...
+    otherwise errorCode = 500.
+  end case.
+  ...
+end method.  // getHttpErrorCode
 ```
 
-A consumer subclassing `fwebh.lang.error.NotFoundException` to add domain context gets 500 instead of 404. The same string-prefix approach at `:220` also determines whether the message is exposed.
+A consumer subclassing `fwebh.lang.error.NotFoundException` to add domain context gets 500 instead of 404. The same string-prefix approach in `handleErrors` also determines whether the message is exposed.
 
 **Why it matters**
 
@@ -975,8 +1036,12 @@ Use `err:GetClass():IsA("fwebh.lang.error.NotFoundException")` in a most-specifi
 **Problem**
 
 ```
-if (request:Accept = "..." ) then
-  response:ContentType = "application/json".
+method public IResponseData GetData(request as IRequestData):
+  ...
+  if (request:Accept = "..." ) then
+    response:ContentType = "application/json".
+  ...
+end method.  // GetData
 ```
 
 A literal `"..."` placeholder in a service that ships in the release artifact (see **F-09**) and is registered in the default `services.json`.
