@@ -110,7 +110,10 @@ class fwebh.core.Factory implements IFactory:
         
     names = jsonDefintions:GetNames().
     do i = 1 to extent(names):
-            
+      
+      classname = "". 
+      singleton = false.
+      config = ?.      
       identifier = names[i].
       propertyType = jsonDefintions:GetType(identifier).
             
@@ -130,7 +133,7 @@ class fwebh.core.Factory implements IFactory:
         end.
                 
         otherwise do:
-          // nothing 
+          undo, throw new AppError(substitute("invalid factory definition '&1': expected a string or object, got JSON type &2", identifier, propertyType), -1).
         end.
              
       end case.
